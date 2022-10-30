@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "Node",
+    "outDir": "dist-electron",
+    "rootDir": "./src-electron",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src-electron/**/*"]
+}
