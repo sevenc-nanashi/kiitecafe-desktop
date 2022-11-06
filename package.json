@@ -2,7 +2,7 @@
   "name": "kiitecafe-desktop",
   "private": true,
   "version": "0.0.0",
-  "main": "dist-electron/main.js",
+  "main": "dist/main.js",
   "enable-pre-post-scripts": true,
   "scripts": {
     "predev": "rimraf dist/* dist-electron/*",

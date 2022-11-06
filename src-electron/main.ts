@@ -12,8 +12,10 @@ const createWindow = () => {
     },
   });
 
+  const params = new URLSearchParams();
+  params.append("dirname", __dirname);
   if (isDevelopment) {
-    win.loadURL("http://localhost:5173");
+    win.loadURL("http://localhost:5173?" + params.toString());
     win.webContents.openDevTools();
   }
 };

@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import { watch, ref } from "vue";
-import inject from "./inject?url";
+import injectScript from "./inject?url";
 
 const webviewRef = ref<WebviewTag>();
 
-const injectScript = fetch(inject).then((res) => res.text());
+const params = new URLSearchParams(location.search);
+const dirname = params.get("dirname");
+const preloadPath = dirname + "/injectPreload.js";
+const preloadUrl = new URL(preloadPath, "file://").toString();
 
 watch(webviewRef, async (webview) => {
-  const script = await injectScript;
   if (webview) {
     if (import.meta.env.DEV) {
-      webview.openDevTools();
+      webview.addEventListener("dom-ready", (e) => {
+        webview.openDevTools();
+      });
     }
+    webview.addEventListener("ipc-message", (e) => {
+      console.log(e.channel, e.args);
+    });
     webview.addEventListener("dom-ready", () => {
-      webview.executeJavaScript(script);
+      webview.send("sendDocument")
     });
   }
 });
@@ -21,7 +28,11 @@ watch(webviewRef, async (webview) => {
 
 <template>
   <div>
-    <webview src="https://cafe.kiite.jp/" ref="webviewRef" />
+    <webview
+      src="https://cafe.kiite.jp/"
+      ref="webviewRef"
+      :preload="preloadUrl"
+    />
   </div>
 </template>
 

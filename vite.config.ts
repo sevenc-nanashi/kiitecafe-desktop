@@ -4,16 +4,29 @@ import electron from "vite-plugin-electron";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    headers: {
+      "Access-Control-Allow-Origin": "cafe.kiite.jp",
+    },
+  },
   plugins: [
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: tag => tag.includes('-') || tag === 'webview'
-        }
-      }
+          isCustomElement: (tag) => tag.includes("-") || tag === "webview",
+        },
+      },
     }),
     electron({
-      entry: "./src-electron/main.ts",
+      entry: {
+        main: "./src-electron/main.ts",
+        injectPreload: "./src/inject/preload.ts",
+      },
+      vite: {
+        build: {
+          outDir: "dist"
+        }
+      }
     }),
   ],
 });
