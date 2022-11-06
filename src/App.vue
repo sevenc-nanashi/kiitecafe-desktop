@@ -1,31 +1,33 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue'
+import { watch, ref } from "vue";
+import inject from "./inject?url";
+
+const webviewRef = ref<WebviewTag>();
+
+const injectScript = fetch(inject).then((res) => res.text());
+
+watch(webviewRef, async (webview) => {
+  const script = await injectScript;
+  if (webview) {
+    if (import.meta.env.DEV) {
+      webview.openDevTools();
+    }
+    webview.addEventListener("dom-ready", () => {
+      webview.executeJavaScript(script);
+    });
+  }
+});
 </script>
 
 <template>
   <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+    <webview src="https://cafe.kiite.jp/" ref="webviewRef" />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+webview {
+  position: absolute;
+  inset: 0;
 }
 </style>

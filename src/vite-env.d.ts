@@ -1,4 +1,6 @@
 /// <reference types="vite/client" />
+/// <reference types="electron" />
+type WebviewTag = Electron.WebviewTag
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
