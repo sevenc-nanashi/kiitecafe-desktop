@@ -1,3 +1,7 @@
 #top_menu {
   display: none;
 }
+
+#overlayBanner {
+  display: none;
+}
