@@ -12,7 +12,7 @@ watch(webviewRef, async (webview) => {
   if (webview) {
     if (import.meta.env.DEV) {
       webview.addEventListener("dom-ready", (e) => {
-        webview.openDevTools();
+        /* webview.openDevTools(); */
       });
     }
     webview.addEventListener("ipc-message", (e) => {

@@ -8,7 +8,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: "./index.html",
-        miniplayer: "./miniplayer.html",
       },
     },
   },

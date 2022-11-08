@@ -29,6 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(playInterval);
       }
     }, 1000);
+    setInterval(() => {
+      if (!document.querySelector("#cafe_player.loading")) {
+        return;
+      }
+      const videos = document.querySelector(".videos") as HTMLDivElement;
+      if (
+        videos.querySelector(".fade") &&
+        videos.querySelector("*:not(.fade)")
+      ) {
+        const front = videos.querySelector(".front") as HTMLDivElement;
+        front.click();
+        front.click();
+      }
+    }, 1000);
   }
 
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {

@@ -5,21 +5,41 @@ window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
   info.value = npinfo;
 });
 
+const mainEl = ref<HTMLDivElement>();
 const titleEl = ref<HTMLDivElement>();
 const titleContentEl = ref<HTMLDivElement>();
+const titleToAnimation = new Map<string, Animation>();
+
+const isHovering = ref(false);
+
+document.documentElement.addEventListener("mouseleave", (e) => {
+  isHovering.value = false;
+});
+
+watch(isHovering, (value) => {
+  window.electron.send("set-ignore-mouse-events", !value);
+});
 
 watch([titleEl, titleContentEl], ([el, conEl]) => {
-  console.log(el, conEl);
   if (!el || !conEl) {
     return;
   }
-  conEl.animate(
-    [
-      { left: "0", offset: 0.2 },
-      { left: (el.scrollWidth - el.clientWidth) * -1 + "px", offset: 0.8 },
-    ],
-    { duration: 10000, iterations: Infinity }
+  titleToAnimation.set(
+    info.value?.id ?? "",
+    conEl.animate(
+      [
+        { left: "0", offset: 0.2 },
+        { left: (el.scrollWidth - el.clientWidth) * -1 + "px", offset: 0.8 },
+      ],
+      { duration: 10000, iterations: Infinity }
+    )
   );
+});
+watch(info, (newInfo, oldInfo) => {
+  if (newInfo?.id === oldInfo?.id) {
+    return;
+  }
+  titleToAnimation.get(oldInfo?.id || "")?.cancel();
 });
 </script>
 
@@ -36,9 +56,13 @@ export default defineComponent({
   <div
     id="main"
     v-if="info"
+    ref="mainEl"
     :style="{
       backgroundImage: 'url(' + info.thumbnail + ')',
     }"
+    :class="{ hover: isHovering }"
+    v-on:mouseenter="() => (isHovering = true)"
+    v-on:mouseleave="() => (isHovering = false)"
   >
     <div id="bg-overlay">
       <div
@@ -64,17 +88,35 @@ export default defineComponent({
           }"
         />
       </div>
+      <div class="control-button"></div>
+      <div class="control-button"></div>
+      <div class="control-button"></div>
     </div>
   </div>
 </template>
+
+<style>
+body {
+  overflow: hidden;
+}
+</style>
 
 <style scoped>
 #main {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
+  background-size: 570px;
+  background-position: left;
   background-repeat: no-repeat;
+  margin-left: 5px;
+  transform: translateX(236px);
+  margin-top: 5px;
+  transition: transform 0.2s, background-size 0.2s;
+  overflow: hidden;
+}
+#main.hover {
+  transform: translateX(0);
+  background-size: calc(100% + 6px);
 }
 #bg-overlay {
   position: absolute;
@@ -85,7 +127,6 @@ export default defineComponent({
   display: flex;
   flex-direction: row;
   align-items: center;
-  position: absolute;
   inset: 0;
 }
 #thumbnail {
@@ -99,6 +140,7 @@ export default defineComponent({
 #info {
   position: relative;
   height: 100%;
+  width: 100%;
   max-width: calc(100% - 100vh);
   flex-grow: 1;
   background: rgba(0, 0, 0, 0.5);
@@ -108,6 +150,18 @@ export default defineComponent({
   text-align: left;
   color: white;
   margin: 10px;
+  margin-right: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.control-button {
+  width: 110px;
+  height: calc(100vh - 20px);
+  background: rgba(0, 0, 0, 0.5);
+  margin: 10px 0;
+  margin-right: 5px;
+  margin-bottom: 15px;
   padding: 10px;
   box-sizing: border-box;
 }
