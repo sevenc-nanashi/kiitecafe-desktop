@@ -12,4 +12,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const styleElement = document.createElement("style");
   styleElement.textContent = style.toString();
   document.head.appendChild(styleElement);
+
+  const playButton = document.querySelector(
+    "#cafe_player .front"
+  ) as HTMLDivElement;
+  console.log(playButton);
+  if (playButton) {
+    let playInterval = setInterval(() => {
+      playButton.click();
+      if (document.querySelector("#cafe_player.loading")) {
+        clearInterval(playInterval);
+      }
+    }, 1000);
+  }
 });
