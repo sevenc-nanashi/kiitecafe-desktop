@@ -20,7 +20,7 @@ export default defineConfig({
     electron({
       entry: {
         main: "./src-electron/main.ts",
-        injectPreload: "./src/inject/preload.ts",
+        injectPreload: "./src/inject",
       },
       vite: {
         build: {
