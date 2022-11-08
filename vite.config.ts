@@ -4,9 +4,17 @@ import electron from "vite-plugin-electron";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  server: {
-    headers: {
-      "Access-Control-Allow-Origin": "cafe.kiite.jp",
+  build: {
+    rollupOptions: {
+      input: {
+        index: "./index.html",
+        miniplayer: "./miniplayer.html",
+      },
+    },
+  },
+  resolve: {
+    alias: {
+      vue: "vue/dist/vue.esm-bundler.js",
     },
   },
   plugins: [
@@ -21,12 +29,13 @@ export default defineConfig({
       entry: {
         main: "./src-electron/main.ts",
         injectPreload: "./src/inject",
+        miniPlayerPreload: "./src/miniplayer/preload.ts",
       },
       vite: {
         build: {
-          outDir: "dist"
-        }
-      }
+          outDir: "dist",
+        },
+      },
     }),
   ],
 });

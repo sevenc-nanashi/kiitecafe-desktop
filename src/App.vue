@@ -25,6 +25,17 @@ watch(webviewRef, async (webview) => {
 });
 </script>
 
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "App",
+  unmounted() {
+    webviewRef.value?.closeDevTools();
+  },
+});
+</script>
+
 <template>
   <div>
     <webview
