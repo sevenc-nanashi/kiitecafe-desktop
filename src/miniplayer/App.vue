@@ -21,12 +21,12 @@ watch(isHovering, (value) => {
   window.electron.send("set-ignore-mouse-events", !value);
 });
 
-watch([titleEl, titleContentEl], ([el, conEl]) => {
-  if (!el || !conEl) {
+watch([info, titleEl, titleContentEl], ([inf, el, conEl]) => {
+  if (!inf || !el || !conEl) {
     return;
   }
   titleToAnimation.set(
-    info.value?.id ?? "",
+    inf.id ?? "",
     conEl.animate(
       [
         { left: "0", offset: 0.2 },
@@ -57,6 +57,16 @@ const toggleFavorite = () => {
 
 const openNico = () => {
   window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`);
+};
+
+const tweet = () => {
+  if (!info.value) return;
+  const text =
+    `♪ ${info.value.title} #${info.value.id} #Kiite\n` +
+    `Kiite Cafe DesktopをつかってKiite Cafeできいてます https://github.com/sevenc-nanashi/kiitecafe-desktop https://cafe.kiite.jp https://nico.ms/${info.value.id}`;
+  window.open(
+    `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+  );
 };
 </script>
 
@@ -124,7 +134,11 @@ export default defineComponent({
         ><br />
         <span>{{ info.volume }}</span>
       </div>
-      <div class="control-button"></div>
+      <div class="control-button" @click="tweet">
+        <i class="fa-brands fa-square-twitter"></i>
+        <br />
+        <span id="tweet-text">ツイート</span>
+      </div>
     </div>
   </div>
 </template>
@@ -188,6 +202,10 @@ body {
   padding: 10px;
   box-sizing: border-box;
   overflow: hidden;
+  cursor: pointer;
+}
+#info:hover {
+  background: rgba(0, 0, 0, 1);
 }
 .control-button {
   width: 110px;
@@ -214,6 +232,9 @@ body {
 }
 .fa-solid.fa-heart {
   color: #ff33aa;
+}
+#tweet-text {
+  font-size: 12px;
 }
 #title {
   font-size: 20px;

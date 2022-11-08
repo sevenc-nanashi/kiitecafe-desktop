@@ -78,9 +78,7 @@ electron.ipcMain.addListener("now-playing-info", (_event, info) => {
 });
 
 electron.ipcMain.addListener("setup-webview", (_event, id) => {
-  console.log("setup-webview", id);
   const webview = electron.webContents.fromId(id);
-  console.log("setup-webview", id, webview);
   if (!webview) {
     return;
   }
