@@ -41,10 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }, 1000);
     setInterval(() => {
-      if (!document.querySelector("#cafe_player.loading")) {
+      if (document.querySelector("#cafe_player.loading") || document.querySelector("#cafe_player .videos iframe")) {
         return;
       }
-      const videos = document.querySelector(".videos") as HTMLDivElement;
       if (
         parseFloat(
           (
@@ -56,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
           100 >
         0.01
       ) {
-        const front = videos.querySelector(".front") as HTMLDivElement;
+        const front = document.querySelector(".front") as HTMLDivElement;
         front.click();
         front.click();
       }

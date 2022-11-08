@@ -5,3 +5,7 @@
 #overlayBanner {
   display: none;
 }
+
+#cafe_menu > .sub_menu.border_right {
+  display: none;
+}

@@ -1,14 +1,30 @@
 import * as electron from "electron";
+import Store from "electron-store";
 import path from "path";
 
 const isDevelopment = import.meta.env.DEV;
 
+const store = new Store();
 let win: electron.BrowserWindow | null = null;
 let miniPlayerWin: electron.BrowserWindow | null = null;
+let tray: electron.Tray | null = null;
+const createTray = () => {
+  if (tray) {
+    return;
+  }
+  tray = new electron.Tray(path.join(__dirname, "../public/icon.png"));
+  tray.on("click", () => {
+    if (miniPlayerWin) {
+      miniPlayerWin.show();
+    }
+  });
+};
+
 const createMainWindow = () => {
   win = new electron.BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
+    icon: path.join(__dirname, "../public/icon.png"),
     webPreferences: {
       webviewTag: true,
       preload: `${__dirname}/preload.js`,
@@ -75,6 +91,7 @@ const createMiniPlayerWindow = () => {
 
 electron.ipcMain.addListener("now-playing-info", (_event, info) => {
   miniPlayerWin?.webContents.send("now-playing-info", info);
+  tray?.setToolTip(`${info.title} - ${info.artist} : Kiite Cafe Desktop`);
 });
 
 electron.ipcMain.addListener("setup-webview", (_event, id) => {
@@ -90,6 +107,19 @@ electron.ipcMain.addListener("setup-webview", (_event, id) => {
     return { action: "deny" };
   });
 });
+electron.ipcMain.addListener("minimize", () => {
+  miniPlayerWin?.hide();
+  if (store.get("minimize-info-displayed", false)) {
+    return;
+  }
+  const notification = new electron.Notification({
+    title: "トレーに最小化されました",
+    body: "タスクトレイのアイコンをクリックすると再表示できます。",
+    icon: path.join(__dirname, "../public/icon.png"),
+  });
+  notification.show();
+  store.set("minimize-info-displayed", true);
+});
 ["set-muted", "set-favorite"].forEach((channel) => {
   electron.ipcMain.addListener(channel, (_event, value) => {
     win?.webContents.send(channel, value);
@@ -102,6 +132,7 @@ electron.app.on("ready", () => {
     const url = new URL(request.url);
     callback({ path: path.normalize(`${__dirname}/${url.pathname}`) });
   });
+  createTray();
   createMainWindow();
   createMiniPlayerWindow();
 });

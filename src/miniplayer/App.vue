@@ -59,6 +59,18 @@ const openNico = () => {
   window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`);
 };
 
+const windowType = ref<"normal" | "smaller">("smaller");
+
+const toNormalWindow = () => {
+  windowType.value = "normal";
+};
+const toSmallerWindow = () => {
+  windowType.value = "smaller";
+};
+const minimizeWindow = () => {
+  window.electron.send("minimize", []);
+};
+
 const tweet = () => {
   if (!info.value) return;
   const text =
@@ -87,7 +99,7 @@ export default defineComponent({
     :style="{
       backgroundImage: 'url(' + info.thumbnail + ')',
     }"
-    :class="{ hover: isHovering }"
+    :class="{ hover: isHovering, smaller: windowType === 'smaller' }"
     v-on:mouseenter="() => (isHovering = true)"
     v-on:mouseleave="() => (isHovering = false)"
   >
@@ -101,7 +113,12 @@ export default defineComponent({
       <div id="info" @click="openNico">
         <div id="info-top">
           <div id="title" ref="titleEl">
-            <div ref="titleContentEl">{{ info.title }}</div>
+            <div ref="titleContentEl">
+              {{ info.title
+              }}<span v-if="windowType === 'smaller'" id="smaller-artist">{{
+                info.artist
+              }}</span>
+            </div>
           </div>
         </div>
         <div id="info-bottom">
@@ -122,22 +139,36 @@ export default defineComponent({
             'fa-solid': info.favorited,
             'fa-regular': !info.favorited,
           }"
-        ></i
-        ><br />
+        ></i>
+        <br v-if="windowType !== 'smaller'" />
         <span>{{ info.favoriteCount }}</span>
       </div>
       <div class="control-button" @click="toggleMute">
         <i
           class="fa-solid"
           :class="{ 'fa-volume-mute': isMuted, 'fa-volume-up': !isMuted }"
-        ></i
-        ><br />
+        ></i>
+
+        <br v-if="windowType !== 'smaller'" />
         <span>{{ info.volume }}</span>
       </div>
       <div class="control-button" @click="tweet">
         <i class="fa-brands fa-square-twitter"></i>
-        <br />
-        <span id="tweet-text">ツイート</span>
+        <br v-if="windowType !== 'smaller'" />
+        <span id="tweet-text" v-if="windowType !== 'smaller'">ツイート</span>
+      </div>
+      <div id="window-control">
+        <i class="fa-regular fa-square-minus" @click="minimizeWindow"></i>
+        <i
+          class="fa-solid fa-down-left-and-up-right-to-center"
+          v-if="windowType === 'normal'"
+          @click="toSmallerWindow"
+        ></i>
+        <i
+          class="fa-solid fa-up-right-and-down-left-from-center"
+          v-if="windowType === 'smaller'"
+          @click="toNormalWindow"
+        ></i>
       </div>
     </div>
   </div>
@@ -149,7 +180,7 @@ body {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 #main {
   position: absolute;
   inset: 0;
@@ -157,14 +188,20 @@ body {
   background-position: left;
   background-repeat: no-repeat;
   margin-left: 5px;
-  transform: translateX(236px);
+  transform: translateX(262px);
   margin-top: 5px;
   transition: transform 0.2s, background-size 0.2s;
   overflow: hidden;
-}
-#main.hover {
-  transform: translateX(0);
-  background-size: calc(100% + 6px);
+  &.smaller {
+    margin-top: 55px;
+    height: 40px;
+    margin-left: 100px;
+    transform: translateX(265px);
+  }
+  &.hover {
+    transform: translateX(0);
+    background-size: calc(100% + 6px);
+  }
 }
 #bg-overlay {
   position: absolute;
@@ -203,9 +240,10 @@ body {
   box-sizing: border-box;
   overflow: hidden;
   cursor: pointer;
-}
-#info:hover {
-  background: rgba(0, 0, 0, 1);
+
+  &:hover {
+    background: rgba(0, 0, 0, 1);
+  }
 }
 .control-button {
   width: 110px;
@@ -219,16 +257,16 @@ body {
   text-align: center;
   color: #bbb;
   cursor: pointer;
-}
-.control-button i {
-  font-size: 35px;
-}
-.control-button span {
-  font-size: 15px;
-}
-.control-button:hover {
-  background: rgba(0, 0, 0, 1);
-  color: white;
+  &:hover {
+    background: rgba(0, 0, 0, 1);
+    color: white;
+  }
+  i {
+    font-size: 35px;
+  }
+  span {
+    font-size: 15px;
+  }
 }
 .fa-solid.fa-heart {
   color: #ff33aa;
@@ -251,10 +289,6 @@ body {
   position: relative;
   margin-top: 4px;
 }
-#info-bottom {
-  display: flex;
-  margin-top: auto;
-}
 #artist {
   font-size: 15px;
   color: #bbb;
@@ -270,5 +304,61 @@ body {
   right: 0;
   height: 2px;
   background: #fff;
+}
+#window-control {
+  display: flex;
+  height: calc(100% - 2px);
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  margin-bottom: 2px;
+  color: #bbb;
+  i {
+    font-size: 24px;
+    display: block;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    &:hover {
+      background: rgba(0, 0, 0, 1);
+      color: white;
+    }
+  }
+}
+.smaller {
+  .control-button {
+    height: calc(100% - 1px);
+    padding: 0;
+    padding-top: 5px;
+  }
+  .control-button i {
+    font-size: 20px;
+    margin-right: 4px;
+  }
+  #title {
+    font-size: 15px;
+  }
+
+  #smaller-artist {
+    font-size: 12px;
+    margin-left: 12px;
+    color: #bbb;
+  }
+  #info-bottom {
+    display: none;
+  }
+
+  #window-control {
+    height: calc(100% - 1px);
+    margin-top: 1px;
+    flex-direction: row;
+    i {
+      padding: 5px;
+      font-size: 20px;
+      &:first-child {
+        margin-right: 5px;
+      }
+    }
+  }
 }
 </style>
