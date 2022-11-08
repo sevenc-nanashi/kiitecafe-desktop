@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { watch, ref } from "vue";
-import injectScript from "./inject?url";
 
 const webviewRef = ref<WebviewTag>();
 
