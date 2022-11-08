@@ -11,6 +11,7 @@ const titleContentEl = ref<HTMLDivElement>();
 const titleToAnimation = new Map<string, Animation>();
 
 const isHovering = ref(false);
+const isMuted = ref(false);
 
 document.documentElement.addEventListener("mouseleave", (e) => {
   isHovering.value = false;
@@ -41,6 +42,22 @@ watch(info, (newInfo, oldInfo) => {
   }
   titleToAnimation.get(oldInfo?.id || "")?.cancel();
 });
+
+window.electron.receive("set-muted", (value: boolean) => {
+  isMuted.value = value;
+});
+
+const toggleMute = () => {
+  window.electron.send("set-muted", !isMuted.value);
+};
+
+const toggleFavorite = () => {
+  window.electron.send("set-favorite", !info.value?.favorited);
+};
+
+const openNico = () => {
+  window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`);
+};
 </script>
 
 <script lang="ts">
@@ -71,7 +88,7 @@ export default defineComponent({
           backgroundImage: `url(${info.thumbnail})`,
         }"
       />
-      <div id="info">
+      <div id="info" @click="openNico">
         <div id="info-top">
           <div id="title" ref="titleEl">
             <div ref="titleContentEl">{{ info.title }}</div>
@@ -88,8 +105,25 @@ export default defineComponent({
           }"
         />
       </div>
-      <div class="control-button"></div>
-      <div class="control-button"></div>
+      <div class="control-button" @click="toggleFavorite">
+        <i
+          class="fa-heart"
+          :class="{
+            'fa-solid': info.favorited,
+            'fa-regular': !info.favorited,
+          }"
+        ></i
+        ><br />
+        <span>{{ info.favoriteCount }}</span>
+      </div>
+      <div class="control-button" @click="toggleMute">
+        <i
+          class="fa-solid"
+          :class="{ 'fa-volume-mute': isMuted, 'fa-volume-up': !isMuted }"
+        ></i
+        ><br />
+        <span>{{ info.volume }}</span>
+      </div>
       <div class="control-button"></div>
     </div>
   </div>
@@ -157,13 +191,29 @@ body {
 }
 .control-button {
   width: 110px;
-  height: calc(100vh - 20px);
+  height: calc(100vh - 17px);
   background: rgba(0, 0, 0, 0.5);
-  margin: 10px 0;
+  margin-top: 3px;
   margin-right: 5px;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   padding: 10px;
   box-sizing: border-box;
+  text-align: center;
+  color: #bbb;
+  cursor: pointer;
+}
+.control-button i {
+  font-size: 35px;
+}
+.control-button span {
+  font-size: 15px;
+}
+.control-button:hover {
+  background: rgba(0, 0, 0, 1);
+  color: white;
+}
+.fa-solid.fa-heart {
+  color: #ff33aa;
 }
 #title {
   font-size: 20px;

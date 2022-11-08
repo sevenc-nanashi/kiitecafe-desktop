@@ -5,4 +5,7 @@ type NowPlayingInfo = {
   publishedAt: string;
   id: string;
   progress: number;
-}
+  favorited: boolean;
+  favoriteCount: number;
+  volume: number;
+};

@@ -27,6 +27,7 @@ export default defineConfig({
     electron({
       entry: {
         main: "./src-electron/main.ts",
+        preload: "./src/preload.ts",
         injectPreload: "./src/inject",
         miniPlayerPreload: "./src/miniplayer/preload.ts",
       },

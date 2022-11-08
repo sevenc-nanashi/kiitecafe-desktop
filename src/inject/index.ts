@@ -8,6 +8,17 @@ setTimeout(() => {
     location.href = "https://kiite.jp/login?mode=cafe";
   }
 }, 0);
+ipcRenderer.on("set-favorite", (_event, favorite) => {
+  const button = document.querySelector(".favorite .button") as HTMLDivElement;
+  if (!button) {
+    return;
+  }
+  const favorited = !!document.querySelector(".favorite.is_faved");
+  if (favorite === favorited) {
+    return;
+  }
+  button.click();
+});
 document.addEventListener("DOMContentLoaded", () => {
   if (
     location.pathname.includes("intro") ||
@@ -35,8 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const videos = document.querySelector(".videos") as HTMLDivElement;
       if (
-        videos.querySelector(".fade") &&
-        videos.querySelector("*:not(.fade)")
+        parseFloat(
+          (
+            document.querySelector(
+              "#song_position .position"
+            )! as HTMLDivElement
+          ).style.width.replace("%", "")
+        ) /
+          100 >
+        0.01
       ) {
         const front = videos.querySelector(".front") as HTMLDivElement;
         front.click();
@@ -72,6 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
             )! as HTMLDivElement
           ).style.width.replace("%", "")
         ) / 100,
+      favorited: !!document.querySelector(".favorite.is_faved"),
+      favoriteCount: parseInt(
+        document.querySelector(".favorite .value")!.textContent!.trim()
+      ),
+      volume: parseInt(
+        document.querySelector(".volume .value")!.textContent!.trim()
+      ),
     };
     if (!nowPlayingInfo.id) {
       return;
