@@ -1,6 +1,9 @@
 import { ipcRenderer } from "electron";
-import style from "./style.css";
+import style from "./style.scss";
 import loginStyle from "./loginStyle.css";
+import { version } from "../../package.json";
+
+import about from "./about.html?raw";
 
 console.log("Preload: loaded");
 setTimeout(() => {
@@ -31,6 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("a").forEach((a) => {
     a.setAttribute("target", "_blank");
   });
+
+  if (!location.search.includes("mode=cafe")) {
+    location.search = "?mode=cafe";
+  }
 });
 document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("pc")) {
@@ -132,11 +139,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   );
 
+  const cafe = document.querySelector("#cafe") as HTMLDivElement;
   const cafeMenu = document.querySelector("#cafe_menu ul") as HTMLUListElement;
   const aboutMenu = document.createElement("li");
   aboutMenu.setAttribute("class", "kcd-about");
   aboutMenu.addEventListener("click", () => {
-    const cafe = document.querySelector("#cafe") as HTMLDivElement;
     cafe.classList.remove(
       [...Object.values(cafe.classList)].find((c) => c.startsWith("view_"))!
     );
@@ -144,4 +151,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   aboutMenu.textContent = "Desktopについて";
   cafeMenu.appendChild(aboutMenu);
+
+  new MutationObserver((_mutations) => {
+    if (
+      !(
+        [...Object.values(cafe.classList)].find(
+          (c) => c.startsWith("view_") && c !== "view_about"
+        ) && cafe.classList.contains("view_about")
+      )
+    ) {
+      return;
+    }
+    cafe.classList.remove("view_about");
+  }).observe(cafe, {
+    subtree: false,
+    attributes: true,
+  });
+  const tempTemplate = document.createElement("template");
+  tempTemplate.innerHTML = about.replace("{{version}}", version);
+  const aboutElement = tempTemplate.content.firstElementChild as HTMLDivElement;
+  cafe.appendChild(aboutElement);
+  const logout = () => {
+    location.href = "https://kiite.jp/my/logout";
+  };
+  tempTemplate.innerHTML = `<div class="sub_menu border_right" id="logout" onclick='(${logout.toString()})()'>ログアウト</div>`;
+  const logoutElement = tempTemplate.content
+    .firstElementChild as HTMLDivElement;
+  cafeMenu.parentElement!.appendChild(logoutElement);
 });

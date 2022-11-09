@@ -29,8 +29,11 @@ watch([info, titleEl, titleContentEl], ([inf, el, conEl]) => {
     inf.id ?? "",
     conEl.animate(
       [
-        { left: "0", offset: 0.2 },
-        { left: (el.scrollWidth - el.clientWidth) * -1 + "px", offset: 0.8 },
+        { left: 0, offset: 0.2 },
+        {
+          left: `-${el.scrollWidth - el.clientWidth}px`,
+          offset: 0.8,
+        },
       ],
       { duration: 10000, iterations: Infinity }
     )
@@ -352,6 +355,10 @@ body {
   }
   #title {
     font-size: 15px;
+  }
+  #info {
+    padding: 0;
+    padding-left: 10px;
   }
 
   #smaller-artist {
