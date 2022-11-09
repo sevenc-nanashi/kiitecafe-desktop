@@ -46,8 +46,8 @@ jobs:
 
       - name: Change version in package.json
         run: |
-          if [ -n "${{ github.event.inputs.name }}" ]; then
-            VERSION="${{ github.event.inputs.name }}" # "
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}" # "
           else
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
@@ -160,8 +160,8 @@ jobs:
       - name: Get version
         id: version
         run: |
-          if [ -n "${{ github.event.inputs.name }}" ]; then
-            VERSION="${{ github.event.inputs.name }}" # "
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}" # "
           else
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
