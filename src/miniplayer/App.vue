@@ -8,7 +8,7 @@ window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
 const mainEl = ref<HTMLDivElement>()
 const titleEl = ref<HTMLDivElement>()
 const titleContentEl = ref<HTMLDivElement>()
-const titleToAnimation = new Map<string, Animation>()
+const animations: Animation[] = []
 
 const isHovering = ref(false)
 const isMuted = ref(false)
@@ -25,8 +25,7 @@ watch([info, titleEl, titleContentEl], ([inf, el, conEl]) => {
   if (!inf || !el || !conEl) {
     return
   }
-  titleToAnimation.set(
-    inf.id ?? "",
+  animations.push(
     conEl.animate(
       [
         { left: 0, offset: 0.2 },
@@ -38,12 +37,17 @@ watch([info, titleEl, titleContentEl], ([inf, el, conEl]) => {
       { duration: 10000, iterations: Infinity }
     )
   )
+  if (animations.length > 1) {
+    animations[0].cancel()
+    animations.shift()
+  }
 })
 watch(info, (newInfo, oldInfo) => {
   if (newInfo?.id === oldInfo?.id) {
     return
   }
-  titleToAnimation.get(oldInfo?.id || "")?.cancel()
+  animations.forEach((a) => a.cancel())
+  animations.length = 0
 })
 
 window.electron.receive("set-muted", (value: boolean) => {

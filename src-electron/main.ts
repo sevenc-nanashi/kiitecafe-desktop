@@ -9,6 +9,8 @@ let win: electron.BrowserWindow | null = null
 let miniPlayerWin: electron.BrowserWindow | null = null
 let tray: electron.Tray | null = null
 
+electron.app.setAppUserModelId("com.sevenc-nanashi.kiitecafe-desktop")
+
 const iconPath = isDevelopment
   ? path.join(__dirname, "../public/icon.png")
   : path.join(__dirname, "icon.png")
@@ -39,7 +41,7 @@ const createMainWindow = () => {
   win = new electron.BrowserWindow({
     width: 1200,
     height: 800,
-    icon: path.join(__dirname, "../public/icon.png"),
+    icon: iconPath,
     webPreferences: {
       webviewTag: true,
       preload: `${__dirname}/preload.js`,
@@ -74,6 +76,7 @@ const createMiniPlayerWindow = () => {
     alwaysOnTop: true,
     focusable: false,
     transparent: true,
+    icon: iconPath,
     x: electron.screen.getPrimaryDisplay().workAreaSize.width - width,
     y: electron.screen.getPrimaryDisplay().workAreaSize.height - height,
     webPreferences: {
