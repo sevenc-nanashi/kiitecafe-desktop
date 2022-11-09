@@ -67,12 +67,16 @@ jobs:
   build-electron:
     strategy:
       matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - ubuntu-latest
         includes:
           - os: windows-latest
             path: dist-electron/*.exe
           - os: macos-latest
             path: dist-electron/*.dmg
-          - os: linux-latest
+          - os: ubuntu-latest
             path: dist-electron/*.AppImage
 
     runs-on: ${{ matrix.os }}
