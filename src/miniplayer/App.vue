@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { watch, ref } from "vue";
-const info = ref<NowPlayingInfo>();
+import { watch, ref } from "vue"
+const info = ref<NowPlayingInfo>()
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
-  info.value = npinfo;
-});
+  info.value = npinfo
+})
 
-const mainEl = ref<HTMLDivElement>();
-const titleEl = ref<HTMLDivElement>();
-const titleContentEl = ref<HTMLDivElement>();
-const titleToAnimation = new Map<string, Animation>();
+const mainEl = ref<HTMLDivElement>()
+const titleEl = ref<HTMLDivElement>()
+const titleContentEl = ref<HTMLDivElement>()
+const titleToAnimation = new Map<string, Animation>()
 
-const isHovering = ref(false);
-const isMuted = ref(false);
+const isHovering = ref(false)
+const isMuted = ref(false)
 
-document.documentElement.addEventListener("mouseleave", (e) => {
-  isHovering.value = false;
-});
+document.documentElement.addEventListener("mouseleave", () => {
+  isHovering.value = false
+})
 
 watch(isHovering, (value) => {
-  window.electron.send("set-ignore-mouse-events", !value);
-});
+  window.electron.send("set-ignore-mouse-events", !value)
+})
 
 watch([info, titleEl, titleContentEl], ([inf, el, conEl]) => {
   if (!inf || !el || !conEl) {
-    return;
+    return
   }
   titleToAnimation.set(
     inf.id ?? "",
@@ -37,74 +37,65 @@ watch([info, titleEl, titleContentEl], ([inf, el, conEl]) => {
       ],
       { duration: 10000, iterations: Infinity }
     )
-  );
-});
+  )
+})
 watch(info, (newInfo, oldInfo) => {
   if (newInfo?.id === oldInfo?.id) {
-    return;
+    return
   }
-  titleToAnimation.get(oldInfo?.id || "")?.cancel();
-});
+  titleToAnimation.get(oldInfo?.id || "")?.cancel()
+})
 
 window.electron.receive("set-muted", (value: boolean) => {
-  isMuted.value = value;
-});
+  isMuted.value = value
+})
 
 const toggleMute = () => {
-  window.electron.send("set-muted", !isMuted.value);
-};
+  window.electron.send("set-muted", !isMuted.value)
+}
 
 const toggleFavorite = () => {
-  window.electron.send("set-favorite", !info.value?.favorited);
-};
+  window.electron.send("set-favorite", !info.value?.favorited)
+}
 
 const openNico = () => {
-  window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`);
-};
+  window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`)
+}
 
-const windowType = ref<"normal" | "smaller">("smaller");
+const windowType = ref<"normal" | "smaller">("smaller")
 
 const toNormalWindow = () => {
-  windowType.value = "normal";
-};
+  windowType.value = "normal"
+}
 const toSmallerWindow = () => {
-  windowType.value = "smaller";
-};
+  windowType.value = "smaller"
+}
 const minimizeWindow = () => {
-  window.electron.send("minimize", []);
-};
+  window.electron.send("minimize", [])
+}
 
 const tweet = () => {
-  if (!info.value) return;
+  if (!info.value) return
   const text =
     `♪ ${info.value.title} #${info.value.id} #Kiite\n` +
-    `Kiite Cafe DesktopをつかってKiite Cafeできいてます https://github.com/sevenc-nanashi/kiitecafe-desktop https://cafe.kiite.jp https://nico.ms/${info.value.id}`;
+    `Kiite Cafe DesktopをつかってKiite Cafeできいてます https://github.com/sevenc-nanashi/kiitecafe-desktop https://cafe.kiite.jp https://nico.ms/${info.value.id}`
   window.open(
     `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
-  );
-};
-</script>
-
-<script lang="ts">
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  name: "App",
-  unmounted() {},
-});
+  )
+}
 </script>
 
 <template>
   <div
-    id="main"
     v-if="info"
+    id="main"
     ref="mainEl"
     :style="{
       backgroundImage: 'url(' + info.thumbnail + ')',
     }"
     :class="{ hover: isHovering, smaller: windowType === 'smaller' }"
-    v-on:mouseenter="() => (isHovering = true)"
-    v-on:mouseleave="() => (isHovering = false)"
+    @mouseenter="() => (isHovering = true)"
+    @mouseleave="() => (isHovering = false)"
   >
     <div id="bg-overlay">
       <div
@@ -164,25 +155,25 @@ export default defineComponent({
       <div class="control-button" @click="tweet">
         <i class="fa-brands fa-square-twitter"></i>
         <br v-if="windowType !== 'smaller'" />
-        <span id="tweet-text" v-if="windowType !== 'smaller'">ツイート</span>
+        <span v-if="windowType !== 'smaller'" id="tweet-text">ツイート</span>
       </div>
       <div id="window-control">
         <i
           class="fa-regular fa-square-minus"
-          @click="minimizeWindow"
           title="ミニプレイヤーを最小化"
+          @click="minimizeWindow"
         ></i>
         <i
-          class="fa-solid fa-down-left-and-up-right-to-center"
           v-if="windowType === 'normal'"
-          @click="toSmallerWindow"
+          class="fa-solid fa-down-left-and-up-right-to-center"
           title="コンパクト表示"
+          @click="toSmallerWindow"
         ></i>
         <i
-          class="fa-solid fa-up-right-and-down-left-from-center"
           v-if="windowType === 'smaller'"
-          @click="toNormalWindow"
+          class="fa-solid fa-up-right-and-down-left-from-center"
           title="拡大表示"
+          @click="toNormalWindow"
         ></i>
       </div>
     </div>

@@ -1,13 +1,14 @@
 {
   "name": "kiitecafe-desktop",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "dist/main.js",
   "scripts": {
     "predev": "rimraf dist/*",
     "dev": "vite",
     "prebuild": "rimraf dist/* dist-electron/*",
-    "build": "vite build && electron-builder --config electron-builder.config.js"
+    "build": "vite build && electron-builder --config electron-builder.config.js",
+    "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ."
   },
   "dependencies": {
     "conf": "^10.2.0",
@@ -17,11 +18,18 @@
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
     "@vitejs/plugin-vue": "^3.2.0",
     "electron": "^21.2.0",
     "electron-builder": "^23.6.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.7.0",
+    "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.6.4",
+    "typescript": "^4.8.4",
     "vite": "^3.2.0",
     "vite-plugin-electron": "^0.10.2"
   }

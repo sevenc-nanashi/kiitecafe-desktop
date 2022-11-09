@@ -1,12 +1,12 @@
-import { ipcRenderer, contextBridge } from "electron";
+import { ipcRenderer, contextBridge } from "electron"
 
-console.log("Preload: loaded");
+console.log("Preload: loaded")
 
 contextBridge.exposeInMainWorld("electron", {
-  send: (channel: string, data: any) => {
-    ipcRenderer.send(channel, data);
+  send: (channel: string, data: unknown) => {
+    ipcRenderer.send(channel, data)
   },
-  receive: (channel: string, func: any) => {
-    ipcRenderer.on(channel, (event, ...args) => func(...args));
+  receive: (channel: string, func: CallableFunction) => {
+    ipcRenderer.on(channel, (_event, ...args) => func(...args))
   },
-});
+})
