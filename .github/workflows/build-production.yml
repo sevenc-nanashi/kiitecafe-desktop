@@ -53,6 +53,7 @@ jobs:
             VERSION=${RAW_VERSION#v}
           fi
           node update-version.js $VERSION
+          echo Version: $VERSION
 
       - name: Build with vite
         run: |
