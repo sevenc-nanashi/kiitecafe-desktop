@@ -66,14 +66,9 @@ jobs:
   build-electron:
     strategy:
       matrix:
-        os:
-          - windows-latest
-          - macos-latest
-          - linux-latest
         includes:
           - os: windows-latest
             path: dist-electron/*.exe
-
           - os: macos-latest
             path: dist-electron/*.dmg
           - os: linux-latest
