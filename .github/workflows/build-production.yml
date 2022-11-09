@@ -46,11 +46,11 @@ jobs:
 
       - name: Change version in package.json
         run: |
-          if [ -n "${{ github.ref_name }}" ]; then
+          if [ -n "${{ github.event.inputs.name }}" ]; then
+            VERSION="${{ github.event.inputs.name }}" # "
+          else
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
-          else
-            VERSION="${{ github.event.inputs.name }}" # "
           fi
           node update-version.js $VERSION
 
@@ -131,7 +131,7 @@ jobs:
           path: ${{ matrix.path }}
 
   release:
-    name: Build with vite
+    name: Upload release
     runs-on: ubuntu-latest
     needs:
       - build-electron
@@ -156,14 +156,14 @@ jobs:
           name: ubuntu-latest-electron-built
           path: dist
 
-      - name: CGet version
+      - name: Get version
         id: version
         run: |
-          if [ -n "${{ github.ref_name }}" ]; then
+          if [ -n "${{ github.event.inputs.name }}" ]; then
+            VERSION="${{ github.event.inputs.name }}" # "
+          else
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
-          else
-            VERSION="${{ github.event.inputs.name }}" # "
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [[ $VERSION == *"-"* ]]; then
