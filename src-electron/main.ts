@@ -95,6 +95,7 @@ const createMiniPlayerWindow = () => {
   } else {
     miniPlayerWin.loadURL("app://./index.html#/miniplayer")
   }
+  registerWindowOpenHandler(miniPlayerWin)
   miniPlayerWin.on("close", (_event) => {
     miniPlayerWin = null
     win?.close()
