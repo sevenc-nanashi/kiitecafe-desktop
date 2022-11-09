@@ -8,11 +8,14 @@ const store = new Store();
 let win: electron.BrowserWindow | null = null;
 let miniPlayerWin: electron.BrowserWindow | null = null;
 let tray: electron.Tray | null = null;
+
+const iconPath = isDevelopment ? path.join(__dirname, "../public/icon.png") : path.join(__dirname, "icon.png");
+
 const createTray = () => {
   if (tray) {
     return;
   }
-  tray = new electron.Tray(path.join(__dirname, "../public/icon.png"));
+  tray = new electron.Tray(iconPath);
   tray.on("click", () => {
     if (miniPlayerWin) {
       miniPlayerWin.show();
@@ -45,7 +48,7 @@ const createMainWindow = () => {
   params.append("dirname", __dirname);
   if (isDevelopment) {
     win.loadURL("http://localhost:5173?" + params.toString());
-    win.webContents.openDevTools();
+    win.webContents.openDevTools({ mode: "detach" });
   } else {
     win.loadURL("app://./index.html?" + params.toString());
   }
@@ -86,7 +89,7 @@ const createMiniPlayerWindow = () => {
   });
   if (isDevelopment) {
     miniPlayerWin.loadURL("http://localhost:5173/miniplayer");
-    miniPlayerWin.webContents.openDevTools();
+    miniPlayerWin.webContents.openDevTools({ mode: "detach" });
   } else {
     miniPlayerWin.loadURL("app://./index.html#/miniplayer");
   }

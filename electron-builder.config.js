@@ -8,6 +8,7 @@ module.exports = {
   directories: {
     output: "dist-electron",
   },
+  files: ["dist/**/*"],
   mac: {
     category: "public.app-category.social-networking",
     target: "dmg",
