@@ -121,6 +121,17 @@ jobs:
           name: vite-compiled
           path: dist
 
+      - name: Change version in package.json
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}" # "
+          else
+            RAW_VERSION="${{ github.ref_name }}" # "
+            VERSION=${RAW_VERSION#v}
+          fi
+          node update-version.js $VERSION
+          echo Version: $VERSION
+
       - name: Build electron
         run: |
           pnpm build:electron
@@ -173,6 +184,7 @@ jobs:
             PREVIEW=false
           fi
           echo "preview=$PREVIEW" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION, is preview: $PREVIEW"
 
       - name: Upload release
         uses: softprops/action-gh-release@v1
