@@ -150,7 +150,13 @@ export default defineComponent({
         ></i>
 
         <br v-if="windowType !== 'smaller'" />
-        <span>{{ info.volume }}</span>
+        <span
+          :style="{
+            textDecoration: isMuted ? 'line-through' : 'none',
+            textDecorationThickness: '2px',
+          }"
+          >{{ info.volume }}</span
+        >
       </div>
       <div class="control-button" @click="tweet">
         <i class="fa-brands fa-square-twitter"></i>
@@ -158,16 +164,22 @@ export default defineComponent({
         <span id="tweet-text" v-if="windowType !== 'smaller'">ツイート</span>
       </div>
       <div id="window-control">
-        <i class="fa-regular fa-square-minus" @click="minimizeWindow"></i>
+        <i
+          class="fa-regular fa-square-minus"
+          @click="minimizeWindow"
+          title="ミニプレイヤーを最小化"
+        ></i>
         <i
           class="fa-solid fa-down-left-and-up-right-to-center"
           v-if="windowType === 'normal'"
           @click="toSmallerWindow"
+          title="コンパクト表示"
         ></i>
         <i
           class="fa-solid fa-up-right-and-down-left-from-center"
           v-if="windowType === 'smaller'"
           @click="toNormalWindow"
+          title="拡大表示"
         ></i>
       </div>
     </div>
@@ -326,6 +338,9 @@ body {
   }
 }
 .smaller {
+  #thumbnail {
+    border-radius: 5px;
+  }
   .control-button {
     height: calc(100% - 1px);
     padding: 0;

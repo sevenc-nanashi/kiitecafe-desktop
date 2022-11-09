@@ -1,5 +1,6 @@
 import { ipcRenderer } from "electron";
 import style from "./style.css";
+import loginStyle from "./loginStyle.css";
 
 console.log("Preload: loaded");
 setTimeout(() => {
@@ -20,10 +21,19 @@ ipcRenderer.on("set-favorite", (_event, favorite) => {
   button.click();
 });
 document.addEventListener("DOMContentLoaded", () => {
-  if (
-    location.pathname.includes("intro") ||
-    location.pathname.includes("login")
-  ) {
+  if (!location.pathname.includes("login")) {
+    return;
+  }
+  const styleElement = document.createElement("style");
+  styleElement.textContent = loginStyle.toString();
+  document.head.appendChild(styleElement);
+
+  document.querySelectorAll("a").forEach((a) => {
+    a.setAttribute("target", "_blank");
+  });
+});
+document.addEventListener("DOMContentLoaded", () => {
+  if (!location.pathname.includes("pc")) {
     return;
   }
   const styleElement = document.createElement("style");
@@ -41,7 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }, 1000);
     setInterval(() => {
-      if (document.querySelector("#cafe_player.loading") || document.querySelector("#cafe_player .videos iframe")) {
+      if (
+        document.querySelector("#cafe_player.loading") ||
+        document.querySelector("#cafe_player .videos iframe")
+      ) {
         return;
       }
       if (
@@ -118,4 +131,17 @@ document.addEventListener("DOMContentLoaded", () => {
       attributes: true,
     }
   );
+
+  const cafeMenu = document.querySelector("#cafe_menu ul") as HTMLUListElement;
+  const aboutMenu = document.createElement("li");
+  aboutMenu.setAttribute("class", "kcd-about");
+  aboutMenu.addEventListener("click", () => {
+    const cafe = document.querySelector("#cafe") as HTMLDivElement;
+    cafe.classList.remove(
+      [...Object.values(cafe.classList)].find((c) => c.startsWith("view_"))!
+    );
+    cafe.classList.add("view_about");
+  });
+  aboutMenu.textContent = "Desktopについて";
+  cafeMenu.appendChild(aboutMenu);
 });

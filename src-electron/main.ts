@@ -20,6 +20,16 @@ const createTray = () => {
   });
 };
 
+const registerWindowOpenHandler = (win: electron.BrowserWindow) => {
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith("app://")) {
+      return { action: "allow" };
+    }
+    electron.shell.openExternal(url);
+    return { action: "deny" };
+  });
+};
+
 const createMainWindow = () => {
   win = new electron.BrowserWindow({
     width: 1200,
@@ -39,13 +49,13 @@ const createMainWindow = () => {
   } else {
     win.loadURL("app://./index.html?" + params.toString());
   }
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith("app://")) {
-      return { action: "allow" };
-    }
-    electron.shell.openExternal(url);
-    return { action: "deny" };
+  registerWindowOpenHandler(win);
+  win.on("close", (_event) => {
+    win = null;
+    miniPlayerWin?.close();
   });
+
+  win.setMenu(null);
 };
 
 const createMiniPlayerWindow = () => {
@@ -67,13 +77,6 @@ const createMiniPlayerWindow = () => {
   });
   miniPlayerWin.setIgnoreMouseEvents(true, { forward: true });
   miniPlayerWin.setBackgroundColor("#00000000");
-  miniPlayerWin.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith("app://")) {
-      return { action: "allow" };
-    }
-    electron.shell.openExternal(url);
-    return { action: "deny" };
-  });
   electron.ipcMain.addListener("set-ignore-mouse-events", (_event, ignore) => {
     if (ignore) {
       miniPlayerWin?.setIgnoreMouseEvents(true, { forward: true });
@@ -87,6 +90,10 @@ const createMiniPlayerWindow = () => {
   } else {
     miniPlayerWin.loadURL("app://./index.html#/miniplayer");
   }
+  miniPlayerWin.on("close", (_event) => {
+    miniPlayerWin = null;
+    win?.close();
+  });
 };
 
 electron.ipcMain.addListener("now-playing-info", (_event, info) => {
@@ -130,6 +137,7 @@ electron.ipcMain.addListener("minimize", () => {
 electron.app.on("ready", () => {
   electron.protocol.registerFileProtocol("app", (request, callback) => {
     const url = new URL(request.url);
+    console.log(path.normalize(`${__dirname}/${url.pathname}`));
     callback({ path: path.normalize(`${__dirname}/${url.pathname}`) });
   });
   createTray();

@@ -9,3 +9,12 @@
 #cafe_menu > .sub_menu.border_right {
   display: none;
 }
+
+.view_about .kcd-about {
+  position: relative;
+  margin-right: 0px;
+  margin-left: 10px;
+  color: #ffef00;
+  background: rgba(0, 0, 0, 0.5);
+  border-left: 4px #ffef00 solid;
+}

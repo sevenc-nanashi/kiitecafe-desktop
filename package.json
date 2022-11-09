@@ -3,14 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "main": "dist/main.js",
-  "enable-pre-post-scripts": true,
   "scripts": {
-    "predev": "rimraf dist/* dist-electron/*",
+    "predev": "rimraf dist/*",
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "prebuild": "rimraf dist/* dist-electron/*",
+    "build": "vite build && electron-builder --config electron-builder.config.js"
   },
   "dependencies": {
+    "electron-store": "^8.1.0",
     "sass": "^1.56.0",
     "vue": "^3.2.41",
     "vue-router": "^4.1.6"
@@ -18,7 +18,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.2.0",
     "electron": "^21.2.0",
-    "electron-store": "^8.1.0",
+    "electron-builder": "^23.6.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "typescript": "^4.6.4",

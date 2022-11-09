@@ -44,6 +44,7 @@ window.electron.send("set-muted", isMuted.value);
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import About from "./components/About.vue";
 
 export default defineComponent({
   name: "App",
@@ -54,6 +55,7 @@ export default defineComponent({
 </script>
 
 <template>
+  <About />
   <div>
     <webview
       src="https://cafe.kiite.jp/"
