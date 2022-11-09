@@ -122,6 +122,7 @@ jobs:
           path: dist
 
       - name: Change version in package.json
+        shell: bash
         run: |
           if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION="${{ github.event.inputs.version }}" # "
