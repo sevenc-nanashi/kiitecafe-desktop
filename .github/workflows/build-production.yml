@@ -1,0 +1,182 @@
+name: Build
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version
+        required: true
+
+jobs:
+  build-vite:
+    name: Build with vite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: pnpm
+
+      - name: Get cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          pnpm i
+
+      - name: Change version in package.json
+        run: |
+          if [ -n "${{ github.ref_name }}" ]; then
+            RAW_VERSION="${{ github.ref_name }}" # "
+            VERSION=${RAW_VERSION#v}
+          else
+            VERSION="${{ github.event.inputs.name }}" # "
+          fi
+          node update-version.js $VERSION
+
+      - name: Build with vite
+        run: |
+          pnpm build:vite
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: vite-compiled
+          path: dist
+
+  build-electron:
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+          - macos-latest
+          - linux-latest
+        includes:
+          - os: windows-latest
+            path: dist-electron/*.exe
+
+          - os: macos-latest
+            path: dist-electron/*.dmg
+          - os: linux-latest
+            path: dist-electron/*.AppImage
+
+    runs-on: ${{ matrix.os }}
+    needs:
+      - build-vite
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: pnpm
+
+      - name: Get cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          pnpm i
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: vite-compiled
+          path: dist
+
+      - name: Build electron
+        run: |
+          pnpm build:electron
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-electron-built
+          path: ${{ matrix.path }}
+
+  release:
+    name: Build with vite
+    runs-on: ubuntu-latest
+    needs:
+      - build-electron
+
+    steps:
+      - name: Download windows binary
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-latest-electron-built
+          path: dist
+
+
+      - name: Download macos binary
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-latest-electron-built
+          path: dist
+
+      - name: Download linux binary
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu-latest-electron-built
+          path: dist
+
+      - name: CGet version
+        id: version
+        run: |
+          if [ -n "${{ github.ref_name }}" ]; then
+            RAW_VERSION="${{ github.ref_name }}" # "
+            VERSION=${RAW_VERSION#v}
+          else
+            VERSION="${{ github.event.inputs.name }}" # "
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if [[ $VERSION == *"-"* ]]; then
+            PREVIEW=true
+          else
+            PREVIEW=false
+          fi
+          echo "preview=$PREVIEW" >> $GITHUB_OUTPUT
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          prerelease: ${{ steps.version.outputs.preview }}
+          files: |
+            dist/*
+
