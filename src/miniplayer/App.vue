@@ -295,6 +295,10 @@ body {
   position: relative;
   margin-top: 4px;
 }
+#info-bottom {
+  position: relative;
+  display: flex;
+}
 #artist {
   font-size: 15px;
   color: #bbb;
