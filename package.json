@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist/* dist-electron/*",
     "build": "run-s build:*",
     "build:vite": "vite build",
-    "build:electron": "electron-builder --config electron-builder.config.js",
+    "build:electron": "electron-builder --config electron-builder.config.js --publish never",
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ."
   },
   "dependencies": {
