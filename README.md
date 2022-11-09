@@ -1,4 +1,5 @@
 # Kiite Cafe Desktop
+[![GitHub release](https://img.shields.io/github/v/release/sevenc-nanashi/kiitecafe-desktop?label=Release)](https://github.com/sevenc-nanashi/kiitecafe-desktop/releases/latest)  
 
 Kiite Cafeのデスクトップアプリ版です。
 
