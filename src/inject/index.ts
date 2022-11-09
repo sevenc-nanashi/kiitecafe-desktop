@@ -172,6 +172,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const aboutElement = tempTemplate.content.firstElementChild as HTMLDivElement
   cafe.appendChild(aboutElement)
   const logout = () => {
+    if (!confirm("ログアウトしますか？")) {
+      return
+    }
     location.href = "https://kiite.jp/my/logout"
   }
   tempTemplate.innerHTML = `<div class="sub_menu border_right" id="logout" onclick='(${logout.toString()})()'>ログアウト</div>`
