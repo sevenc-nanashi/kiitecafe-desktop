@@ -71,7 +71,7 @@ jobs:
           - windows-latest
           - macos-latest
           - ubuntu-latest
-        includes:
+        include:
           - os: windows-latest
             path: dist-electron/*.exe
           - os: macos-latest
