@@ -9,6 +9,9 @@ const preloadPath = dirname + "/injectPreload.js"
 const preloadUrl = new URL(preloadPath, "file://").toString()
 
 const isMuted = ref(false)
+const updateAvailable = ref<
+  { tag_name: string; html_url: string } | boolean | null
+>(null)
 
 watch(webviewRef, async (webview) => {
   if (webview) {
@@ -19,6 +22,7 @@ watch(webviewRef, async (webview) => {
     }
     webview.addEventListener("dom-ready", () => {
       window.electron.send("setup-webview", webview.getWebContentsId())
+      window.electron.send("get-update-available", null)
     })
   }
 })
@@ -39,6 +43,11 @@ window.electron.receive("set-favorite", (value: boolean) => {
   }
 })
 
+window.electron.receive("update-available", (value: boolean) => {
+  updateAvailable.value = value
+  webviewRef.value?.send("update-available", value)
+})
+
 window.electron.send("set-muted", isMuted.value)
 </script>
 
@@ -48,7 +57,7 @@ import { defineComponent } from "vue"
 export default defineComponent({
   name: "App",
   unmounted() {
-    webviewRef.value?.closeDevTools()
+    ;(document.querySelector("webview") as WebviewTag).closeDevTools()
   },
 })
 </script>

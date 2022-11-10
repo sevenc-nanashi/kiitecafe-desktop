@@ -1,11 +1,50 @@
 import { ipcRenderer } from "electron"
 import style from "./style.scss"
 import loginStyle from "./loginStyle.css"
-import { version } from "../../package.json"
+import packageJson from "../../package.json?raw"
 
 import about from "./about.html?raw"
 
 console.log("Preload: loaded")
+
+const version = JSON.parse(packageJson).version
+
+type UpdateAvailable = { tag_name: string; html_url: string } | false
+
+ipcRenderer.on(
+  "update-available",
+  (_event, updateAvailable: UpdateAvailable) => {
+    const cafe = document.querySelector("#cafe") as HTMLDivElement
+    const tempTemplate = document.createElement("template")
+    let aboutHTML = about
+    aboutHTML = aboutHTML.replace("{{version}}", version)
+    console.log(updateAvailable)
+    if (updateAvailable) {
+      aboutHTML = aboutHTML.replace(/\{\[\/?new-version\]\}/gm, "")
+      aboutHTML = aboutHTML.replaceAll(
+        "{{new-version-name}}",
+        updateAvailable.tag_name
+      )
+      aboutHTML = aboutHTML.replaceAll(
+        "{{new-version-url}}",
+        updateAvailable.html_url
+      )
+      document.querySelector(".kcd-about")?.setAttribute("update-available", "")
+    } else {
+      aboutHTML = aboutHTML.replace(
+        /\{\[new-version\]\}([\s\S]+)\{\[\/new-version\]\}/gm,
+        ""
+      )
+    }
+
+    tempTemplate.innerHTML = aboutHTML
+
+    const aboutElement = tempTemplate.content
+      .firstElementChild as HTMLDivElement
+    cafe.appendChild(aboutElement)
+  }
+)
+
 setTimeout(() => {
   if (location.pathname.includes("intro")) {
     // document.querySelector(".goto_kiite_login_button")!.click();
@@ -226,9 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
     attributes: true,
   })
   const tempTemplate = document.createElement("template")
-  tempTemplate.innerHTML = about.replace("{{version}}", version)
-  const aboutElement = tempTemplate.content.firstElementChild as HTMLDivElement
-  cafe.appendChild(aboutElement)
   const logout = () => {
     if (!confirm("ログアウトしますか？")) {
       return

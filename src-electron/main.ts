@@ -1,6 +1,10 @@
 import * as electron from "electron"
 import Store from "electron-store"
 import path from "path"
+import fetch from "node-fetch"
+import * as semver from "semver"
+
+import { version } from "../package.json"
 
 const isDevelopment = import.meta.env.DEV
 
@@ -142,6 +146,21 @@ electron.ipcMain.addListener("setup-webview", (_event, id) => {
     electron.shell.openExternal(url)
     return { action: "deny" }
   })
+})
+electron.ipcMain.addListener("get-update-available", async () => {
+  if (version === "0.0.0") {
+    return
+  }
+  const latestVersion = (await fetch(
+    "https://api.github.com/repos/sevenc-nanashi/kiitecafe-desktop/releases/latest"
+  ).then((resp) => resp.json())) as { tag_name: string }
+
+  win?.webContents.send(
+    "update-available",
+    semver.gt(latestVersion.tag_name.replace(/^v/, ""), version)
+      ? latestVersion
+      : false
+  )
 })
 electron.ipcMain.addListener("minimize", () => {
   miniPlayerWin?.hide()

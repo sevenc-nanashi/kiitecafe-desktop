@@ -12,6 +12,10 @@
   border-right-color: red !important;
 }
 
+.kcd-about[update-available] {
+  background-color: rgba(64, 64, 0, 0.7) !important;
+}
+
 .view_about {
   .kcd-about:not(#dummy) {
     position: relative;
@@ -95,6 +99,13 @@
 
     #app_info {
       margin-top: 1.5rem;
+    }
+
+    #new-version {
+      h4 {
+        margin-bottom: 0.5rem;
+        color: #ffef00;
+      }
     }
   }
 }

@@ -16,7 +16,9 @@
   "dependencies": {
     "conf": "^10.2.0",
     "electron-store": "^8.1.0",
+    "node-fetch": "^3.2.10",
     "sass": "^1.56.0",
+    "semver": "^7.3.8",
     "vue": "^3.2.41",
     "vue-router": "^4.1.6"
   },
