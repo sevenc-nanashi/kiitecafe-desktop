@@ -223,7 +223,7 @@ jobs:
               ----
 
               ${{ github.event.inputs.description }}
-            EOS
+          EOS
           fi
 
       - name: Upload release
