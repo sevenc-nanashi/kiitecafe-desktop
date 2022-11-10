@@ -43,6 +43,63 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("pc")) {
     return
   }
+  const patchPlay = () => {
+    // @ts-expect-error: †黒魔術に制約は要らない†
+    const patchedPlay = function (e) {
+      console.log("Preload: Called patchedPlay")
+      // @ts-expect-error: †黒魔術に制約は要らない†
+      d3.select("#cafe_player")
+        .classed("loading", true)
+        .classed("show_hint_tab_active", false)
+      // @ts-expect-error: †黒魔術に制約は要らない†
+      const player = new CafePlayer(e.video_id, e.start_time)
+
+      player.load({
+        onFirstPlay: function () {
+          // eslint-disable-next-line
+          return (
+            // @ts-expect-error: †黒魔術に制約は要らない†
+            5 < player.seekTo(window.cafe_music.get_song_pos(e)),
+            // @ts-expect-error: †黒魔術に制約は要らない†
+            d3
+              .select("#cafe_player")
+              .classed("loading", false)
+              .classed("playing", true)
+          )
+        },
+        onPause: function () {
+          return this.pause()
+        },
+      })
+
+      // @ts-expect-error: †黒魔術に制約は要らない†
+      this.now_playing_player = player
+
+      // @ts-expect-error: †黒魔術に制約は要らない†
+      this.play_history(e)
+    }
+    patchedPlay.isPatched = true
+
+    const patchInterval = setInterval(() => {
+      // @ts-expect-error: †黒魔術に制約は要らない†
+      if (window.cafe_music.play.isPatched) clearInterval(patchInterval)
+
+      // @ts-expect-error: †黒魔術に制約は要らない†
+      window.cafe_music.play = patchedPlay
+      // @ts-expect-error: †黒魔術に制約は要らない†
+      window.CafeMusic.prototype.play = patchedPlay
+    }, 100)
+  }
+  const script = document.createElement("script")
+  script.textContent = `(${patchPlay.toString()})()`
+  document.body.appendChild(script)
+  console.log("Preload: Added script", script)
+})
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!location.pathname.includes("pc")) {
+    return
+  }
   const styleElement = document.createElement("style")
   styleElement.textContent = style.toString()
   document.head.appendChild(styleElement)
@@ -56,30 +113,39 @@ document.addEventListener("DOMContentLoaded", () => {
       if (document.querySelector("#cafe_player.loading")) {
         clearInterval(playInterval)
       }
-    }, 1000)
-    setInterval(() => {
-      if (
-        document.querySelector("#cafe_player.loading") ||
-        document.querySelector("#cafe_player .videos iframe")
-      ) {
-        return
-      }
-      if (
-        parseFloat(
-          (
-            document.querySelector(
-              "#song_position .position"
-            )! as HTMLDivElement
-          ).style.width.replace("%", "")
-        ) /
-          100 >
-        0.01
-      ) {
-        const front = document.querySelector(".front") as HTMLDivElement
-        front.click()
-        front.click()
-      }
-    }, 1000)
+    }, 100)
+    // setInterval(() => {
+    //   if (
+    //     (document.querySelector(".hint_tab_active") as HTMLDivElement).style
+    //       .display === "none"
+    //   ) {
+    //     return
+    //   }
+    //   playButton.click()
+    // }, 100)
+    // setInterval(() => {
+    //   if (
+    //     document.querySelector("#cafe_player.loading") ||
+    //     document.querySelector("#cafe_player .videos iframe")
+    //   ) {
+    //     return
+    //   }
+    //   if (
+    //     parseFloat(
+    //       (
+    //         document.querySelector(
+    //           "#song_position .position"
+    //         )! as HTMLDivElement
+    //       ).style.width.replace("%", "")
+    //     ) /
+    //       100 >
+    //     0.01
+    //   ) {
+    //     const front = document.querySelector(".front") as HTMLDivElement
+    //     front.click()
+    //     front.click()
+    //   }
+    // }, 100)
   }
 
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {
@@ -98,9 +164,10 @@ document.addEventListener("DOMContentLoaded", () => {
       publishedAt: document
         .querySelector("#now_playing_info .published_at")!
         .textContent!.trim(),
-      id: document
-        .querySelector("#cafe_player .videos div")
-        ?.id.replace("video_", ""),
+      id:
+        document
+          .querySelector("#cafe_player .videos div")
+          ?.id.replace("video_", "") ?? "",
       progress:
         parseFloat(
           (

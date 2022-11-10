@@ -59,6 +59,7 @@ export default defineComponent({
       ref="webviewRef"
       src="https://cafe.kiite.jp/"
       :preload="preloadUrl"
+      webpreferences="autoplayPolicy=no-user-gesture-required"
       allowpopups
     />
   </div>
