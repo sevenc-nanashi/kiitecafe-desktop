@@ -11,15 +11,33 @@ let tray: electron.Tray | null = null
 
 electron.app.setAppUserModelId("com.sevenc-nanashi.kiitecafe-desktop")
 
-const iconPath = isDevelopment
-  ? path.join(__dirname, "../public/icon.png")
-  : path.join(__dirname, "icon.png")
+let iconPath: string
+const publicDir = isDevelopment ? path.join(__dirname, "../public") : __dirname
+
+if (process.platform === "darwin") {
+  iconPath = path.join(publicDir, "mac-icon.png")
+} else if (process.platform === "win32") {
+  iconPath = path.join(publicDir, "icon.ico")
+} else {
+  iconPath = path.join(publicDir, "icon.png")
+}
 
 const createTray = () => {
   if (tray) {
     return
   }
-  tray = new electron.Tray(iconPath)
+  let trayIconPath: string
+  if (process.platform === "darwin") {
+    trayIconPath = path.join(publicDir, "mac-tray-icon.png")
+  } else if (process.platform === "win32") {
+    trayIconPath = path.join(publicDir, "win-tray-icon.png")
+  } else {
+    trayIconPath = path.join(publicDir, "icon.png")
+  }
+  tray = new electron.Tray(trayIconPath)
+  if (process.platform === "darwin") {
+    tray.setPressedImage(path.join(publicDir, "mac-tray-icon-pressed.png"))
+  }
   tray.on("click", () => {
     if (miniPlayerWin) {
       miniPlayerWin.show()

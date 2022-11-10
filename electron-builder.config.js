@@ -5,6 +5,7 @@ module.exports = {
   appId: "com.sevenc-nanashi.kiitecafe-desktop",
   productName: "Kiite Cafe Desktop",
   copyright: "2022 © Nanashi. <@sevenc-nanashi>",
+  icon: "build/icon.png",
   directories: {
     output: "dist-electron",
   },
@@ -12,11 +13,11 @@ module.exports = {
   mac: {
     category: "public.app-category.social-networking",
     target: "dmg",
-    icon: "build/icon.png",
+    icon: "public/mac-icon.png",
   },
   win: {
     target: "nsis",
-    icon: "build/icon.png",
+    icon: "public/icon.ico",
   },
   nsis: {
     oneClick: false,
@@ -24,6 +25,6 @@ module.exports = {
   },
   linux: {
     target: "AppImage",
-    icon: "build/icon.png",
+    icon: "public/icon.png",
   },
 };
