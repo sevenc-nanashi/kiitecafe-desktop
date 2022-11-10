@@ -215,14 +215,14 @@ jobs:
           else
             LAST_VERSION=$(git tag -l --sort=-creatordate | sed -n "2p")
           fi
-          git log $LAST_VERSION...HEAD --pretty=format:"- %s" | head -n -1 > description.txt
+          git log $LAST_VERSION...HEAD --pretty=format:"- %s" | head -n -1 >> description.txt
 
           if [ -n "${{ github.event.inputs.description }}" ]; then
-            cat > description.txt << EOS
+            cat >> description.txt << EOS
 
-              ----
+            ----
 
-              ${{ github.event.inputs.description }}
+            ${{ github.event.inputs.description }}
           EOS
           fi
 
