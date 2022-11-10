@@ -149,6 +149,7 @@ electron.ipcMain.addListener("setup-webview", (_event, id) => {
 })
 electron.ipcMain.addListener("get-update-available", async () => {
   if (version === "0.0.0") {
+    win?.webContents.send("update-available", false)
     return
   }
   const latestVersion = (await fetch(
