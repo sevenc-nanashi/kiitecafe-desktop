@@ -114,38 +114,29 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(playInterval)
       }
     }, 100)
-    // setInterval(() => {
-    //   if (
-    //     (document.querySelector(".hint_tab_active") as HTMLDivElement).style
-    //       .display === "none"
-    //   ) {
-    //     return
-    //   }
-    //   playButton.click()
-    // }, 100)
-    // setInterval(() => {
-    //   if (
-    //     document.querySelector("#cafe_player.loading") ||
-    //     document.querySelector("#cafe_player .videos iframe")
-    //   ) {
-    //     return
-    //   }
-    //   if (
-    //     parseFloat(
-    //       (
-    //         document.querySelector(
-    //           "#song_position .position"
-    //         )! as HTMLDivElement
-    //       ).style.width.replace("%", "")
-    //     ) /
-    //       100 >
-    //     0.01
-    //   ) {
-    //     const front = document.querySelector(".front") as HTMLDivElement
-    //     front.click()
-    //     front.click()
-    //   }
-    // }, 100)
+    setInterval(() => {
+      if (
+        document.querySelector("#cafe_player.loading") ||
+        document.querySelector("#cafe_player .videos iframe")
+      ) {
+        return
+      }
+      if (
+        parseFloat(
+          (
+            document.querySelector(
+              "#song_position .position"
+            )! as HTMLDivElement
+          ).style.width.replace("%", "")
+        ) /
+          100 >
+        0.01
+      ) {
+        const front = document.querySelector(".front") as HTMLDivElement
+        front.click()
+        front.click()
+      }
+    }, 100)
   }
 
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {
