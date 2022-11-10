@@ -6,8 +6,11 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version
+        description: バージョン
         required: true
+      description:
+        description: 説明
+        required: false
 
 jobs:
   build-vite:
@@ -150,12 +153,16 @@ jobs:
       - build-electron
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Download windows binary
         uses: actions/download-artifact@v3
         with:
           name: windows-latest-electron-built
           path: dist
-
 
       - name: Download macos binary
         uses: actions/download-artifact@v3
@@ -169,7 +176,7 @@ jobs:
           name: ubuntu-latest-electron-built
           path: dist
 
-      - name: Get version
+      - name: Setup resources
         id: version
         run: |
           if [ -n "${{ github.event.inputs.version }}" ]; then
@@ -187,11 +194,43 @@ jobs:
           echo "preview=$PREVIEW" >> $GITHUB_OUTPUT
           echo "Version: $VERSION, is preview: $PREVIEW"
 
+          cat > description.txt << EOS
+          Windows環境ではSetup.$VERSION.exe、
+          Mac環境では$VERSION.dmg、
+          Linux環境では$VERSION.AppImageをダウンロードして下さい。
+
+          ### Mac：「"Kiite Cafe Desktop"の開発元を検証できないため開けません」が出た場合
+          Finder で、Control キーを押しながらダウンロードしたアプリをクリックし、メニューから「開く」をクリックしてください。
+          または、「システム環境設定」→「セキュリティとプライバシー」→「一般」→「このまま開く」をクリックして下さい。
+
+          > **Warning**
+          > 開発者がMacの実機を持っていないため、記述が間違っている場合があります。
+
+          ----
+
+          EOS
+
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            LAST_VERSION=$(git tag -l --sort=-creatordate | sed -n "1p")
+          else
+            LAST_VERSION=$(git tag -l --sort=-creatordate | sed -n "2p")
+          fi
+          git log $LAST_VERSION...HEAD --pretty=format:"- %s" | head -n -1 > description.txt
+
+          if [ -n "${{ github.event.inputs.description }}" ]; then
+            cat > description.txt << EOS
+
+              ----
+
+              ${{ github.event.inputs.description }}
+            EOS
+          fi
+
       - name: Upload release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.version.outputs.version }}
           prerelease: ${{ steps.version.outputs.preview }}
+          body_path: description.txt
           files: |
             dist/*
-
