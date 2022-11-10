@@ -211,7 +211,7 @@ jobs:
           EOS
 
           if [ -n "${{ github.event.inputs.version }}" ]; then
-            LAST_VERSION=$(git tag -l --sort=-creatordate | sed -n "1p")
+            LAST_VERSION=$(git tag -l --sort=-creatordate | sed "/v${VERSION//./\\.}/d" | sed -n "1p")
           else
             LAST_VERSION=$(git tag -l --sort=-creatordate | sed -n "2p")
           fi
