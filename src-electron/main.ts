@@ -94,6 +94,7 @@ const createMiniPlayerWindow = () => {
     alwaysOnTop: true,
     focusable: false,
     transparent: true,
+    hasShadow: false,
     icon: iconPath,
     x: electron.screen.getPrimaryDisplay().workAreaSize.width - width,
     y: electron.screen.getPrimaryDisplay().workAreaSize.height - height,
