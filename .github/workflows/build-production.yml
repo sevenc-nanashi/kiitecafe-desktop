@@ -151,7 +151,7 @@ jobs:
 
       - name: Build electron
         run: |
-          pnpm build:electron ${{ matrix.args }}
+          pnpm build:electron ${{ matrix.build-args }}
 
       - name: Change extension
         if: matrix.ext != ''
