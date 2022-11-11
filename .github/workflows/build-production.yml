@@ -159,12 +159,14 @@ jobs:
         run: |
           FILE=$(ls ${{ matrix.path }})
           mv "${FILE}" "${FILE%.*}-${{ matrix.ext }}.${i##*.}"
+          ls -al ./dist-electron
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.name }}-electron-built
           path: ${{ matrix.path }}
+          if-no-files-found: error
 
   release:
     name: Upload release
