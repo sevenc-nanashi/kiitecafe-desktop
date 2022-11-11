@@ -158,8 +158,7 @@ jobs:
         shell: bash
         run: |
           FILE=$(ls ${{ matrix.path }})
-          mv "${FILE}" "${FILE%.*}-${{ matrix.ext }}.${i##*.}"
-          ls -al ./dist-electron
+          mv "${FILE}" "${FILE%.*}-${{ matrix.ext }}.${FILE##*.}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
