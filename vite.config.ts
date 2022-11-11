@@ -1,6 +1,7 @@
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
 import electron from "vite-plugin-electron"
+import checker from "vite-plugin-checker"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,6 +18,13 @@ export default defineConfig({
     },
   },
   plugins: [
+    checker({
+      eslint: {
+        lintCommand: "eslint --ext .js,.ts,.vue",
+      },
+      typescript: true,
+      vueTsc: true,
+    }),
     vue({
       template: {
         compilerOptions: {
