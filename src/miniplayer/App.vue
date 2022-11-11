@@ -293,6 +293,8 @@ body {
 #title div {
   white-space: nowrap;
   position: relative;
+  width: fit-content;
+  padding-right: 8px;
 }
 #info-top {
   position: relative;

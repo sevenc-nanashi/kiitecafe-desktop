@@ -24,7 +24,7 @@ if (process.platform === "darwin") {
 } else if (process.platform === "win32") {
   iconPath = path.join(publicDir, "icon.ico")
 } else {
-  iconPath = path.join(publicDir, "icon.png")
+  iconPath = path.join(publicDir, "icon-256.png")
 }
 
 const createTray = () => {
@@ -35,9 +35,9 @@ const createTray = () => {
   if (process.platform === "darwin") {
     trayIconPath = path.join(publicDir, "mac-tray-icon.png")
   } else if (process.platform === "win32") {
-    trayIconPath = path.join(publicDir, "win-tray-icon.png")
+    trayIconPath = path.join(publicDir, "icon.ico")
   } else {
-    trayIconPath = path.join(publicDir, "icon.png")
+    trayIconPath = path.join(publicDir, "icon-16.png")
   }
   tray = new electron.Tray(trayIconPath)
   if (process.platform === "darwin") {
@@ -172,7 +172,7 @@ electron.ipcMain.addListener("minimize", () => {
   const notification = new electron.Notification({
     title: "トレーに最小化されました",
     body: "タスクトレイのアイコンをクリックすると再表示できます。",
-    icon: path.join(__dirname, "../public/icon.png"),
+    icon: iconPath,
   })
   notification.show()
   store.set("minimize-info-displayed", true)
