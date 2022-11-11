@@ -206,7 +206,7 @@ body {
     margin-top: 55px;
     height: 40px;
     margin-left: 100px;
-    transform: translateX(265px);
+    transform: translateX(266px);
   }
   &.hover {
     transform: translateX(0);
