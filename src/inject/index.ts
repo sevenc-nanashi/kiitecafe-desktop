@@ -18,7 +18,6 @@ ipcRenderer.on(
     const tempTemplate = document.createElement("template")
     let aboutHTML = about
     aboutHTML = aboutHTML.replace("{{version}}", version)
-    console.log(updateAvailable)
     if (updateAvailable) {
       aboutHTML = aboutHTML.replace(/\{\[\/?new-version\]\}/gm, "")
       aboutHTML = aboutHTML.replaceAll(
@@ -264,6 +263,8 @@ document.addEventListener("DOMContentLoaded", () => {
     subtree: false,
     attributes: true,
   })
+
+  const topMenu = document.querySelector("#top_menu ul") as HTMLUListElement
   const tempTemplate = document.createElement("template")
   const logout = () => {
     if (!confirm("ログアウトしますか？")) {
@@ -271,7 +272,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     location.href = "https://kiite.jp/my/logout"
   }
-  tempTemplate.innerHTML = `<div class="sub_menu border_right" id="logout" onclick='(${logout.toString()})()'>ログアウト</div>`
-  const logoutElement = tempTemplate.content.firstElementChild as HTMLDivElement
-  cafeMenu.parentElement!.appendChild(logoutElement)
+
+  tempTemplate.innerHTML = `<li kcd onclick='location.reload()'>Reload</li>`
+  const reloadElement = tempTemplate.content.firstElementChild as HTMLLIElement
+  topMenu.appendChild(reloadElement)
+
+  tempTemplate.innerHTML = `<li kcd onclick='(${logout.toString()})()'>Logout</li>`
+  const logoutElement = tempTemplate.content.firstElementChild as HTMLLIElement
+  topMenu.appendChild(logoutElement)
 })
