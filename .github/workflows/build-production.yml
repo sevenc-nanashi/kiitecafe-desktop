@@ -90,7 +90,6 @@ jobs:
             path: dist-electron/*.dmg
             build-args: "--arm64"
             name: mac-arm64
-            ext: arm64
           - os: ubuntu-latest
             path: dist-electron/*.AppImage
             build-args: ""

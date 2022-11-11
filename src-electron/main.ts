@@ -3,6 +3,7 @@ import Store from "electron-store"
 import path from "path"
 import fetch from "node-fetch"
 import * as semver from "semver"
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 
 import { version } from "../package.json"
 
@@ -183,7 +184,8 @@ electron.ipcMain.addListener("minimize", () => {
   })
 })
 
-electron.app.on("ready", () => {
+electron.app.on("ready", async () => {
+  await installExtension(VUEJS_DEVTOOLS)
   electron.protocol.registerFileProtocol("app", (request, callback) => {
     const url = new URL(request.url)
     console.log(path.normalize(`${__dirname}/${url.pathname}`))
