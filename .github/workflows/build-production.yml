@@ -71,10 +71,11 @@ jobs:
   build-electron:
     strategy:
       matrix:
-        os:
-          - windows-latest
-          - macos-latest
-          - ubuntu-latest
+        name:
+          - windows
+          - mac-x64
+          - mac-arm64
+          - linux
         include:
           - os: windows-latest
             path: dist-electron/*.exe
@@ -186,13 +187,13 @@ jobs:
       - name: Download macos x64 binary
         uses: actions/download-artifact@v3
         with:
-          name: macos-x64-electron-built
+          name: mac-x64-electron-built
           path: dist
 
       - name: Download macos arm64 binary
         uses: actions/download-artifact@v3
         with:
-          name: macos-arm64-electron-built
+          name: mac-arm64-electron-built
           path: dist
 
       - name: Download linux binary
