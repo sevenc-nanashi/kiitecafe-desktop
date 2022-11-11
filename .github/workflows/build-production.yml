@@ -225,9 +225,17 @@ jobs:
           Mac環境では$VERSION-x64.dmg、（[Appleシリコン搭載](https://support.apple.com/ja-jp/HT211814)の場合は$VERSION-arm64.dmg）、
           Linux環境では$VERSION.AppImageをダウンロードして下さい。
 
-          ### Mac：「"Kiite Cafe Desktop"の開発元を検証できないため開けません」が出た場合
+          ### Mac（x64）：「"Kiite Cafe Desktop"の開発元を検証できないため開けません。」が出た場合
+
           Finder で、Control キーを押しながらダウンロードしたアプリをクリックし、メニューから「開く」をクリックしてください。
           または、「システム環境設定」→「セキュリティとプライバシー」→「一般」→「このまま開く」をクリックして下さい。
+
+          ### Mac（arm64）：「"Kiite Cafe Desktop"は壊れているため開けません。ゴミ箱に入れる必要があります。」が出た場合
+
+          ターミナルを開き、以下のコマンドを実行して下さい：
+          ```zsh
+          sudo xattr -d com.apple.quarantine "/Applications/Kiite Cafe Desktop.app"
+          ```
 
           > **Warning**
           > 開発者がMacの実機を持っていないため、記述が間違っている場合があります。
