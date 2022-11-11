@@ -3,7 +3,7 @@ import Store from "electron-store"
 import path from "path"
 import fetch from "node-fetch"
 import * as semver from "semver"
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer"
 
 import { version } from "../package.json"
 
