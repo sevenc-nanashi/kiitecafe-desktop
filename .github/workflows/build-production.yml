@@ -78,10 +78,22 @@ jobs:
         include:
           - os: windows-latest
             path: dist-electron/*.exe
+            build-args: ""
+            name: windows
           - os: macos-latest
             path: dist-electron/*.dmg
+            build-args: "--x64"
+            name: mac-x64
+            ext: x64
+          - os: macos-latest
+            path: dist-electron/*.dmg
+            build-args: "--arm64"
+            name: mac-arm64
+            ext: arm64
           - os: ubuntu-latest
             path: dist-electron/*.AppImage
+            build-args: ""
+            name: linux
 
     runs-on: ${{ matrix.os }}
     needs:
@@ -138,12 +150,19 @@ jobs:
 
       - name: Build electron
         run: |
-          pnpm build:electron
+          pnpm build:electron ${{ matrix.args }}
+
+      - name: Change extension
+        if: matrix.ext != ''
+        shell: bash
+        run: |
+          FILE=$(ls ${{ matrix.path }})
+          mv "${FILE}" "${FILE%.*}-${{ matrix.ext }}.${i##*.}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}-electron-built
+          name: ${{ matrix.name }}-electron-built
           path: ${{ matrix.path }}
 
   release:
@@ -161,19 +180,25 @@ jobs:
       - name: Download windows binary
         uses: actions/download-artifact@v3
         with:
-          name: windows-latest-electron-built
+          name: windows-electron-built
           path: dist
 
-      - name: Download macos binary
+      - name: Download macos x64 binary
         uses: actions/download-artifact@v3
         with:
-          name: macos-latest-electron-built
+          name: macos-x64-electron-built
+          path: dist
+
+      - name: Download macos arm64 binary
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-arm64-electron-built
           path: dist
 
       - name: Download linux binary
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu-latest-electron-built
+          name: linux-electron-built
           path: dist
 
       - name: Setup resources
@@ -196,7 +221,7 @@ jobs:
 
           cat > description.txt << EOS
           Windows環境ではSetup.$VERSION.exe、
-          Mac環境では$VERSION.dmg、
+          Mac環境では$VERSION-x64.dmg、（[Appleシリコン搭載](https://support.apple.com/ja-jp/HT211814)の場合は$VERSION-arm64.dmg）、
           Linux環境では$VERSION.AppImageをダウンロードして下さい。
 
           ### Mac：「"Kiite Cafe Desktop"の開発元を検証できないため開けません」が出た場合
