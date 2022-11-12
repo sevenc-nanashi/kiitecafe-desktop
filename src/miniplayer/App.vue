@@ -21,33 +21,34 @@ watch(isHovering, (value) => {
   window.electron.send("set-ignore-mouse-events", !value)
 })
 
-watch([info, titleEl, titleContentEl], ([inf, el, conEl]) => {
-  if (!inf || !el || !conEl) {
-    return
-  }
-})
-watch(info, (newInfo, oldInfo) => {
-  if (newInfo?.id === oldInfo?.id && animations.length > 0) {
-    return
-  }
-  animations.forEach((a) => a.cancel())
-  const conEl = titleContentEl.value
-  if (!conEl) {
-    return
-  }
-  animations.push(
-    conEl.animate(
-      [
-        { left: 0, offset: 0.2 },
-        {
-          left: `-${conEl.scrollWidth - conEl.clientWidth}px`,
-          offset: 0.8,
-        },
-      ],
-      { duration: 10000, iterations: Infinity }
+watch(
+  info,
+  (newInfo, oldInfo) => {
+    if (newInfo?.id === oldInfo?.id && animations.length > 0) {
+      return
+    }
+    console.log("new info", newInfo)
+    animations.forEach((a) => a.cancel())
+    const titlEl = titleEl.value
+    const conEl = titleContentEl.value
+    if (!conEl || !titlEl) {
+      return
+    }
+    animations.push(
+      conEl.animate(
+        [
+          { left: 0, offset: 0.2 },
+          {
+            left: `-${conEl.scrollWidth - titlEl.clientWidth}px`,
+            offset: 0.7,
+          },
+        ],
+        { duration: 10000, iterations: Infinity }
+      )
     )
-  )
-})
+  },
+  { immediate: true }
+)
 
 window.electron.receive("set-muted", (value: boolean) => {
   isMuted.value = value
