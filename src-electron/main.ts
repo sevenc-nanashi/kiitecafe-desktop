@@ -27,7 +27,7 @@ if (process.platform === "darwin") {
   iconPath = path.join(publicDir, "icon-256.png")
 }
 
-const createTray = () => {
+const createTray = async () => {
   if (tray) {
     return
   }
@@ -60,7 +60,7 @@ const registerWindowOpenHandler = (win: electron.BrowserWindow) => {
   })
 }
 
-const createMainWindow = () => {
+const createMainWindow = async () => {
   win = new electron.BrowserWindow({
     width: 1200,
     height: 800,
@@ -73,6 +73,7 @@ const createMainWindow = () => {
 
   const params = new URLSearchParams()
   params.append("dirname", __dirname)
+  params.append("muted", (store.get("muted", false) as boolean).toString())
   if (isDevelopment) {
     win.loadURL("http://localhost:5173?" + params.toString())
     win.webContents.openDevTools({ mode: "detach" })
@@ -88,7 +89,7 @@ const createMainWindow = () => {
   win.setMenu(null)
 }
 
-const createMiniPlayerWindow = () => {
+const createMiniPlayerWindow = async () => {
   const width = 810
   const height = 95
   miniPlayerWin = new electron.BrowserWindow({
@@ -177,13 +178,16 @@ electron.ipcMain.addListener("minimize", () => {
   notification.show()
   store.set("minimize-info-displayed", true)
 })
-;["set-muted", "set-favorite"].forEach((channel) => {
-  electron.ipcMain.addListener(channel, (_event, value) => {
-    win?.webContents.send(channel, value)
-    miniPlayerWin?.webContents.send(channel, value)
-  })
+electron.ipcMain.addListener("set-muted", (_event, value) => {
+  win?.webContents.send("set-muted", value)
+  miniPlayerWin?.webContents.send("set-muted", value)
+  store.set("muted", value)
 })
 
+electron.ipcMain.addListener("set-favorite", (_event, value) => {
+  win?.webContents.send("set-favorite", value)
+  miniPlayerWin?.webContents.send("set-favorite", value)
+})
 electron.app.on("ready", async () => {
   await installExtension(VUEJS_DEVTOOLS)
   electron.protocol.registerFileProtocol("app", (request, callback) => {

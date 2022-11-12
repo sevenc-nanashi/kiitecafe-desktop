@@ -8,7 +8,7 @@ const dirname = params.get("dirname")
 const preloadPath = dirname + "/injectPreload.js"
 const preloadUrl = new URL(preloadPath, "file://").toString()
 
-const isMuted = ref(false)
+const isMuted = ref(params.get("muted") === "true")
 const updateAvailable = ref<
   { tag_name: string; html_url: string } | boolean | null
 >(null)
@@ -16,13 +16,14 @@ const updateAvailable = ref<
 watch(webviewRef, async (webview) => {
   if (webview) {
     if (import.meta.env.DEV) {
-      webview.addEventListener("dom-ready", (e) => {
+      webview.addEventListener("dom-ready", () => {
         webview.openDevTools()
       })
     }
     webview.addEventListener("dom-ready", () => {
       window.electron.send("setup-webview", webview.getWebContentsId())
       window.electron.send("get-update-available", null)
+      webview.setAudioMuted(isMuted.value)
     })
   }
 })
@@ -57,7 +58,9 @@ import { defineComponent } from "vue"
 export default defineComponent({
   name: "App",
   unmounted() {
-    ;(document.querySelector("webview") as WebviewTag).closeDevTools()
+    try {
+      ;(document.querySelector("webview") as WebviewTag).closeDevTools()
+    } catch {}
   },
 })
 </script>
