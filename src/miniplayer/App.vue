@@ -246,7 +246,6 @@ body {
   color: white;
   margin: 10px;
   margin-right: 5px;
-  padding: 10px;
   box-sizing: border-box;
   overflow: hidden;
   cursor: pointer;
@@ -295,7 +294,7 @@ body {
   white-space: nowrap;
   position: relative;
   width: fit-content;
-  padding-right: 8px;
+  padding: 0 8px;
 }
 #info-top {
   position: relative;
@@ -304,6 +303,7 @@ body {
 #info-bottom {
   position: relative;
   display: flex;
+  margin: 0 8px;
 }
 #artist {
   font-size: 15px;
@@ -359,7 +359,6 @@ body {
   }
   #info {
     padding: 0;
-    padding-left: 10px;
   }
 
   #smaller-artist {
