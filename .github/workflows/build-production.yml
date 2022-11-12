@@ -233,9 +233,9 @@ jobs:
           ### Mac（arm64）：「"Kiite Cafe Desktop"は壊れているため開けません。ゴミ箱に入れる必要があります。」が出た場合
 
           ターミナルを開き、以下のコマンドを実行して下さい：
-          ```zsh
+          \`\`\`zsh
           sudo xattr -d com.apple.quarantine "/Applications/Kiite Cafe Desktop.app"
-          ```
+          \`\`\`
 
           > **Warning**
           > 開発者がMacの実機を持っていないため、記述が間違っている場合があります。
