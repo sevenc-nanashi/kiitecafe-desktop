@@ -140,7 +140,7 @@ window.electron.receive("set-rotating", (value: boolean) => {
         }"
       />
       <template v-if="windowType === 'info'">
-        <div id="info" @click="openNico">
+        <div id="info" :data-reason="info.reason" @click="openNico">
           <div id="info-top">
             <div id="title" ref="titleEl">
               <div ref="titleContentEl">
@@ -296,6 +296,15 @@ body {
 
   &:hover {
     background: rgba(0, 0, 0, 1);
+  }
+  &[data-reason="priority_playlist"] {
+    color: #00feff;
+  }
+  &[data-reason="favorite"] {
+    color: #ff33aa;
+  }
+  &[data-reason="playlist"] {
+    color: #10d300;
   }
 }
 .control-button {
