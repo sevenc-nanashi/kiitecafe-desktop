@@ -128,6 +128,7 @@ window.electron.receive("set-rotating", (value: boolean) => {
       backgroundImage: 'url(' + info.thumbnail + ')',
     }"
     :class="{ hover: isHovering }"
+    :data-window-type="windowType"
     @mouseenter="() => (isHovering = true)"
     @mouseleave="() => (isHovering = false)"
   >
@@ -249,7 +250,7 @@ body {
   height: 40px;
   margin-left: 100px;
   transform: translateX(268px);
-  &.hover {
+  &.hover, &[data-window-type="action"] {
     transform: translateX(0);
     background-size: calc(100% + 6px);
   }
@@ -275,7 +276,7 @@ body {
 }
 #info {
   position: relative;
-  height: 100%;
+  height: calc(100% + 1px);
   width: 100%;
   max-width: calc(100% - 100vh);
   flex-grow: 1;
@@ -286,6 +287,7 @@ body {
   text-align: left;
   color: white;
   margin: 10px;
+  margin-top: 11px;
   margin-right: 5px;
   box-sizing: border-box;
   overflow: hidden;
@@ -420,9 +422,12 @@ svg[data-icon="heart"] {
     color: #000;
   }
 }
-#rotate-button.active {
-  svg {
-    animation: rotate 10s infinite linear;
+#rotate-button {
+  margin-left: 10px;
+  &.active {
+    svg {
+      animation: rotate 10s infinite linear;
+    }
   }
 }
 #popup-message-button {
