@@ -18,6 +18,7 @@ watch(webviewRef, async (webview) => {
     if (import.meta.env.DEV) {
       webview.addEventListener("dom-ready", () => {
         webview.openDevTools()
+        webviewWithDevTools = webview
       })
     }
     webview.addEventListener("dom-ready", () => {
@@ -37,11 +38,12 @@ watch(isMuted, (value) => {
 window.electron.receive("set-muted", (value: boolean) => {
   isMuted.value = value
 })
-
-window.electron.receive("set-favorite", (value: boolean) => {
-  if (webviewRef.value) {
-    webviewRef.value.send("set-favorite", value)
-  }
+;["set-favorite", "set-rotating", "set-popup-message"].forEach((name) => {
+  window.electron.receive(name, (value: unknown) => {
+    if (webviewRef.value) {
+      webviewRef.value.send(name, value)
+    }
+  })
 })
 
 window.electron.receive("update-available", (value: boolean) => {
@@ -55,11 +57,12 @@ window.electron.send("set-muted", isMuted.value)
 <script lang="ts">
 import { defineComponent } from "vue"
 
+let webviewWithDevTools: WebviewTag | null = null
 export default defineComponent({
   name: "App",
   unmounted() {
     try {
-      ;(document.querySelector("webview") as WebviewTag).closeDevTools()
+      webviewWithDevTools?.closeDevTools()
     } catch {}
   },
 })

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 import { watch, ref } from "vue"
 const info = ref<NowPlayingInfo>()
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
@@ -27,11 +28,13 @@ watch(
     if (newInfo?.id === oldInfo?.id && animations.length > 0) {
       return
     }
-    console.log("new info", newInfo)
     animations.forEach((a) => a.cancel())
     const titlEl = titleEl.value
     const conEl = titleContentEl.value
     if (!conEl || !titlEl) {
+      return
+    }
+    if (conEl.scrollWidth - titlEl.clientWidth < 0) {
       return
     }
     animations.push(
@@ -66,13 +69,13 @@ const openNico = () => {
   window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`)
 }
 
-const windowType = ref<"normal" | "smaller">("smaller")
+const windowType = ref<"action" | "info">("info")
 
-const toNormalWindow = () => {
-  windowType.value = "normal"
+const toActionWindow = () => {
+  windowType.value = "action"
 }
-const toSmallerWindow = () => {
-  windowType.value = "smaller"
+const toInfoWindow = () => {
+  windowType.value = "info"
 }
 const minimizeWindow = () => {
   window.electron.send("minimize", [])
@@ -87,6 +90,33 @@ const tweet = () => {
     `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
   )
 }
+
+const isRotating = ref(false)
+const rotate = () => {
+  window.electron.send("set-rotating", !isRotating.value)
+}
+
+let prevMessage: string | null = null
+const messageTextBoxContent = ref("")
+const isPopupMessageActive = ref(false)
+const popupMessage = () => {
+  if (messageTextBoxContent.value === prevMessage) {
+    messageTextBoxContent.value = ""
+    isPopupMessageActive.value = false
+    window.electron.send("set-popup-message", "")
+  } else {
+    isPopupMessageActive.value = true
+    window.electron.send("set-popup-message", messageTextBoxContent.value)
+  }
+}
+window.electron.receive("set-popup-message", (message: string) => {
+  prevMessage = message
+  messageTextBoxContent.value = message
+  isPopupMessageActive.value = message !== ""
+})
+window.electron.receive("set-rotating", (value: boolean) => {
+  isRotating.value = value
+})
 </script>
 
 <template>
@@ -97,7 +127,7 @@ const tweet = () => {
     :style="{
       backgroundImage: 'url(' + info.thumbnail + ')',
     }"
-    :class="{ hover: isHovering, smaller: windowType === 'smaller' }"
+    :class="{ hover: isHovering }"
     @mouseenter="() => (isHovering = true)"
     @mouseleave="() => (isHovering = false)"
   >
@@ -108,77 +138,92 @@ const tweet = () => {
           backgroundImage: `url(${info.thumbnail})`,
         }"
       />
-      <div id="info" @click="openNico">
-        <div id="info-top">
-          <div id="title" ref="titleEl">
-            <div ref="titleContentEl">
-              {{ info.title
-              }}<span v-if="windowType === 'smaller'" id="smaller-artist">{{
-                info.artist
-              }}</span>
+      <template v-if="windowType === 'info'">
+        <div id="info" @click="openNico">
+          <div id="info-top">
+            <div id="title" ref="titleEl">
+              <div ref="titleContentEl">
+                {{ info.title
+                }}<span id="smaller-artist">{{ info.artist }}</span>
+              </div>
             </div>
           </div>
+          <div
+            id="progress"
+            :style="{
+              width: info.progress * 100 + '%',
+            }"
+          />
         </div>
-        <div id="info-bottom">
-          <div id="artist">{{ info.artist }}</div>
-          <div id="publishedAt">{{ info.publishedAt }}</div>
+        <div class="control-button" @click="toggleFavorite">
+          <FontAwesomeIcon
+            :icon="info.favorited ? ['fas', 'fa-heart'] : ['far', 'fa-heart']"
+            :class="{ favorited: info.favorited }"
+          />
+          <br v-if="windowType !== 'info'" />
+          <span>{{ info.favoriteCount }}</span>
         </div>
-        <div
-          id="progress"
-          :style="{
-            width: info.progress * 100 + '%',
-          }"
-        />
-      </div>
-      <div class="control-button" @click="toggleFavorite">
-        <i
-          class="fa-heart"
-          :class="{
-            'fa-solid': info.favorited,
-            'fa-regular': !info.favorited,
-          }"
-        ></i>
-        <br v-if="windowType !== 'smaller'" />
-        <span>{{ info.favoriteCount }}</span>
-      </div>
-      <div class="control-button" @click="toggleMute">
-        <i
-          class="fa-solid"
-          :class="{ 'fa-volume-mute': isMuted, 'fa-volume-up': !isMuted }"
-        ></i>
+        <div class="control-button" @click="toggleMute">
+          <FontAwesomeIcon
+            :icon="isMuted ? ['fas', 'volume-mute'] : ['fas', 'volume-up']"
+          />
 
-        <br v-if="windowType !== 'smaller'" />
-        <span
-          :style="{
-            textDecoration: isMuted ? 'line-through' : 'none',
-            textDecorationThickness: '2px',
-          }"
-          >{{ info.volume }}</span
+          <br v-if="windowType !== 'info'" />
+          <span
+            :style="{
+              textDecoration: isMuted ? 'line-through' : 'none',
+              textDecorationThickness: '2px',
+            }"
+            >{{ info.volume }}</span
+          >
+        </div>
+        <div class="control-button" @click="tweet">
+          <FontAwesomeIcon icon="fab fa-square-twitter" />
+          <br v-if="windowType !== 'info'" />
+          <span v-if="windowType !== 'info'" id="tweet-text">ツイート</span>
+        </div>
+      </template>
+      <template v-else>
+        <div
+          id="rotate-button"
+          class="icon-button-wrapper"
+          :class="{ active: isRotating }"
+          @click="rotate"
         >
-      </div>
-      <div class="control-button" @click="tweet">
-        <i class="fa-brands fa-square-twitter"></i>
-        <br v-if="windowType !== 'smaller'" />
-        <span v-if="windowType !== 'smaller'" id="tweet-text">ツイート</span>
-      </div>
+          <FontAwesomeIcon icon="fas fa-rotate-right" title="回る" />
+        </div>
+        <input
+          id="message-textbox"
+          v-model="messageTextBoxContent"
+          type="text"
+        />
+        <div
+          id="popup-message-button"
+          class="icon-button-wrapper"
+          :class="{ active: isPopupMessageActive }"
+          @click="popupMessage"
+        >
+          <FontAwesomeIcon icon="fas fa-message" title="吹き出し" />
+        </div>
+      </template>
       <div id="window-control">
-        <i
-          class="fa-regular fa-square-minus"
-          title="ミニプレイヤーを最小化"
+        <FontAwesomeIcon
+          v-if="windowType === 'info'"
+          icon="fas fa-comment"
+          class="icon-button"
+          @click="toActionWindow"
+        />
+        <FontAwesomeIcon
+          v-if="windowType === 'action'"
+          icon="fas fa-info"
+          class="icon-button"
+          @click="toInfoWindow"
+        />
+        <FontAwesomeIcon
+          icon="far fa-square-minus"
+          class="icon-button"
           @click="minimizeWindow"
-        ></i>
-        <i
-          v-if="windowType === 'normal'"
-          class="fa-solid fa-down-left-and-up-right-to-center"
-          title="コンパクト表示"
-          @click="toSmallerWindow"
-        ></i>
-        <i
-          v-if="windowType === 'smaller'"
-          class="fa-solid fa-up-right-and-down-left-from-center"
-          title="拡大表示"
-          @click="toNormalWindow"
-        ></i>
+        />
       </div>
     </div>
   </div>
@@ -197,17 +242,13 @@ body {
   background-size: 570px;
   background-position: left;
   background-repeat: no-repeat;
-  margin-left: 5px;
   transform: translateX(262px);
-  margin-top: 5px;
   transition: transform 0.2s, background-size 0.2s;
   overflow: hidden;
-  &.smaller {
-    margin-top: 55px;
-    height: 40px;
-    margin-left: 100px;
-    transform: translateX(266px);
-  }
+  margin-top: 55px;
+  height: 40px;
+  margin-left: 100px;
+  transform: translateX(268px);
   &.hover {
     transform: translateX(0);
     background-size: calc(100% + 6px);
@@ -230,7 +271,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 #info {
   position: relative;
@@ -256,12 +297,13 @@ body {
 }
 .control-button {
   width: 110px;
-  height: calc(100vh - 17px);
+  height: calc(100% - 1px);
+  padding: 0;
+  padding-top: 5px;
   background: rgba(0, 0, 0, 0.5);
   margin-top: 3px;
   margin-right: 5px;
   margin-bottom: 5px;
-  padding: 10px;
   box-sizing: border-box;
   text-align: center;
   color: #bbb;
@@ -270,21 +312,25 @@ body {
     background: rgba(0, 0, 0, 1);
     color: white;
   }
-  i {
-    font-size: 35px;
+  svg {
+    font-size: 20px;
+    margin-right: 4px;
   }
   span {
     font-size: 15px;
   }
 }
-.fa-solid.fa-heart {
+svg.favorited {
   color: #ff33aa;
+}
+svg[data-icon="heart"] {
+  transition: color 0.2s;
 }
 #tweet-text {
   font-size: 12px;
 }
 #title {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: bold;
   overflow: hidden;
   flex-grow: 1;
@@ -299,11 +345,6 @@ body {
 #info-top {
   position: relative;
   margin-top: 4px;
-}
-#info-bottom {
-  position: relative;
-  display: flex;
-  margin: 0 8px;
 }
 #artist {
   font-size: 15px;
@@ -324,63 +365,83 @@ body {
 #window-control {
   display: flex;
   height: calc(100% - 2px);
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   text-align: center;
   margin-bottom: 2px;
   color: #bbb;
-  i {
-    font-size: 24px;
-    display: block;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px;
-    &:hover {
-      background: rgba(0, 0, 0, 1);
-      color: white;
-    }
+}
+.icon-button {
+  font-size: 19px;
+  display: block;
+  cursor: pointer;
+  aspect-ratio: 1;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px;
+  margin-right: 5px;
+  color: #bbb;
+  &:last-child {
+    margin-right: 0;
+  }
+  &:hover {
+    background: rgba(0, 0, 0, 1);
+    color: white;
   }
 }
-.smaller {
-  #thumbnail {
-    border-radius: 5px;
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
   }
-  .control-button {
-    height: calc(100% - 1px);
-    padding: 0;
-    padding-top: 5px;
+  100% {
+    transform: rotate(360deg);
   }
-  .control-button i {
-    font-size: 20px;
-    margin-right: 4px;
+}
+.icon-button-wrapper {
+  font-size: 19px;
+  height: calc(100% - 1px);
+  display: flex;
+  cursor: pointer;
+  position: relative;
+  aspect-ratio: 1;
+  background: rgba(0, 0, 0, 0.5);
+  margin: 5px;
+  margin-top: 3px;
+  aspect-ratio: 1;
+  color: #bbb;
+  svg {
+    margin: auto;
   }
-  #title {
-    font-size: 15px;
+  &:hover {
+    background: rgba(0, 0, 0, 1);
+    color: white;
   }
-  #info {
-    padding: 0;
+  &.active {
+    background: #fffe00;
+    color: #000;
   }
+}
+#rotate-button.active {
+  svg {
+    animation: rotate 10s infinite linear;
+  }
+}
+#popup-message-button {
+  margin-bottom: 1px;
+}
+#message-textbox {
+  margin: 6px 4px 8px 0;
+  height: calc(100% - 5px);
+  flex-grow: 1;
+}
 
-  #smaller-artist {
-    font-size: 12px;
-    margin-left: 12px;
-    color: #bbb;
-  }
-  #info-bottom {
-    display: none;
-  }
+#popup-message-button {
+  margin-top: 0;
+  margin-left: 0;
+}
 
-  #window-control {
-    height: calc(100% - 1px);
-    margin-top: 1px;
-    flex-direction: row;
-    i {
-      padding: 5px;
-      font-size: 20px;
-      &:first-child {
-        margin-right: 5px;
-      }
-    }
-  }
+#smaller-artist {
+  font-size: 12px;
+  margin-left: 12px;
+  color: #bbb;
 }
 </style>

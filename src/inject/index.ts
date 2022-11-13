@@ -1,16 +1,38 @@
-import { ipcRenderer } from "electron"
+import { contextBridge, ipcRenderer } from "electron"
 import style from "./style.scss"
 import loginStyle from "./loginStyle.css"
 import packageJson from "../../package.json?raw"
 
 import about from "./about.html?raw"
 
+import type { CafeMusicInfo } from "./window"
+
 console.log("Preload: loaded")
 
 const version = JSON.parse(packageJson).version
 
 type UpdateAvailable = { tag_name: string; html_url: string } | false
+type CafeMusicGetter = () => CafeMusic
+type CafeUsersGetter = () => CafeUsers
+let cafeMusic: CafeMusicGetter | null = null
+let cafeUsers: CafeUsersGetter | null = null
+contextBridge.exposeInMainWorld("preload", {
+  setCafeMusicGetter: (func: CafeMusicGetter) => {
+    cafeMusic = func
+  },
+  setCafeUsersGetter: (func: CafeUsersGetter) => {
+    cafeUsers = func
+  },
+})
 
+declare global {
+  interface Window {
+    preload: {
+      setCafeMusicGetter: (func: CafeMusicGetter) => void
+      setCafeUsersGetter: (func: CafeUsersGetter) => void
+    }
+  }
+}
 ipcRenderer.on(
   "update-available",
   (_event, updateAvailable: UpdateAvailable) => {
@@ -61,6 +83,32 @@ ipcRenderer.on("set-favorite", (_event, favorite) => {
   }
   button.click()
 })
+ipcRenderer.on("set-rotating", (_event, rotating) => {
+  const button = document.querySelector(
+    '.btn[data-gesture="rotate"]'
+  ) as HTMLDivElement
+  if (button.classList.contains("on") === rotating) {
+    return
+  }
+  button.click()
+})
+ipcRenderer.on("set-popup-message", (_event, popupMessage: string | null) => {
+  const input = document.querySelector(
+    "#comment_form input"
+  ) as HTMLInputElement
+  const submitButton = document.querySelector(
+    "#comment_form .btn.submit"
+  ) as HTMLButtonElement
+  const cleanButton = document.querySelector(
+    "#comment_form .btn.clean"
+  ) as HTMLButtonElement
+  if (popupMessage) {
+    input.value = popupMessage
+    submitButton.click()
+  } else {
+    cleanButton.click()
+  }
+})
 document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("login")) {
     return
@@ -81,25 +129,26 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("pc")) {
     return
   }
-  const patchPlay = () => {
-    // @ts-expect-error: †黒魔術に制約は要らない†
-    const patchedPlay = function (e) {
+  const injectScript = () => {
+    const patchedPlay = function (
+      this: CafeMusic,
+      musicInfo: CafeMusicInfo & { start_time: number }
+    ) {
       console.log("Preload: Called patchedPlay")
-      // @ts-expect-error: †黒魔術に制約は要らない†
-      d3.select("#cafe_player")
+      window.d3
+        .select("#cafe_player")
         .classed("loading", true)
         .classed("show_hint_tab_active", false)
-      // @ts-expect-error: †黒魔術に制約は要らない†
-      const player = new CafePlayer(e.video_id, e.start_time)
+      const player = new window.CafePlayer(
+        musicInfo.video_id,
+        musicInfo.start_time
+      )
 
       player.load({
         onFirstPlay: function () {
-          // eslint-disable-next-line
           return (
-            // @ts-expect-error: †黒魔術に制約は要らない†
-            5 < player.seekTo(window.cafe_music.get_song_pos(e)),
-            // @ts-expect-error: †黒魔術に制約は要らない†
-            d3
+            5 < player.seekTo(window.cafe_music.get_song_pos(musicInfo)),
+            window.d3
               .select("#cafe_player")
               .classed("loading", false)
               .classed("playing", true)
@@ -110,26 +159,29 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       })
 
-      // @ts-expect-error: †黒魔術に制約は要らない†
       this.now_playing_player = player
 
-      // @ts-expect-error: †黒魔術に制約は要らない†
-      this.play_history(e)
+      this.play_history(musicInfo)
     }
     patchedPlay.isPatched = true
 
     const patchInterval = setInterval(() => {
-      // @ts-expect-error: †黒魔術に制約は要らない†
+      // @ts-expect-error: 改造されたかどうか判断する黒魔術
       if (window.cafe_music.play.isPatched) clearInterval(patchInterval)
 
-      // @ts-expect-error: †黒魔術に制約は要らない†
       window.cafe_music.play = patchedPlay
-      // @ts-expect-error: †黒魔術に制約は要らない†
       window.CafeMusic.prototype.play = patchedPlay
     }, 100)
+
+    window.preload.setCafeMusicGetter(() => {
+      return window.cafe_music
+    })
+    window.preload.setCafeUsersGetter(() => {
+      return window.cafe_users
+    })
   }
   const script = document.createElement("script")
-  script.textContent = `(${patchPlay.toString()})()`
+  script.textContent = `(${injectScript.toString()})()`
   document.body.appendChild(script)
   console.log("Preload: Added script", script)
 })
@@ -212,6 +264,9 @@ document.addEventListener("DOMContentLoaded", () => {
       volume: parseInt(
         document.querySelector(".volume .value")!.textContent!.trim()
       ),
+      reason: cafeMusic!().reason.reasons.find(
+        (r) => r.user_id === cafeUsers!().me.user_id
+      )?.type,
     }
     if (!nowPlayingInfo.id) {
       return
@@ -234,6 +289,14 @@ document.addEventListener("DOMContentLoaded", () => {
       attributes: true,
     }
   )
+  const rotateButton = document.querySelector(
+    '.btn[data-gesture="rotate"]'
+  ) as HTMLDivElement
+  new MutationObserver(() => {
+    ipcRenderer.send("set-rotating", rotateButton.classList.contains("on"))
+  }).observe(rotateButton, {
+    attributes: true,
+  })
 
   const cafe = document.querySelector("#cafe") as HTMLDivElement
   const cafeMenu = document.querySelector("#cafe_menu ul") as HTMLUListElement

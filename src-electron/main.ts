@@ -98,7 +98,7 @@ const createMiniPlayerWindow = async () => {
     frame: false,
     resizable: false,
     alwaysOnTop: true,
-    focusable: false,
+    skipTaskbar: true,
     transparent: true,
     hasShadow: false,
     icon: iconPath,
@@ -178,10 +178,12 @@ electron.ipcMain.addListener("minimize", () => {
   notification.show()
   store.set("minimize-info-displayed", true)
 })
-electron.ipcMain.addListener("set-muted", (_event, value) => {
-  win?.webContents.send("set-muted", value)
-  miniPlayerWin?.webContents.send("set-muted", value)
-  store.set("muted", value)
+;["set-muted", "set-popup-message", "set-rotating"].forEach((channel) => {
+  electron.ipcMain.addListener(channel, (_event, value) => {
+    win?.webContents.send(channel, value)
+    miniPlayerWin?.webContents.send(channel, value)
+    store.set("muted", value)
+  })
 })
 
 electron.ipcMain.addListener("set-favorite", (_event, value) => {
