@@ -135,6 +135,16 @@ electron.ipcMain.addListener("now-playing-info", (_event, info) => {
   tray?.setToolTip(`${info.title} - ${info.artist} | Kiite Cafe Desktop`)
   win?.setTitle(`${info.title} - ${info.artist} | Kiite Cafe Desktop`)
 })
+;["get-playlists", "add-playlist-song"].forEach((channel) => {
+  electron.ipcMain.addListener(channel, (_event, ...args) => {
+    console.log(channel, args)
+    win?.webContents.send(channel, ...args)
+  })
+  electron.ipcMain.addListener(channel + "-result", (_event, playlists) => {
+    console.log(channel + "-result", playlists)
+    miniPlayerWin?.webContents.send(channel + "-result", playlists)
+  })
+})
 
 electron.ipcMain.addListener("setup-webview", (_event, id) => {
   const webview = electron.webContents.fromId(id)

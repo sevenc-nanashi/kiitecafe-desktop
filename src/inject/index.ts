@@ -17,22 +17,32 @@ if (version === "0.0.0") {
 type UpdateAvailable = { tag_name: string; html_url: string } | false
 type CafeMusicGetter = () => CafeMusic
 type CafeUsersGetter = () => CafeUsers
+type SnsUserGetter = () => SnsUser
+type WindowFuncs = {
+  cafeMusic: CafeMusicGetter
+  cafeUsers: CafeUsersGetter
+  snsUser: SnsUserGetter
+  getPlaylists: () => Promise<Playlist[]>
+  addPlaylistSong: (listId: string, songId: string) => Promise<boolean>
+}
 let cafeMusic: CafeMusicGetter | null = null
 let cafeUsers: CafeUsersGetter | null = null
+let getPlaylists: WindowFuncs["getPlaylists"] | null = null
+let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
+
 contextBridge.exposeInMainWorld("preload", {
-  setCafeMusicGetter: (func: CafeMusicGetter) => {
-    cafeMusic = func
-  },
-  setCafeUsersGetter: (func: CafeUsersGetter) => {
-    cafeUsers = func
+  setFuncs: (funcs: WindowFuncs) => {
+    cafeMusic = funcs.cafeMusic
+    cafeUsers = funcs.cafeUsers
+    getPlaylists = funcs.getPlaylists
+    addPlaylistSong = funcs.addPlaylistSong
   },
 })
 
 declare global {
   interface Window {
     preload: {
-      setCafeMusicGetter: (func: CafeMusicGetter) => void
-      setCafeUsersGetter: (func: CafeUsersGetter) => void
+      setFuncs: (funcs: WindowFuncs) => void
     }
   }
 }
@@ -114,6 +124,16 @@ ipcRenderer.on("set-popup-message", (_event, popupMessage: string | null) => {
     cleanButton.click()
   }
 })
+ipcRenderer.on("get-playlists", async () => {
+  ipcRenderer.send("get-playlists-result", await getPlaylists!())
+})
+ipcRenderer.on("add-playlist-song", async (_event, listId, songId) => {
+  ipcRenderer.send(
+    "add-playlist-song-result",
+    await addPlaylistSong!(listId, songId)
+  )
+})
+
 document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("login")) {
     return
@@ -160,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
           )
         },
         onPause: function () {
-          return this.pause()
+          return this.pause!()
         },
       })
 
@@ -178,11 +198,29 @@ document.addEventListener("DOMContentLoaded", () => {
       window.CafeMusic.prototype.play = patchedPlay
     }, 100)
 
-    window.preload.setCafeMusicGetter(() => {
-      return window.cafe_music
-    })
-    window.preload.setCafeUsersGetter(() => {
-      return window.cafe_users
+    window.preload.setFuncs({
+      cafeMusic: () => window.cafe_music,
+      cafeUsers: () => window.cafe_users,
+      snsUser: () => window.sns_user,
+      getPlaylists: () =>
+        new Promise<Playlist[]>((resolve) => {
+          window.sns_user.get_api_playlists(resolve)
+        }),
+      addPlaylistSong: async (playlistId, songId) => {
+        const playlist = await new Promise<{ songs: string[] }>((resolve) =>
+          window.sns_user.get_api_playlist_songs(playlistId, resolve)
+        )
+
+        if (playlist.songs.includes(songId)) {
+          return false
+        }
+        await new Promise((resolve) =>
+          window.sns_user.post_song_to_playlist(songId, playlistId, {
+            onSuccess: resolve,
+          })
+        )
+        return true
+      },
     })
   }
   const script = document.createElement("script")
@@ -235,6 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {
+    if (!cafeUsers || !cafeUsers().me) {
+      return
+    }
     const nowPlayingInfo: NowPlayingInfo = {
       title: document
         .querySelector("#now_playing_info .title")!

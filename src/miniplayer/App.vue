@@ -10,6 +10,9 @@ import MinusIcon from "vue-material-design-icons/Minus.vue"
 import ReloadIcon from "vue-material-design-icons/Reload.vue"
 import MessageIcon from "vue-material-design-icons/Message.vue"
 import PlaylistMusicIcon from "vue-material-design-icons/PlaylistMusic.vue"
+import PlaylistPlusIcon from "vue-material-design-icons/PlaylistPlus.vue"
+import PlaylistCheckIcon from "vue-material-design-icons/PlaylistCheck.vue"
+import PlaylistRemoveIcon from "vue-material-design-icons/PlaylistRemove.vue"
 import { watch, ref } from "vue"
 const info = ref<NowPlayingInfo>()
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
@@ -79,10 +82,14 @@ const openNico = () => {
   window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`)
 }
 
-const windowType = ref<"action" | "info">("info")
+const windowType = ref<"action" | "playlist" | "info">("info")
 
 const toActionWindow = () => {
   windowType.value = "action"
+}
+const toPlaylistWindow = () => {
+  windowType.value = "playlist"
+  fetchPlaylists()
 }
 const toInfoWindow = () => {
   windowType.value = "info"
@@ -127,14 +134,48 @@ const popupMessage = () => {
   }
 }
 
-const addPlaylist = () => {
-  window.electron.send("add-playlist", info.value?.id)
+const isAddingPlaylist = ref(false)
+const addPlaylistResult = ref<boolean | null>(null)
+const selectedPlaylist = ref<string | null>(null)
+const playlists = ref<Playlist[]>([])
+const fetchPlaylists = async () => {
+  window.electron.send("get-playlists", [])
+}
+let resolveAddPlaylistSong: ((value: boolean) => void) | null = null
+const addPlaylist = async () => {
+  if (!info.value) return
+  if (isAddingPlaylist.value) return
+  if (selectedPlaylist.value) {
+    isAddingPlaylist.value = true
+    window.electron.send(
+      "add-playlist-song",
+      selectedPlaylist.value,
+      info.value.id
+    )
+    addPlaylistResult.value = await new Promise<boolean>((resolve) => {
+      resolveAddPlaylistSong = resolve
+    })
+    setTimeout(() => {
+      addPlaylistResult.value = null
+
+      isAddingPlaylist.value = false
+    }, 3000)
+  }
 }
 
 window.electron.receive("set-popup-message", (message: string) => {
   prevMessage = message
   messageTextBoxContent.value = message
   isPopupMessageActive.value = message !== ""
+})
+window.electron.receive("get-playlists-result", (value: Playlist[]) => {
+  playlists.value = value
+})
+window.electron.receive("add-playlist-song-result", (value: boolean) => {
+  if (resolveAddPlaylistSong) {
+    resolveAddPlaylistSong(value)
+    resolveAddPlaylistSong = null
+  }
 })
 window.electron.receive("set-rotating", (value: boolean) => {
   isRotating.value = value
@@ -195,11 +236,44 @@ window.electron.receive("set-rotating", (value: boolean) => {
             >{{ info.volume }}</span
           >
         </div>
-        <div class="icon-button-wrapper" @click="addPlaylist">
+        <div class="icon-button-wrapper" @click="toPlaylistWindow">
           <PlaylistMusicIcon />
         </div>
         <div id="tweet-button" class="icon-button-wrapper" @click="tweet">
           <FontAwesomeIcon icon="fab fa-square-twitter" />
+        </div>
+      </template>
+      <template v-else-if="windowType === 'playlist'">
+        <select
+          id="playlist-selector"
+          v-model="selectedPlaylist"
+          :disabled="!playlists.length || isAddingPlaylist"
+          :data-result="addPlaylistResult"
+        >
+          <option
+            v-for="item in playlists"
+            :key="item.list_id"
+            :value="item.list_id"
+          >
+            {{ item.list_title }} ({{ item.quantity }})<template
+              v-if="addPlaylistResult !== null"
+              >:
+              {{
+                addPlaylistResult ? "追加しました。" : "既に追加されています。"
+              }}</template
+            >
+          </option>
+        </select>
+        <div class="icon-button-wrapper" @click="addPlaylist">
+          <PlaylistPlusIcon v-if="addPlaylistResult === null" />
+          <PlaylistCheckIcon
+            v-else-if="addPlaylistResult"
+            id="playlist-button-check"
+          />
+          <PlaylistRemoveIcon v-else id="playlist-button-failed" />
+        </div>
+        <div class="icon-button-wrapper" @click="toInfoWindow">
+          <InformationIcon />
         </div>
       </template>
       <template v-else>
@@ -269,7 +343,7 @@ body {
   margin-left: 100px;
   transform: translateX(284px);
   &.hover,
-  &[data-window-type="action"] {
+  &:not([data-window-type="info"]) {
     transform: translateX(0);
     background-size: calc(100% + 6px);
   }
@@ -482,5 +556,30 @@ svg[data-icon="heart"] {
 
 #tweet-button {
   font-size: 24px;
+}
+
+#playlist-selector {
+  height: 100%;
+  margin-left: 10px;
+  margin-right: 5px;
+  flex-grow: 1;
+
+  transition: background 0.2s, color 0.2s;
+  &[data-result="true"] {
+    background: #10d300;
+    color: #fff;
+  }
+  &[data-result="false"] {
+    background: #ff0000;
+    color: #fff;
+  }
+}
+
+#playlist-button-check {
+  color: #10d300;
+}
+
+#playlist-button-failed {
+  color: #ff0000;
 }
 </style>

@@ -38,10 +38,16 @@ watch(isMuted, (value) => {
 window.electron.receive("set-muted", (value: boolean) => {
   isMuted.value = value
 })
-;["set-favorite", "set-rotating", "set-popup-message"].forEach((name) => {
-  window.electron.receive(name, (value: unknown) => {
+;[
+  "set-favorite",
+  "set-rotating",
+  "set-popup-message",
+  "get-playlists",
+  "add-playlist-song",
+].forEach((name) => {
+  window.electron.receive(name, (...args: unknown[]) => {
     if (webviewRef.value) {
-      webviewRef.value.send(name, value)
+      webviewRef.value.send(name, ...args)
     }
   })
 })

@@ -3,6 +3,7 @@ declare global {
   interface Window {
     cafe_music: CafeMusic
     cafe_users: CafeUsers
+    sns_user: SnsUser
     CafePlayer: Class<CafePlayer>
     CafeMusic: Class<CafeMusic>
     d3: d3
@@ -23,6 +24,17 @@ declare global {
 
   class CafePlayer {
     constructor(video_id: string, start_time: number): void
+    seekTo: (time: number) => number
+    load: (player: Partial<CafePlayer>) => void
+    pause: () => unknown
+    onFirstPlay: () => void
+    onPause: () => void
+  }
+
+  type SnsUser = {
+    get_api_playlists: Request<Playlist[]>
+    get_api_playlist_songs: Request<{ songs: string[] }>
+    post_song_to_playlist: MultiRequest<void>
   }
 }
 type ReasonBase = {
@@ -95,4 +107,18 @@ type CafeMusicInfo = {
   rotate_action: string | null
   bpm: number
   display_playlist_link: boolean
+}
+
+type Class<T> = new (...args: unknown[]) => T
+
+type RequestCallback<T> = (response: T) => void
+interface Request<T> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (...args: any[]): void
+  (callback: RequestCallback<T>): void
+}
+interface MultiRequest<T> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (...args: any[]): void
+  (callback: Record<string, RequestCallback<T>>): void
 }
