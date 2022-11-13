@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
+import VolumeMuteIcon from "vue-material-design-icons/VolumeMute.vue"
+import VolumeHighIcon from "vue-material-design-icons/VolumeHigh.vue"
+import HeartIcon from "vue-material-design-icons/Heart.vue"
+import HeartOutlineIcon from "vue-material-design-icons/HeartOutline.vue"
+import AutoFixIcon from "vue-material-design-icons/AutoFix.vue"
+import InformationIcon from "vue-material-design-icons/Information.vue"
+import MinusIcon from "vue-material-design-icons/Minus.vue"
+import ReloadIcon from "vue-material-design-icons/Reload.vue"
+import MessageIcon from "vue-material-design-icons/Message.vue"
+import PlaylistMusicIcon from "vue-material-design-icons/PlaylistMusic.vue"
 import { watch, ref } from "vue"
 const info = ref<NowPlayingInfo>()
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
@@ -116,6 +126,11 @@ const popupMessage = () => {
     }, 60000)
   }
 }
+
+const addPlaylist = () => {
+  window.electron.send("add-playlist", info.value?.id)
+}
+
 window.electron.receive("set-popup-message", (message: string) => {
   prevMessage = message
   messageTextBoxContent.value = message
@@ -164,19 +179,14 @@ window.electron.receive("set-rotating", (value: boolean) => {
           />
         </div>
         <div class="control-button" @click="toggleFavorite">
-          <FontAwesomeIcon
-            :icon="info.favorited ? ['fas', 'fa-heart'] : ['far', 'fa-heart']"
-            :class="{ favorited: info.favorited }"
-          />
-          <br v-if="windowType !== 'info'" />
+          <HeartIcon v-if="info.favorited" />
+          <HeartOutlineIcon v-else />
           <span>{{ info.favoriteCount }}</span>
         </div>
         <div class="control-button" @click="toggleMute">
-          <FontAwesomeIcon
-            :icon="isMuted ? ['fas', 'volume-mute'] : ['fas', 'volume-up']"
-          />
+          <VolumeMuteIcon v-if="isMuted" />
+          <VolumeHighIcon v-else />
 
-          <br v-if="windowType !== 'info'" />
           <span
             :style="{
               textDecoration: isMuted ? 'line-through' : 'none',
@@ -185,10 +195,11 @@ window.electron.receive("set-rotating", (value: boolean) => {
             >{{ info.volume }}</span
           >
         </div>
-        <div class="control-button" @click="tweet">
+        <div class="icon-button-wrapper" @click="addPlaylist">
+          <PlaylistMusicIcon />
+        </div>
+        <div id="tweet-button" class="icon-button-wrapper" @click="tweet">
           <FontAwesomeIcon icon="fab fa-square-twitter" />
-          <br v-if="windowType !== 'info'" />
-          <span v-if="windowType !== 'info'" id="tweet-text">ツイート</span>
         </div>
       </template>
       <template v-else>
@@ -198,7 +209,7 @@ window.electron.receive("set-rotating", (value: boolean) => {
           :class="{ active: isRotating }"
           @click="rotate"
         >
-          <FontAwesomeIcon icon="fas fa-rotate-right" title="回る" />
+          <ReloadIcon />
         </div>
         <input
           id="message-textbox"
@@ -211,27 +222,27 @@ window.electron.receive("set-rotating", (value: boolean) => {
           :class="{ active: isPopupMessageActive }"
           @click="popupMessage"
         >
-          <FontAwesomeIcon icon="fas fa-message" title="吹き出し" />
+          <MessageIcon />
         </div>
       </template>
-      <div id="window-control">
-        <FontAwesomeIcon
-          v-if="windowType === 'info'"
-          icon="fas fa-comment"
-          class="icon-button"
-          @click="toActionWindow"
-        />
-        <FontAwesomeIcon
-          v-if="windowType === 'action'"
-          icon="fas fa-info"
-          class="icon-button"
-          @click="toInfoWindow"
-        />
-        <FontAwesomeIcon
-          icon="far fa-square-minus"
-          class="icon-button"
-          @click="minimizeWindow"
-        />
+      <div
+        v-if="windowType === 'info'"
+        class="icon-button-wrapper"
+        @click="toActionWindow"
+      >
+        <AutoFixIcon />
+      </div>
+
+      <div
+        v-if="windowType === 'action'"
+        class="icon-button-wrapper"
+        @click="toInfoWindow"
+      >
+        <InformationIcon />
+      </div>
+
+      <div class="icon-button-wrapper" @click="minimizeWindow">
+        <MinusIcon />
       </div>
     </div>
   </div>
@@ -256,7 +267,7 @@ body {
   margin-top: 55px;
   height: 40px;
   margin-left: 100px;
-  transform: translateX(268px);
+  transform: translateX(284px);
   &.hover,
   &[data-window-type="action"] {
     transform: translateX(0);
@@ -267,7 +278,8 @@ body {
   position: absolute;
   inset: 0;
   backdrop-filter: blur(10px);
-  padding: 5px;
+  padding: 4px;
+  padding-top: 3px;
 
   display: flex;
   flex-direction: row;
@@ -284,7 +296,7 @@ body {
 }
 #info {
   position: relative;
-  height: calc(100% + 1px);
+  height: 100%;
   width: 100%;
   max-width: calc(100% - 100vh);
   flex-grow: 1;
@@ -294,9 +306,8 @@ body {
   justify-content: center;
   text-align: left;
   color: white;
-  margin: 10px;
-  margin-top: 11px;
   margin-right: 5px;
+  margin-left: 5px;
   box-sizing: border-box;
   overflow: hidden;
   cursor: pointer;
@@ -314,29 +325,39 @@ body {
     color: #10d300;
   }
 }
+span.material-design-icon {
+  height: 24px;
+}
 .control-button {
   width: 110px;
-  height: calc(100% - 1px);
-  padding: 0;
-  padding-top: 5px;
-  background: rgba(0, 0, 0, 0.5);
-  margin-top: 3px;
   margin-right: 5px;
-  margin-bottom: 5px;
+  padding-left: 5px;
+  height: 100%;
+  display: flex;
+  background: rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   text-align: center;
+  align-items: center;
   color: #bbb;
   cursor: pointer;
   &:hover {
     background: rgba(0, 0, 0, 1);
     color: white;
   }
-  svg {
-    font-size: 20px;
-    margin-right: 4px;
+  span.material-design-icon {
+    margin-right: 2px;
+    &.heart-icon {
+      color: #ff33aa;
+    }
+    svg {
+      width: 16px;
+      aspect-ratio: 1;
+      margin-right: 2px;
+    }
   }
-  span {
-    font-size: 15px;
+  span:not(.material-design-icon) {
+    font-size: 12px;
+    text-overflow: ellipsis;
   }
 }
 svg.favorited {
@@ -383,29 +404,11 @@ svg[data-icon="heart"] {
 }
 #window-control {
   display: flex;
-  height: calc(100% - 2px);
+  height: 100%;
   flex-direction: row;
   justify-content: space-between;
   text-align: center;
-  margin-bottom: 2px;
   color: #bbb;
-}
-.icon-button {
-  font-size: 19px;
-  display: block;
-  cursor: pointer;
-  aspect-ratio: 1;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 5px;
-  margin-right: 5px;
-  color: #bbb;
-  &:last-child {
-    margin-right: 0;
-  }
-  &:hover {
-    background: rgba(0, 0, 0, 1);
-    color: white;
-  }
 }
 @keyframes rotate {
   0% {
@@ -416,23 +419,32 @@ svg[data-icon="heart"] {
   }
 }
 .icon-button-wrapper {
-  font-size: 19px;
-  height: calc(100% - 1px);
+  height: 100%;
+  aspect-ratio: 1;
   display: flex;
-  cursor: pointer;
-  position: relative;
-  aspect-ratio: 1;
   background: rgba(0, 0, 0, 0.5);
-  margin: 5px;
-  margin-top: 3px;
-  aspect-ratio: 1;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
   color: #bbb;
-  svg {
-    margin: auto;
-  }
+  cursor: pointer;
+  margin-right: 5px;
   &:hover {
     background: rgba(0, 0, 0, 1);
     color: white;
+  }
+  span.material-design-icon {
+    &.heart-icon {
+      color: #ff33aa;
+    }
+    svg {
+      width: 16px;
+      aspect-ratio: 1;
+    }
+  }
+  &:last-child {
+    margin-right: 0;
   }
   &.active {
     background: #fffe00;
@@ -440,9 +452,9 @@ svg[data-icon="heart"] {
   }
 }
 #rotate-button {
-  margin-left: 10px;
+  margin-left: 5px;
   &.active {
-    svg {
+    span {
       animation: rotate 10s infinite linear;
     }
   }
@@ -465,5 +477,9 @@ svg[data-icon="heart"] {
   font-size: 12px;
   margin-left: 12px;
   color: #bbb;
+}
+
+#tweet-button {
+  font-size: 24px;
 }
 </style>

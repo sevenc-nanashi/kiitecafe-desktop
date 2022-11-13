@@ -25,6 +25,7 @@
     "sass": "^1.56.0",
     "semver": "^7.3.8",
     "vue": "^3.2.41",
+    "vue-material-design-icons": "^5.1.2",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
