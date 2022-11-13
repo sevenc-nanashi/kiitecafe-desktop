@@ -250,7 +250,8 @@ body {
   height: 40px;
   margin-left: 100px;
   transform: translateX(268px);
-  &.hover, &[data-window-type="action"] {
+  &.hover,
+  &[data-window-type="action"] {
     transform: translateX(0);
     background-size: calc(100% + 6px);
   }
