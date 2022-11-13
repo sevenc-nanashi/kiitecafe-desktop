@@ -310,7 +310,7 @@ body {
   &[data-reason="favorite"] {
     color: #ff33aa;
   }
-  &[data-reason="playlist"] {
+  &[data-reason="add_playlist"] {
     color: #10d300;
   }
 }

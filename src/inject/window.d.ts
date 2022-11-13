@@ -37,9 +37,8 @@ type PriPlaylistReason = ReasonBase & {
   list_title: string
 }
 type PlaylistReason = ReasonBase & {
-  type: "playlist"
+  type: "add_playlist"
   list_id: number
-  list_title: string
 }
 type Reason = FavoriteReason | PriPlaylistReason | PlaylistReason
 
