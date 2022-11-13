@@ -180,6 +180,7 @@ electron.ipcMain.addListener("minimize", () => {
 })
 ;["set-muted", "set-popup-message", "set-rotating"].forEach((channel) => {
   electron.ipcMain.addListener(channel, (_event, value) => {
+    console.log(channel, value)
     win?.webContents.send(channel, value)
     miniPlayerWin?.webContents.send(channel, value)
     store.set("muted", value)

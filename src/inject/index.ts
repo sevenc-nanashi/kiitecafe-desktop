@@ -83,6 +83,7 @@ ipcRenderer.on("set-favorite", (_event, favorite) => {
   }
   button.click()
 })
+let isRotating = false
 ipcRenderer.on("set-rotating", (_event, rotating) => {
   const button = document.querySelector(
     '.btn[data-gesture="rotate"]'
@@ -90,6 +91,7 @@ ipcRenderer.on("set-rotating", (_event, rotating) => {
   if (button.classList.contains("on") === rotating) {
     return
   }
+  isRotating = rotating
   button.click()
 })
 ipcRenderer.on("set-popup-message", (_event, popupMessage: string | null) => {
@@ -293,6 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
     '.btn[data-gesture="rotate"]'
   ) as HTMLDivElement
   new MutationObserver(() => {
+    if (isRotating === rotateButton.classList.contains("on")) {
+      return
+    }
     ipcRenderer.send("set-rotating", rotateButton.classList.contains("on"))
   }).observe(rotateButton, {
     attributes: true,
