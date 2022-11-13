@@ -14,7 +14,9 @@ let win: electron.BrowserWindow | null = null
 let miniPlayerWin: electron.BrowserWindow | null = null
 let tray: electron.Tray | null = null
 
-electron.app.setAppUserModelId("com.sevenc-nanashi.kiitecafe-desktop")
+if (process.platform === "win32") {
+  electron.app.setAppUserModelId("com.sevenc-nanashi.kiitecafe-desktop")
+}
 
 let iconPath: string
 const publicDir = isDevelopment ? path.join(__dirname, "../public") : __dirname
