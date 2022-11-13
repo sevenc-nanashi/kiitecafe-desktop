@@ -463,8 +463,9 @@ svg[data-icon="heart"] {
   margin-bottom: 1px;
 }
 #message-textbox {
-  margin: 6px 4px 8px 0;
-  height: calc(100% - 5px);
+  height: calc(100% - 4px);
+  margin: 5px;
+  margin-left: 0;
   flex-grow: 1;
 }
 
