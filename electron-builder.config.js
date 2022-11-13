@@ -12,11 +12,11 @@ module.exports = {
   files: ["dist/**/*"],
   mac: {
     category: "public.app-category.social-networking",
-    target: "dmg",
+    target: ["dmg", "zip"],
     icon: "public/mac-icon.png",
   },
   win: {
-    target: "nsis",
+    target: ["nsis", "portable"],
     icon: "public/icon.ico",
   },
   nsis: {
