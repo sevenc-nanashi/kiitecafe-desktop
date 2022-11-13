@@ -9,7 +9,10 @@ import type { CafeMusicInfo } from "./window"
 
 console.log("Preload: loaded")
 
-const version = JSON.parse(packageJson).version
+let version = JSON.parse(packageJson).version
+if (version === "0.0.0") {
+  version = "開発版（0.0.0）"
+}
 
 type UpdateAvailable = { tag_name: string; html_url: string } | false
 type CafeMusicGetter = () => CafeMusic

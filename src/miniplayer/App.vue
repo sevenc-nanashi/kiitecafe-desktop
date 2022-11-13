@@ -99,7 +99,11 @@ const rotate = () => {
 let prevMessage: string | null = null
 const messageTextBoxContent = ref("")
 const isPopupMessageActive = ref(false)
+let clearPopupMessageTimeout: NodeJS.Timeout | null = null
 const popupMessage = () => {
+  if (clearPopupMessageTimeout) {
+    clearTimeout(clearPopupMessageTimeout)
+  }
   if (messageTextBoxContent.value === prevMessage) {
     messageTextBoxContent.value = ""
     isPopupMessageActive.value = false
@@ -107,6 +111,9 @@ const popupMessage = () => {
   } else {
     isPopupMessageActive.value = true
     window.electron.send("set-popup-message", messageTextBoxContent.value)
+    clearPopupMessageTimeout = setTimeout(() => {
+      isPopupMessageActive.value = false
+    }, 60000)
   }
 }
 window.electron.receive("set-popup-message", (message: string) => {
