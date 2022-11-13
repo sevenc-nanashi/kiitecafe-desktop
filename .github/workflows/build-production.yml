@@ -1,8 +1,5 @@
 name: Build
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       version:
@@ -242,6 +239,9 @@ jobs:
 
           ----
 
+          <details>
+          <summary>コミットログ</summary>
+
           EOS
 
           if [ -n "${{ github.event.inputs.version }}" ]; then
@@ -250,6 +250,12 @@ jobs:
             LAST_VERSION=$(git tag -l --sort=-creatordate | sed "/.*-preview.*/d"| sed -n "2p")
           fi
           git log $LAST_VERSION...HEAD --pretty=format:"- %s" | head -n -1 >> description.txt
+
+          cat >> description.txt << EOS
+
+          </details>
+
+          EOS
 
           if [ -n "${{ github.event.inputs.description }}" ]; then
             cat >> description.txt << EOS
