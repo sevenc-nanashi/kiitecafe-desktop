@@ -1,0 +1,20 @@
+@mixin margin-x ($size) {
+  margin-left: $size;
+  margin-right: $size;
+}
+
+@mixin margin-y ($size) {
+  margin-top: $size;
+  margin-bottom: $size;
+}
+
+@mixin padding-x ($size) {
+  padding-left: $size;
+  padding-right: $size;
+}
+
+@mixin padding-y ($size) {
+  padding-top: $size;
+  padding-bottom: $size;
+}
+
