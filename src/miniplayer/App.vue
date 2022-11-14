@@ -38,10 +38,15 @@ watch(isHovering, (value) => {
 watch(
   info,
   (newInfo, oldInfo) => {
-    if (newInfo?.id === oldInfo?.id && animations.length > 0) {
+    if (
+      `${newInfo?.title}/${newInfo?.artist}` ===
+        `${oldInfo?.title}/${oldInfo?.artist}` &&
+      animations.length > 0
+    ) {
       return
     }
     animations.forEach((a) => a.cancel())
+    animations.length = 0
     const titlEl = titleEl.value
     const conEl = titleContentEl.value
     if (!conEl || !titlEl) {
