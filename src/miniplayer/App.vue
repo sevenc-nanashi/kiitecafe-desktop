@@ -350,7 +350,12 @@ window.electron.receive("set-rotating", (value: boolean) => {
         <InformationIcon />
       </div>
 
-      <div class="icon-button-wrapper" title="最小化" @click="minimizeWindow">
+      <div
+        id="minimize-button"
+        class="icon-button-wrapper"
+        title="最小化"
+        @click="minimizeWindow"
+      >
         <MinusIcon />
       </div>
     </div>
@@ -616,5 +621,9 @@ svg[data-icon="heart"] {
 
 #playlist-button-failed {
   color: #ff0000;
+}
+
+#minimize-button {
+  margin-left: auto;
 }
 </style>
