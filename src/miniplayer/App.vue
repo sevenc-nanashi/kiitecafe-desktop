@@ -22,7 +22,7 @@ window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
 const mainEl = ref<HTMLDivElement>()
 const titleEl = ref<HTMLDivElement>()
 const titleContentEl = ref<HTMLDivElement>()
-const animations: Animation[] = []
+let animation: { width: number; animation: Animation } | null = null
 
 const isHovering = ref(false)
 const isMuted = ref(false)
@@ -35,41 +35,35 @@ watch(isHovering, (value) => {
   window.electron.send("set-ignore-mouse-events", !value)
 })
 
-watch(
-  info,
-  (newInfo, oldInfo) => {
-    if (
-      `${newInfo?.title}/${newInfo?.artist}` ===
-        `${oldInfo?.title}/${oldInfo?.artist}` &&
-      animations.length > 0
-    ) {
-      return
-    }
-    animations.forEach((a) => a.cancel())
-    animations.length = 0
-    const titlEl = titleEl.value
-    const conEl = titleContentEl.value
-    if (!conEl || !titlEl) {
-      return
-    }
-    if (conEl.scrollWidth - titlEl.clientWidth < 0) {
-      return
-    }
-    animations.push(
-      conEl.animate(
-        [
-          { left: 0, offset: 0.2 },
-          {
-            left: `-${conEl.scrollWidth - titlEl.clientWidth}px`,
-            offset: 0.7,
-          },
-        ],
-        { duration: 10000, iterations: Infinity }
-      )
-    )
-  },
-  { immediate: true }
-)
+interval = setInterval(() => {
+  const titlEl = titleEl.value
+  const conEl = titleContentEl.value
+  if (!conEl || !titlEl) {
+    return
+  }
+  const moveWidth = conEl.scrollWidth - titlEl.clientWidth
+  if (animation && animation.width === moveWidth) {
+    return
+  }
+  animation?.animation.cancel()
+  if (moveWidth <= 0) {
+    animation = null
+    return
+  }
+  animation = {
+    width: moveWidth,
+    animation: conEl.animate(
+      [
+        { left: 0, offset: 0.2 },
+        {
+          left: `-${moveWidth}px`,
+          offset: 0.7,
+        },
+      ],
+      { duration: 10000, iterations: Infinity }
+    ),
+  }
+}, 10)
 
 window.electron.receive("set-muted", (value: boolean) => {
   isMuted.value = value
@@ -186,7 +180,19 @@ window.electron.receive("set-rotating", (value: boolean) => {
   isRotating.value = value
 })
 </script>
+<script lang="ts">
+import { defineComponent } from "vue"
 
+let interval: NodeJS.Timer | null = null
+
+export default defineComponent({
+  unmounted() {
+    if (interval) {
+      clearInterval(interval)
+    }
+  },
+})
+</script>
 <template>
   <div
     v-if="info"
@@ -383,6 +389,7 @@ body {
   margin-top: 55px;
   height: 40px;
   margin-left: 100px;
+  user-select: none;
   transform: translateX(284px);
   &.hover,
   &:not([data-window-type="info"]) {
