@@ -590,8 +590,7 @@ svg[data-icon="heart"] {
 
 #playlist-selector {
   height: 100%;
-  margin-left: 10px;
-  margin-right: 5px;
+  margin: 0 5px;
   flex-grow: 1;
 
   transition: background 0.2s, color 0.2s;
