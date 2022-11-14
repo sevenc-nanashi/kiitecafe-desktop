@@ -4,7 +4,7 @@ import {
   createRouter,
   createWebHashHistory,
 } from "vue-router"
-import "./style.css"
+import "./style.scss"
 import App from "./App.vue"
 import MiniPlayerApp from "./miniplayer/App.vue"
 import { library } from "@fortawesome/fontawesome-svg-core"

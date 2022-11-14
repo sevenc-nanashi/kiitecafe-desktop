@@ -359,6 +359,8 @@ body {
 </style>
 
 <style scoped lang="scss">
+@use "~/src/utils.scss";
+
 #main {
   position: absolute;
   inset: 0;
@@ -399,6 +401,7 @@ body {
   border-radius: 5px;
 }
 #info {
+  @include utils.margin-x(5px);
   position: relative;
   height: 100%;
   width: 100%;
@@ -410,8 +413,6 @@ body {
   justify-content: center;
   text-align: left;
   color: white;
-  margin-right: 5px;
-  margin-left: 5px;
   box-sizing: border-box;
   overflow: hidden;
   cursor: pointer;
@@ -589,8 +590,8 @@ svg[data-icon="heart"] {
 }
 
 #playlist-selector {
+  @include utils.margin-x(5px);
   height: 100%;
-  margin: 0 5px;
   flex-grow: 1;
 
   transition: background 0.2s, color 0.2s;
