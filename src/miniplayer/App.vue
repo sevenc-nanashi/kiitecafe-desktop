@@ -203,7 +203,12 @@ window.electron.receive("set-rotating", (value: boolean) => {
         }"
       />
       <template v-if="windowType === 'info'">
-        <div id="info" :data-reason="info.reason" @click="openNico">
+        <div
+          id="info"
+          :data-reason="info.reason"
+          title="ニコニコで開く"
+          @click="openNico"
+        >
           <div id="info-top">
             <div id="title" ref="titleEl">
               <div ref="titleContentEl">
@@ -219,12 +224,16 @@ window.electron.receive("set-rotating", (value: boolean) => {
             }"
           />
         </div>
-        <div class="control-button" @click="toggleFavorite">
+        <div class="control-button" title="お気に入り" @click="toggleFavorite">
           <HeartIcon v-if="info.favorited" />
           <HeartOutlineIcon v-else />
           <span>{{ info.favoriteCount }}</span>
         </div>
-        <div class="control-button" @click="toggleMute">
+        <div
+          class="control-button"
+          title="ミュートを切り換え"
+          @click="toggleMute"
+        >
           <VolumeMuteIcon v-if="isMuted" />
           <VolumeHighIcon v-else />
 
@@ -236,10 +245,19 @@ window.electron.receive("set-rotating", (value: boolean) => {
             >{{ info.volume }}</span
           >
         </div>
-        <div class="icon-button-wrapper" @click="toPlaylistWindow">
+        <div
+          class="icon-button-wrapper"
+          title="プレイリストに追加"
+          @click="toPlaylistWindow"
+        >
           <PlaylistMusicIcon />
         </div>
-        <div id="tweet-button" class="icon-button-wrapper" @click="tweet">
+        <div
+          id="tweet-button"
+          class="icon-button-wrapper"
+          title="今聴いている曲をツイート"
+          @click="tweet"
+        >
           <FontAwesomeIcon icon="fab fa-square-twitter" />
         </div>
       </template>
@@ -264,7 +282,11 @@ window.electron.receive("set-rotating", (value: boolean) => {
             >
           </option>
         </select>
-        <div class="icon-button-wrapper" @click="addPlaylist">
+        <div
+          class="icon-button-wrapper"
+          title="プレイリストに追加"
+          @click="addPlaylist"
+        >
           <PlaylistPlusIcon v-if="addPlaylistResult === null" />
           <PlaylistCheckIcon
             v-else-if="addPlaylistResult"
@@ -272,7 +294,11 @@ window.electron.receive("set-rotating", (value: boolean) => {
           />
           <PlaylistRemoveIcon v-else id="playlist-button-failed" />
         </div>
-        <div class="icon-button-wrapper" @click="toInfoWindow">
+        <div
+          class="icon-button-wrapper"
+          title="情報表示に戻る"
+          @click="toInfoWindow"
+        >
           <InformationIcon />
         </div>
       </template>
@@ -281,6 +307,7 @@ window.electron.receive("set-rotating", (value: boolean) => {
           id="rotate-button"
           class="icon-button-wrapper"
           :class="{ active: isRotating }"
+          title="回る"
           @click="rotate"
         >
           <ReloadIcon />
@@ -294,6 +321,7 @@ window.electron.receive("set-rotating", (value: boolean) => {
           id="popup-message-button"
           class="icon-button-wrapper"
           :class="{ active: isPopupMessageActive }"
+          title="吹き出し"
           @click="popupMessage"
         >
           <MessageIcon />
@@ -302,6 +330,7 @@ window.electron.receive("set-rotating", (value: boolean) => {
       <div
         v-if="windowType === 'info'"
         class="icon-button-wrapper"
+        title="アクション"
         @click="toActionWindow"
       >
         <AutoFixIcon />
@@ -310,12 +339,13 @@ window.electron.receive("set-rotating", (value: boolean) => {
       <div
         v-if="windowType === 'action'"
         class="icon-button-wrapper"
+        title="情報表示に戻る"
         @click="toInfoWindow"
       >
         <InformationIcon />
       </div>
 
-      <div class="icon-button-wrapper" @click="minimizeWindow">
+      <div class="icon-button-wrapper" title="最小化" @click="minimizeWindow">
         <MinusIcon />
       </div>
     </div>
