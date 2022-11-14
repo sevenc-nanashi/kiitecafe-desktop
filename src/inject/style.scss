@@ -109,15 +109,14 @@
     }
   }
 }
-
-@media screen and (max-width: 1050px) {
-  #logout {
-    margin-top: 0px;
-  }
-
+@media screen and (max-width: 900px) {
   #about_desktop {
     grid-row: 5/7;
     grid-column: 2/3;
+  }
+}
+@media screen and (max-width: 1050px) {
+  #about_desktop {
     .logo_mini {
       display: block;
     }
