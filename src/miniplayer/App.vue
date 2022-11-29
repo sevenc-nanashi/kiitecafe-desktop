@@ -13,10 +13,23 @@ import PlaylistMusicIcon from "vue-material-design-icons/PlaylistMusic.vue"
 import PlaylistPlusIcon from "vue-material-design-icons/PlaylistPlus.vue"
 import PlaylistCheckIcon from "vue-material-design-icons/PlaylistCheck.vue"
 import PlaylistRemoveIcon from "vue-material-design-icons/PlaylistRemove.vue"
-import { watch, ref } from "vue"
+import { watch, ref, computed, onUnmounted } from "vue"
+
 const info = ref<NowPlayingInfo>()
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
   info.value = npinfo
+})
+const favoriteCount = computed(() => {
+  if (info.value == null) {
+    return "-"
+  } else if (info.value.favoriteCount > 999) {
+    return "999"
+  } else {
+    return info.value.favoriteCount
+  }
+})
+const isFavoriteOverflowing = computed(() => {
+  return (info.value?.favoriteCount || 0) > 999
 })
 
 const mainEl = ref<HTMLDivElement>()
@@ -26,6 +39,8 @@ let animation: { width: number; animation: Animation } | null = null
 
 const isHovering = ref(false)
 const isMuted = ref(false)
+
+let interval: NodeJS.Timer | null = null
 
 document.documentElement.addEventListener("mouseleave", () => {
   isHovering.value = false
@@ -179,18 +194,11 @@ window.electron.receive("add-playlist-song-result", (value: boolean) => {
 window.electron.receive("set-rotating", (value: boolean) => {
   isRotating.value = value
 })
-</script>
-<script lang="ts">
-import { defineComponent } from "vue"
 
-let interval: NodeJS.Timer | null = null
-
-export default defineComponent({
-  unmounted() {
-    if (interval) {
-      clearInterval(interval)
-    }
-  },
+onUnmounted(() => {
+  if (interval) {
+    clearInterval(interval)
+  }
 })
 </script>
 <template>
@@ -235,10 +243,16 @@ export default defineComponent({
             }"
           />
         </div>
-        <div class="control-button" title="お気に入り" @click="toggleFavorite">
+        <div
+          class="control-button"
+          :title="`お気に入り：${info.favoriteCount}`"
+          @click="toggleFavorite"
+        >
           <HeartIcon v-if="info.favorited" />
           <HeartOutlineIcon v-else />
-          <span>{{ info.favoriteCount }}</span>
+          <span id="favorite-count" :data-overflowing="isFavoriteOverflowing">{{
+            favoriteCount
+          }}</span>
         </div>
         <div
           class="control-button"
@@ -573,11 +587,21 @@ svg[data-icon="heart"] {
     color: #000;
   }
 }
+
 #rotate-button {
   margin-left: 5px;
   &.active {
     span {
       animation: rotate 10s infinite linear;
+    }
+  }
+}
+#favorite-count {
+  &[data-overflowing="true"] {
+    font-size: 12px;
+    &::after {
+      content: "+";
+      font-size: 8px;
     }
   }
 }
@@ -590,7 +614,6 @@ svg[data-icon="heart"] {
   margin-left: 0;
   flex-grow: 1;
 }
-
 #popup-message-button {
   margin-top: 0;
   margin-left: 0;
@@ -601,7 +624,6 @@ svg[data-icon="heart"] {
   margin-left: 12px;
   color: #bbb;
 }
-
 #tweet-button {
   font-size: 24px;
 }
