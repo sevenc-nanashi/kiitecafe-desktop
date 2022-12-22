@@ -224,7 +224,7 @@ onUnmounted(() => {
       <template v-if="windowType === 'info'">
         <div
           id="info"
-          :data-reason="info.reason || ''"
+          :data-reason="info.reason"
           title="ニコニコで開く"
           @click="openNico"
         >
@@ -460,7 +460,7 @@ body {
   &[data-reason="add_playlist"] {
     color: #10d300;
   }
-  &[data-reason=""] {
+  &[data-reason="none"] {
     color: #ffffff;
   }
 }

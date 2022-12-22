@@ -42,6 +42,31 @@ const createTray = async () => {
     trayIconPath = path.join(publicDir, "icon-16.png")
   }
   tray = new electron.Tray(trayIconPath)
+  const contextMenu = electron.Menu.buildFromTemplate([
+    {
+      label: "メインウィンドウを表示",
+      click: () => {
+        win?.show()
+      },
+    },
+    {
+      label: "ミニプレイヤーを表示する",
+      click: () => {
+        miniPlayerWin?.show()
+      },
+    },
+    {
+      type: "separator",
+    },
+    {
+      label: "終了",
+      click: () => {
+        win?.close()
+      },
+      role: "quit",
+    },
+  ])
+  tray.setContextMenu(contextMenu)
   if (process.platform === "darwin") {
     tray.setPressedImage(path.join(publicDir, "mac-tray-icon-pressed.png"))
   }

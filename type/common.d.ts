@@ -8,7 +8,7 @@ type NowPlayingInfo = {
   favorited: boolean
   favoriteCount: number
   volume: number
-  reason: "priority_playlist" | "add_playlist" | "favorite" | undefined
+  reason: "priority_playlist" | "add_playlist" | "favorite" | "none"
 }
 
 type Playlist = {

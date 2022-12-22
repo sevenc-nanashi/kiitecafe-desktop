@@ -310,9 +310,10 @@ document.addEventListener("DOMContentLoaded", () => {
       volume: parseInt(
         document.querySelector(".volume .value")!.textContent!.trim()
       ),
-      reason: cafeMusic!().reason.reasons.find(
-        (r) => r.user_id === cafeUsers!().me.user_id
-      )?.type,
+      reason:
+        cafeMusic!().reason.reasons.find(
+          (r) => r.user_id === cafeUsers!().me.user_id
+        )?.type ?? "none",
     }
     if (!nowPlayingInfo.id) {
       return
