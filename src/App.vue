@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref } from "vue"
+import { watch, ref, onUnmounted } from "vue"
 
 const webviewRef = ref<WebviewTag>()
 
@@ -58,19 +58,12 @@ window.electron.receive("update-available", (value: boolean) => {
 })
 
 window.electron.send("set-muted", isMuted.value)
-</script>
-
-<script lang="ts">
-import { defineComponent } from "vue"
 
 let webviewWithDevTools: WebviewTag | null = null
-export default defineComponent({
-  name: "App",
-  unmounted() {
-    try {
-      webviewWithDevTools?.closeDevTools()
-    } catch {}
-  },
+onUnmounted(() => {
+  try {
+    webviewWithDevTools?.closeDevTools()
+  } catch {}
 })
 </script>
 
