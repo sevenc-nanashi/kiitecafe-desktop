@@ -44,7 +44,7 @@ const createTray = async () => {
   tray = new electron.Tray(trayIconPath)
   const contextMenu = electron.Menu.buildFromTemplate([
     {
-      label: "メインウィンドウを表示",
+      label: "メインウィンドウを表示する",
       click: () => {
         win?.show()
       },

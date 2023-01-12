@@ -273,28 +273,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {
-    if (!cafeUsers || !cafeUsers().me) {
+    if (!cafeUsers || !cafeUsers().me || !cafeMusic) {
       return
     }
+    const nowPlaying = cafeMusic().now_playing
     const nowPlayingInfo: NowPlayingInfo = {
-      title: document
-        .querySelector("#now_playing_info .title")!
-        .textContent!.trim(),
-      artist: document
-        .querySelector("#now_playing_info .artist")!
-        .textContent!.trim(),
-      thumbnail: (
-        document.querySelector(
-          "#now_playing_info .thumbnail .icon"
-        ) as HTMLDivElement
-      ).style.backgroundImage!.replace(/url\((.+)\)/, "$1"),
-      publishedAt: document
-        .querySelector("#now_playing_info .published_at")!
-        .textContent!.trim(),
-      id:
-        document
-          .querySelector("#cafe_player .videos div")
-          ?.id.replace("video_", "") ?? "",
+      title: nowPlaying.title,
+      artist: nowPlaying.artist_name,
+      thumbnail: nowPlaying.thumbnail,
+      publishedAt: nowPlaying.published_at,
+      id: nowPlaying.video_id,
       progress:
         parseFloat(
           (
