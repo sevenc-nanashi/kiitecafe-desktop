@@ -157,10 +157,24 @@ const createMiniPlayerWindow = async () => {
   })
 }
 
+let forceReload: NodeJS.Timeout | null = null
 electron.ipcMain.addListener("now-playing-info", (_event, info) => {
   miniPlayerWin?.webContents.send("now-playing-info", info)
   tray?.setToolTip(`${info.title} - ${info.artist} | Kiite Cafe Desktop`)
   win?.setTitle(`${info.title} - ${info.artist} | Kiite Cafe Desktop`)
+  if (forceReload) {
+    clearTimeout(forceReload)
+  }
+  forceReload = setTimeout(() => {
+    win?.reload()
+    console.log("Did not receive now-playing-info for 20 seconds, reloading")
+  }, 20000)
+})
+electron.ipcMain.addListener("cancel-force-reload", () => {
+  console.log("cancel-force-reload")
+  if (forceReload) {
+    clearTimeout(forceReload)
+  }
 })
 ;["get-playlists", "add-playlist-song"].forEach((channel) => {
   electron.ipcMain.addListener(channel, (_event, ...args) => {

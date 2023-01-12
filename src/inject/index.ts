@@ -373,12 +373,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     location.href = "https://kiite.jp/my/logout"
   }
+  const reload = () => {
+    location.reload()
+  }
 
-  tempTemplate.innerHTML = `<li kcd onclick='location.reload()'>Reload</li>`
+  tempTemplate.innerHTML = `<li kcd onclick='(${reload.toString()})()'>Reload</li>`
   const reloadElement = tempTemplate.content.firstElementChild as HTMLLIElement
   topMenu.appendChild(reloadElement)
 
   tempTemplate.innerHTML = `<li kcd onclick='(${logout.toString()})()'>Logout</li>`
   const logoutElement = tempTemplate.content.firstElementChild as HTMLLIElement
   topMenu.appendChild(logoutElement)
+
+  ipcRenderer.send("cancel-force-reload")
 })
