@@ -40,7 +40,7 @@ const router = createRouter({
   history: import.meta.env.PROD ? createWebHashHistory() : createWebHistory(),
   routes: [
     { path: "/", component: App },
-    { path: "/miniplayer", component: MiniPlayerApp },
+    { path: "/mini-player", component: MiniPlayerApp },
     {
       path: "/inject/about",
       props: (route) => ({
