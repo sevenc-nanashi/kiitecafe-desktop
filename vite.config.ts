@@ -2,6 +2,7 @@ import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
 import electron from "vite-plugin-electron"
 import checker from "vite-plugin-checker"
+import tsconfigPaths from "vite-tsconfig-paths"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,9 +17,11 @@ export default defineConfig({
     alias: {
       vue: "vue/dist/vue.esm-bundler.js",
       "~": __dirname,
+      "package.json": __dirname + "/package.json",
     },
   },
   plugins: [
+    tsconfigPaths(),
     checker({
       eslint: {
         lintCommand: "eslint --ext .js,.ts,.vue",
@@ -40,10 +43,12 @@ export default defineConfig({
         injectPreload: "./src/inject",
         miniPlayerPreload: "./src/miniplayer/preload.ts",
       },
+
       vite: {
         build: {
           outDir: "dist",
         },
+        plugins: [vue(), tsconfigPaths()],
       },
     }),
   ],

@@ -7,6 +7,7 @@ import {
 import "./style.scss"
 import App from "./App.vue"
 import MiniPlayerApp from "./miniplayer/App.vue"
+import AboutDesktop from "./inject/AboutDesktop.vue"
 import { library } from "@fortawesome/fontawesome-svg-core"
 
 import {
@@ -35,13 +36,22 @@ import { faSquareTwitter } from "@fortawesome/free-brands-svg-icons"
   faRotateRight,
   faMessage,
 ].forEach((icon) => library.add(icon))
-const routes = [
-  { path: "/", component: App },
-  { path: "/miniplayer", component: MiniPlayerApp },
-]
 const router = createRouter({
   history: import.meta.env.PROD ? createWebHashHistory() : createWebHistory(),
-  routes,
+  routes: [
+    { path: "/", component: App },
+    { path: "/miniplayer", component: MiniPlayerApp },
+    {
+      path: "/inject/about",
+      props: (route) => ({
+        currentVersion: route.query.version as string,
+        updateAvailable: JSON.parse(
+          route.query.updateAvailable as string
+        ) as UpdateAvailable,
+      }),
+      component: AboutDesktop,
+    },
+  ],
 })
 
 createApp({}).use(router).mount("#app")

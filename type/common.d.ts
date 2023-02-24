@@ -21,3 +21,5 @@ type Playlist = {
   description: string
   status: "active" | "inactive"
 }
+
+type UpdateAvailable = { tag_name: string; html_url: string } | false

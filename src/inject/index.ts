@@ -1,20 +1,17 @@
 import { contextBridge, ipcRenderer } from "electron"
+import packageJson from "../../package.json"
 import style from "./style.scss"
 import loginStyle from "./loginStyle.css"
-import packageJson from "../../package.json?raw"
-
-import about from "./about.html?raw"
 
 import type { CafeMusicInfo } from "./window"
 
 console.log("Preload: loaded")
 
-let version = JSON.parse(packageJson).version
+let version = packageJson.version
 if (version === "0.0.0") {
   version = "開発版（0.0.0）"
 }
 
-type UpdateAvailable = { tag_name: string; html_url: string } | false
 type CafeMusicGetter = () => CafeMusic
 type CafeUsersGetter = () => CafeUsers
 type SnsUserGetter = () => SnsUser
@@ -29,6 +26,11 @@ let cafeMusic: CafeMusicGetter | null = null
 let cafeUsers: CafeUsersGetter | null = null
 let getPlaylists: WindowFuncs["getPlaylists"] | null = null
 let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
+
+const sideMenus = [
+  { name: "about", label: "Desktopについて" },
+  // { name: "history", label: "選曲履歴100" },
+]
 
 contextBridge.exposeInMainWorld("preload", {
   setFuncs: (funcs: WindowFuncs) => {
@@ -47,35 +49,24 @@ declare global {
   }
 }
 ipcRenderer.on(
-  "update-available",
-  (_event, updateAvailable: UpdateAvailable) => {
+  "information",
+  (_event, updateAvailable: UpdateAvailable, url: string) => {
     const cafe = document.querySelector("#cafe") as HTMLDivElement
-    const tempTemplate = document.createElement("template")
-    let aboutHTML = about
-    aboutHTML = aboutHTML.replace("{{version}}", version)
-    if (updateAvailable) {
-      aboutHTML = aboutHTML.replace(/\{\[\/?new-version\]\}/gm, "")
-      aboutHTML = aboutHTML.replaceAll(
-        "{{new-version-name}}",
-        updateAvailable.tag_name
-      )
-      aboutHTML = aboutHTML.replaceAll(
-        "{{new-version-url}}",
-        updateAvailable.html_url
-      )
-      document.querySelector(".kcd-about")?.setAttribute("update-available", "")
-    } else {
-      aboutHTML = aboutHTML.replace(
-        /\{\[new-version\]\}([\s\S]+)\{\[\/new-version\]\}/gm,
-        ""
-      )
+
+    for (const { name } of sideMenus) {
+      const menuContainer = document.createElement("div")
+      menuContainer.id = `bottom-view-${name}`
+      menuContainer.classList.add("bottom-view")
+      const menuViewer = document.createElement("iframe")
+      menuViewer.src =
+        `${url}/inject/${name}?` +
+        new URLSearchParams({
+          updateAvailable: JSON.stringify(updateAvailable),
+          version,
+        }).toString()
+      menuContainer.appendChild(menuViewer)
+      cafe.appendChild(menuContainer)
     }
-
-    tempTemplate.innerHTML = aboutHTML
-
-    const aboutElement = tempTemplate.content
-      .firstElementChild as HTMLDivElement
-    cafe.appendChild(aboutElement)
   }
 )
 
@@ -338,32 +329,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const cafe = document.querySelector("#cafe") as HTMLDivElement
   const cafeMenu = document.querySelector("#cafe_menu ul") as HTMLUListElement
-  const aboutMenu = document.createElement("li")
-  aboutMenu.setAttribute("class", "kcd-about")
-  aboutMenu.addEventListener("click", () => {
-    cafe.classList.remove(
-      [...Object.values(cafe.classList)].find((c) => c.startsWith("view_"))!
-    )
-    cafe.classList.add("view_about")
-  })
-  aboutMenu.textContent = "Desktopについて"
-  cafeMenu.appendChild(aboutMenu)
-
-  new MutationObserver((_mutations) => {
-    if (
-      !(
-        [...Object.values(cafe.classList)].find(
-          (c) => c.startsWith("view_") && c !== "view_about"
-        ) && cafe.classList.contains("view_about")
+  for (const { name, label } of sideMenus) {
+    const aboutMenu = document.createElement("li")
+    aboutMenu.setAttribute("class", `kcd-${name}`)
+    aboutMenu.addEventListener("click", () => {
+      cafe.classList.remove(
+        [...Object.values(cafe.classList)].find((c) => c.startsWith("view_"))!
       )
-    ) {
-      return
-    }
-    cafe.classList.remove("view_about")
-  }).observe(cafe, {
-    subtree: false,
-    attributes: true,
-  })
+      cafe.classList.add(`view_${name}`)
+    })
+    aboutMenu.textContent = label
+    cafeMenu.appendChild(aboutMenu)
+
+    new MutationObserver((_mutations) => {
+      if (
+        !(
+          [...Object.values(cafe.classList)].find(
+            (c) => c.startsWith("view_") && c !== `view_${name}`
+          ) && cafe.classList.contains(`view_${name}`)
+        )
+      ) {
+        return
+      }
+      cafe.classList.remove(`view_${name}`)
+    }).observe(cafe, {
+      subtree: false,
+      attributes: true,
+    })
+  }
 
   const topMenu = document.querySelector("#top_menu ul") as HTMLUListElement
   const tempTemplate = document.createElement("template")

@@ -54,7 +54,7 @@ window.electron.receive("set-muted", (value: boolean) => {
 
 window.electron.receive("update-available", (value: boolean) => {
   updateAvailable.value = value
-  webviewRef.value?.send("update-available", value)
+  webviewRef.value?.send("information", value, params.get("url"))
 })
 
 window.electron.send("set-muted", isMuted.value)

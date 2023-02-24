@@ -16,107 +16,49 @@
   background-color: rgba(64, 64, 0, 0.7) !important;
 }
 
-.view_about {
-  .kcd-about:not(#dummy) {
-    position: relative;
-    margin-right: 0px;
-    margin-left: 10px;
-    color: #ffef00;
-    background: rgba(0, 0, 0, 0.5);
-    border-left: 4px #ffef00 solid;
-  }
+$menus: ("about", "history");
+@each $menu in $menus {
+  .view_#{$menu} {
+    .kcd-#{$menu}:not(#dummy) {
+      position: relative;
+      margin-right: 0px;
+      margin-left: 10px;
+      color: #ffef00;
+      background: rgba(0, 0, 0, 0.5);
+      border-left: 4px #ffef00 solid;
+    }
 
-  #about_desktop {
-    display: block;
+    #bottom-view-#{$menu} {
+      display: block;
+    }
   }
 }
-#about_desktop {
+
+.bottom-view {
   display: none;
 
   position: relative;
   width: 100%;
   height: 100%;
-  margin: 0px auto;
-  padding: 5px 10px 0px 0px;
+  margin: 5px auto 0px auto;
+  padding: 0px 10px 0px 0px;
   display: none;
   width: 100%;
   height: 100%;
   z-index: 25;
   grid-row: 6/8;
   grid-column: 2/5;
-  .logo_mini {
-    display: none;
-    opacity: 0.7;
-    position: absolute;
-    left: 0px;
-    top: 30px;
-    z-index: 40;
-    text-align: center;
-    height: 100px;
-    width: 120px;
-    img {
-      width: 70px;
-    }
-
-    .logo_cafe {
-      margin-top: 5px;
-      font-size: 10px;
-    }
-  }
-  .inner {
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    overflow-y: scroll;
-  }
-
-  h2 {
-    font-size: 2em;
-    line-height: 1em;
-    margin: 40px;
-    margin-bottom: 10px;
-  }
-
-  .exp {
-    margin: 20px 10px 0px 40px;
-    line-height: 1.5em;
-
-    b {
-      font-weight: bold;
-      color: cyan;
-    }
-
-    h4 {
-      margin-top: 0.5em;
-      font-size: 1.5em;
-    }
-
-    #features {
-      margin-top: 0.5rem;
-      list-style: disc;
-      padding-left: 1.5rem;
-    }
-
-    #app_info {
-      margin-top: 1.5rem;
-    }
-
-    #new-version {
-      h4 {
-        margin-bottom: 0.5rem;
-        color: #ffef00;
-      }
-    }
-  }
+  background: rgba(0, 0, 0, 0.5);
+  overflow-y: scroll;
 }
 @media screen and (max-width: 900px) {
-  #about_desktop {
+  .bottom-view {
     grid-row: 5/7;
     grid-column: 2/3;
   }
 }
 @media screen and (max-width: 1050px) {
-  #about_desktop {
+  .bottom-view {
     .logo_mini {
       display: block;
     }
@@ -124,4 +66,11 @@
       padding-left: 150px;
     }
   }
+}
+
+.bottom-view iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }

@@ -20,6 +20,7 @@ if (process.platform === "win32") {
 
 let iconPath: string
 const publicDir = isDevelopment ? path.join(__dirname, "../public") : __dirname
+const url = isDevelopment ? "http://localhost:5173" : "app://./index.html#"
 
 if (process.platform === "darwin") {
   iconPath = path.join(publicDir, "mac-icon.png")
@@ -101,12 +102,12 @@ const createMainWindow = async () => {
   const params = new URLSearchParams()
   params.append("dirname", __dirname)
   params.append("muted", (store.get("muted", false) as boolean).toString())
+  params.append("url", url)
   if (isDevelopment) {
-    win.loadURL("http://localhost:5173?" + params.toString())
     win.webContents.openDevTools({ mode: "detach" })
-  } else {
-    win.loadURL("app://./index.html?" + params.toString())
   }
+  win.loadURL(`${url}?${params.toString()}`)
+
   registerWindowOpenHandler(win)
   win.on("close", (_event) => {
     win = null
@@ -144,11 +145,9 @@ const createMiniPlayerWindow = async () => {
       miniPlayerWin?.setIgnoreMouseEvents(false)
     }
   })
+  miniPlayerWin.loadURL(`${url}/mini-player`)
   if (isDevelopment) {
-    miniPlayerWin.loadURL("http://localhost:5173/miniplayer")
     miniPlayerWin.webContents.openDevTools({ mode: "detach" })
-  } else {
-    miniPlayerWin.loadURL("app://./index.html#/miniplayer")
   }
   registerWindowOpenHandler(miniPlayerWin)
   miniPlayerWin.on("close", (_event) => {
