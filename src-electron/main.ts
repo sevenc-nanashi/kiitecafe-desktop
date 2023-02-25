@@ -45,6 +45,13 @@ const createTray = async () => {
   tray = new electron.Tray(trayIconPath)
   const contextMenu = electron.Menu.buildFromTemplate([
     {
+      label: `Kiite Cafe Desktop: ${version}`,
+      enabled: false,
+    },
+    {
+      type: "separator",
+    },
+    {
       label: "メインウィンドウを表示する",
       click: () => {
         win?.show()
@@ -60,6 +67,14 @@ const createTray = async () => {
       type: "separator",
     },
     {
+      label: "GitHub",
+      click: () => {
+        electron.shell.openExternal(
+          "https://github.com/sevenc-nanashi/kiitecafe-desktop"
+        )
+      },
+    },
+    {
       label: "終了",
       click: () => {
         win?.close()
@@ -73,7 +88,11 @@ const createTray = async () => {
   }
   tray.on("click", () => {
     if (miniPlayerWin) {
-      miniPlayerWin.show()
+      if (miniPlayerWin.isVisible()) {
+        win?.show()
+      } else {
+        miniPlayerWin.show()
+      }
     }
   })
 }
