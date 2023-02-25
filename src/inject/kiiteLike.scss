@@ -35,31 +35,3 @@ h4 {
   margin-bottom: 0.5em;
   font-size: 1.5em;
 }
-
-.logo_mini {
-  display: none;
-  opacity: 0.7;
-  position: absolute;
-  left: 0px;
-  top: 25px;
-  z-index: 40;
-  text-align: center;
-  height: 100px;
-  width: 120px;
-  img {
-    width: 70px;
-  }
-
-  .logo_cafe {
-    margin-top: 4px;
-    font-size: 10px;
-  }
-}
-@media screen and (max-width: 1050px) {
-  .logo_mini {
-    display: block;
-  }
-  .inner {
-    padding-left: 150px;
-  }
-}

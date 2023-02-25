@@ -9,58 +9,49 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div id="about_desktop">
-    <div class="logo_mini">
-      <div class="logo_inner">
-        <img src="https://cafe.kiite.jp/assets/logo.png" />
-        <div class="logo_cafe">Cafe</div>
-      </div>
-    </div>
+  <div>
+    <h2>Kiite Cafe Desktopについて</h2>
+    <div class="exp">
+      Kiite Cafeのデスクトップ版です。
 
-    <div class="inner">
-      <h2>Kiite Cafe Desktopについて</h2>
-      <div class="exp">
-        Kiite Cafeのデスクトップ版です。
+      <h4>機能</h4>
 
-        <h4>機能</h4>
+      <ul id="features">
+        <li><b>バックグラウンド再生</b></li>
+        <li>いいねができる<b>ミニプレイヤー</b></li>
+        <li>
+          動画フリーズ（動画が消えてそれ以外は動いている状態）時の<b
+            >自動復帰</b
+          >
+        </li>
+      </ul>
 
-        <ul id="features">
-          <li><b>バックグラウンド再生</b></li>
-          <li>いいねができる<b>ミニプレイヤー</b></li>
-          <li>
-            動画フリーズ（動画が消えてそれ以外は動いている状態）時の<b
-              >自動復帰</b
-            >
-          </li>
-        </ul>
-
-        <ul id="app-info">
-          <li>
-            <b>開発者：</b
-            ><a href="https://kiite.jp/user/sevenc_nanashi" target="_blank"
-              >名無し｡</a
-            >
-          </li>
-          <li><b>バージョン：</b>{{ props.currentVersion }}</li>
-          <li>
-            <b>ソースコード：</b
-            ><a
-              href="https://github.com/sevenc-nanashi/kiitecafe-desktop"
-              target="_blank"
-              >sevenc-nanashi/kiitecafe-desktop</a
-            >
-          </li>
-        </ul>
-        <div v-if="props.updateAvailable" id="new-version">
-          <h4>新しいバージョンがリリースされました！</h4>
-          <p>
-            バージョン<b>{{ props.updateAvailable.tag_name }}</b>
-            がリリースされました。
-            <a :href="props.updateAvailable.html_url" target="_blank">
-              ダウンロードする</a
-            >
-          </p>
-        </div>
+      <ul id="app-info">
+        <li>
+          <b>開発者：</b
+          ><a href="https://kiite.jp/user/sevenc_nanashi" target="_blank"
+            >名無し｡</a
+          >
+        </li>
+        <li><b>バージョン：</b>{{ props.currentVersion }}</li>
+        <li>
+          <b>ソースコード：</b
+          ><a
+            href="https://github.com/sevenc-nanashi/kiitecafe-desktop"
+            target="_blank"
+            >sevenc-nanashi/kiitecafe-desktop</a
+          >
+        </li>
+      </ul>
+      <div v-if="props.updateAvailable" id="new-version">
+        <h4>新しいバージョンがリリースされました！</h4>
+        <p>
+          バージョン<b>{{ props.updateAvailable.tag_name }}</b>
+          がリリースされました。
+          <a :href="props.updateAvailable.html_url" target="_blank">
+            ダウンロードする</a
+          >
+        </p>
       </div>
     </div>
   </div>

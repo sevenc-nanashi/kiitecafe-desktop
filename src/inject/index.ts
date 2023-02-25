@@ -64,6 +64,14 @@ ipcRenderer.on(
       const menuContainer = document.createElement("div")
       menuContainer.id = `bottom-view-${name}`
       menuContainer.classList.add("bottom-view")
+      menuContainer.innerHTML = `
+      <div class="logo_mini">
+        <div class="logo_inner">
+          <img src="https://cafe.kiite.jp/assets/logo.png" />
+          <div class="logo_cafe">Cafe</div>
+        </div>
+      </div>
+`
       const menuViewer = document.createElement("iframe")
 
       let params: Record<string, string>

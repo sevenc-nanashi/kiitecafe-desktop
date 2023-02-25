@@ -143,98 +143,88 @@ const formatRelativeTime = (time: string) => {
 </script>
 
 <template>
-  <div id="about_desktop">
-    <div class="logo_mini">
-      <div class="logo_inner">
-        <img src="https://cafe.kiite.jp/assets/logo.png" />
-        <div class="logo_cafe">Cafe</div>
-      </div>
+  <div>
+    <h2>選曲履歴100</h2>
+    <div class="exp">
+      Kiite Cafe
+      にログインしているユーザの、プレイリストやお気に入り、イチ推しリストから自動的に選曲されます<br />
+      毎晩21時から<b>発掘タイム</b>です
     </div>
-
-    <div class="inner">
-      <h2>選曲履歴100</h2>
-      <div class="exp">
-        Kiite Cafe
-        にログインしているユーザの、プレイリストやお気に入り、イチ推しリストから自動的に選曲されます<br />
-        毎晩21時から<b>発掘タイム</b>です
-      </div>
-      <ul id="history">
-        <li v-for="(music, i) of history" :key="music.id" class="history-item">
-          <div
-            class="thumbnail"
-            :style="{
-              backgroundImage: `url(${music.thumbnail})`,
-            }"
-          ></div>
-          <div class="info">
-            <div class="play-info">
-              <span
-                v-if="i === 0"
-                class="time time-onair"
-                :title="new Date(music.start_time).toLocaleString()"
-                >ON AIR</span
-              >
-              <span
-                v-else
-                class="time"
-                :title="new Date(music.start_time).toLocaleString()"
-                >{{ formatRelativeTime(music.start_time) }}</span
-              >
-              <div
-                v-if="historyPpReasons[i] && users.has(historyPpReasons[i]!.user_id)"
-                class="reason-info"
-              >
-                <a
-                  :href="
+    <ul id="history">
+      <li v-for="(music, i) of history" :key="music.id" class="history-item">
+        <div
+          class="thumbnail"
+          :style="{
+            backgroundImage: `url(${music.thumbnail})`,
+          }"
+        ></div>
+        <div class="info">
+          <div class="play-info">
+            <span
+              v-if="i === 0"
+              class="time time-onair"
+              :title="new Date(music.start_time).toLocaleString()"
+              >ON AIR</span
+            >
+            <span
+              v-else
+              class="time"
+              :title="new Date(music.start_time).toLocaleString()"
+              >{{ formatRelativeTime(music.start_time) }}</span
+            >
+            <div
+              v-if="historyPpReasons[i] && users.has(historyPpReasons[i]!.user_id)"
+              class="reason-info"
+            >
+              <a
+                :href="
                 `https://kiite.jp/user/${users.get(historyPpReasons[i]!.user_id)!.user_name}`
                 "
-                  target="_blank"
-                >
-                  <img
-                    :src="users.get(historyPpReasons[i]!.user_id)!.avatar_url"
-                    class="user-icon"
-                  />
-                  <span class="user">{{
-                    users.get(historyPpReasons[i]!.user_id)!.nickname
-                  }}</span> </a
-                >さんの<span class="priority-playlist">イチ推し</span>
-              </div>
-            </div>
-            <div class="title">{{ music.title }}</div>
-            <div class="artist">{{ music.artist_name }}</div>
-            <div class="stats">
-              <div class="flex-grow" />
-              <div class="rotate item">
-                <div class="rotate-text stat-label">回</div>
-                {{
-                  i === 0
-                    ? lastGesturesCount
-                    : rotateUsers.get(music.id)?.length || 0
-                }}
-              </div>
-              <div class="favs item">
-                <div class="favs-icon stat-label">
-                  <HeartIcon class="favs-outside" :size="14" />
-                  <HeartIcon class="favs-inside" :size="14" />
-                </div>
-                {{
-                  i === 0 ? lastNewFavsCount : music.new_fav_user_ids?.length
-                }}
-              </div>
-            </div>
-            <div v-if="historyPpReasons[i]?.playlist_comment" class="comment">
-              <img
-                :src="users.get(historyPpReasons[i]!.user_id)?.avatar_url || 'https://kiite.jp/img/icon-user.jpg'"
-                class="comment-user-icon"
-              />
-              <div class="comment-text">
-                {{ historyPpReasons[i]?.playlist_comment }}
-              </div>
+                target="_blank"
+              >
+                <img
+                  :src="users.get(historyPpReasons[i]!.user_id)!.avatar_url"
+                  class="user-icon"
+                />
+                <span class="user">{{
+                  users.get(historyPpReasons[i]!.user_id)!.nickname
+                }}</span>
+              </a>
+              さんの<span class="priority-playlist">イチ推し</span>
             </div>
           </div>
-        </li>
-      </ul>
-    </div>
+          <div class="title">{{ music.title }}</div>
+          <div class="artist">{{ music.artist_name }}</div>
+          <div class="stats">
+            <div class="flex-grow" />
+            <div class="rotate item">
+              <div class="rotate-text stat-label">回</div>
+              {{
+                i === 0
+                  ? lastGesturesCount
+                  : rotateUsers.get(music.id)?.length || 0
+              }}
+            </div>
+            <div class="favs item">
+              <div class="favs-icon stat-label">
+                <HeartIcon class="favs-outside" :size="14" />
+                <HeartIcon class="favs-inside" :size="14" />
+              </div>
+              {{ i === 0 ? lastNewFavsCount : music.new_fav_user_ids?.length }}
+            </div>
+          </div>
+          <div v-if="historyPpReasons[i]?.playlist_comment" class="comment">
+            <img
+              :src="users.get(historyPpReasons[i]!.user_id)?.avatar_url || 'https://kiite.jp/img/icon-user.jpg'"
+              class="comment-user-icon"
+            />
+            <div class="comment-text">
+              {{ historyPpReasons[i]?.playlist_comment }}
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -307,7 +297,8 @@ const formatRelativeTime = (time: string) => {
         a {
           display: flex;
           align-items: center;
-          color: #fff;
+          color: #ff0;
+          margin-right: 5px;
         }
 
         .priority-playlist {
