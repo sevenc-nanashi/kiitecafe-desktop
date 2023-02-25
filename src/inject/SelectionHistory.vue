@@ -156,7 +156,7 @@ const formatRelativeTime = (time: string) => {
       <div class="exp">
         Kiite Cafe
         にログインしているユーザの、プレイリストやお気に入り、イチ推しリストから自動的に選曲されます<br />
-        毎晩21時から発掘タイムです
+        毎晩21時から<b>発掘タイム</b>です
       </div>
       <ul id="history">
         <li v-for="(music, i) of history" :key="music.id" class="history-item">
@@ -216,7 +216,7 @@ const formatRelativeTime = (time: string) => {
             </div>
             <div v-if="historyPpReasons[i]?.playlist_comment" class="comment">
               <img
-                :src="users.get(historyPpReasons[i]!.user_id)!.avatar_url"
+                :src="users.get(historyPpReasons[i]!.user_id)?.avatar_url || 'https://kiite.jp/img/icon-user.jpg'"
                 class="comment-user-icon"
               />
               <div class="comment-text">

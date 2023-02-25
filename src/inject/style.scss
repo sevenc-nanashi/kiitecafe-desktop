@@ -12,8 +12,20 @@
   border-right-color: red !important;
 }
 
-.kcd-about[update-available] {
-  background-color: rgba(64, 64, 0, 0.7) !important;
+.kcd-about.update-available {
+  animation: update-available 2s infinite;
+}
+
+@keyframes update-available {
+  0% {
+    background-color: rgba(64, 64, 0, 0.7);
+  }
+  50% {
+    background-color: rgba(64, 64, 0, 0.9);
+  }
+  100% {
+    background-color: rgba(64, 64, 0, 0.7);
+  }
 }
 
 $menus: ("about", "history");
@@ -49,15 +61,11 @@ $menus: ("about", "history");
   grid-row: 6/8;
   grid-column: 2/5;
   background: rgba(0, 0, 0, 0.5);
-}
-@media screen and (max-width: 900px) {
-  .bottom-view {
+  @media screen and (max-width: 900px) {
     grid-row: 5/7;
     grid-column: 2/3;
   }
-}
-@media screen and (max-width: 1050px) {
-  .bottom-view {
+  @media screen and (max-width: 1050px) {
     .logo_mini {
       display: block;
     }

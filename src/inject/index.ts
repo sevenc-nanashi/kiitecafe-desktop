@@ -3,7 +3,7 @@ import style from "./style.scss"
 import loginStyle from "./loginStyle.css"
 
 import type { CafeMusicInfo } from "./window"
-import packageJson from "^/package.json"
+import packageJsonRaw from "^/package.json?raw"
 import { NowPlayingInfo, Playlist, UpdateAvailable } from "^/type/common"
 
 console.log("InjectPreload: loaded")
@@ -13,6 +13,7 @@ if (location.pathname.includes("intro")) {
   location.href = "https://kiite.jp/login?mode=cafe"
 }
 
+const packageJson = JSON.parse(packageJsonRaw)
 let version = packageJson.version
 if (version === "0.0.0") {
   version = "開発版（0.0.0）"
@@ -82,6 +83,11 @@ ipcRenderer.on(
         `${url}/inject/${name}?` + new URLSearchParams(params).toString()
       menuContainer.appendChild(menuViewer)
       cafe.appendChild(menuContainer)
+    }
+
+    const aboutButton = document.querySelector(".kcd-about") as HTMLDivElement
+    if (updateAvailable) {
+      aboutButton.classList.add("update-available")
     }
   }
 )

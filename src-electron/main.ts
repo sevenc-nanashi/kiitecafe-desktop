@@ -45,7 +45,7 @@ const createTray = async () => {
   tray = new electron.Tray(trayIconPath)
   const contextMenu = electron.Menu.buildFromTemplate([
     {
-      label: `Kiite Cafe Desktop: ${version}`,
+      label: `Kiite Cafe Desktop: v${version}`,
       enabled: false,
     },
     {

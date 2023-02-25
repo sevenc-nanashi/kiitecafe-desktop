@@ -54,7 +54,7 @@ const props = defineProps<{
         <div v-if="props.updateAvailable" id="new-version">
           <h4>新しいバージョンがリリースされました！</h4>
           <p>
-            バージョン ><b>{{ props.updateAvailable.tag_name }}</b>
+            バージョン<b>{{ props.updateAvailable.tag_name }}</b>
             がリリースされました。
             <a :href="props.updateAvailable.html_url" target="_blank">
               ダウンロードする</a
