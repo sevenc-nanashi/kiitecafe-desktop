@@ -6,9 +6,14 @@ import { CafeMusicInfo, Reason, User } from "./window"
 import "./kiiteLike.scss"
 
 const history = ref<CafeMusicInfo[]>([])
-const historyReasons = computed<(Reason | undefined)[]>(() =>
-  history.value.map((m) =>
-    m.reasons.find((r) => r.type === "priority_playlist")
+const historyPpReasons = computed<
+  ((Reason & { type: "priority_playlist" }) | undefined)[]
+>(() =>
+  history.value.map(
+    (m) =>
+      m.reasons.find((r) => r.type === "priority_playlist") as
+        | (Reason & { type: "priority_playlist" })
+        | undefined
   )
 )
 const users = ref<Map<number, User>>(new Map())
@@ -75,7 +80,7 @@ onUnmounted(() => {
 
 watchEffect(async () => {
   const userIds = new Set(
-    historyReasons.value
+    historyPpReasons.value
       .filter((r) => r)
       .map((r) => r!.user_id)
       .filter((id) => !users.value.has(id))
@@ -168,21 +173,21 @@ const formatRelativeTime = (time: string) => {
                 formatRelativeTime(music.start_time)
               }}</span>
               <div
-                v-if="historyReasons[i] && users.has(historyReasons[i]!.user_id)"
+                v-if="historyPpReasons[i] && users.has(historyPpReasons[i]!.user_id)"
                 class="reason-info"
               >
                 <a
                   :href="
-                `https://kiite.jp/user/${users.get(historyReasons[i]!.user_id)!.user_name}`
+                `https://kiite.jp/user/${users.get(historyPpReasons[i]!.user_id)!.user_name}`
                 "
                   target="_blank"
                 >
                   <img
-                    :src="users.get(historyReasons[i]!.user_id)!.avatar_url"
+                    :src="users.get(historyPpReasons[i]!.user_id)!.avatar_url"
                     class="user-icon"
                   />
                   <span class="user">{{
-                    users.get(historyReasons[i]!.user_id)!.nickname
+                    users.get(historyPpReasons[i]!.user_id)!.nickname
                   }}</span> </a
                 >さんの<span class="priority-playlist">イチ推し</span>
               </div>
@@ -207,6 +212,15 @@ const formatRelativeTime = (time: string) => {
                 {{
                   i === 0 ? lastNewFavsCount : music.new_fav_user_ids?.length
                 }}
+              </div>
+            </div>
+            <div v-if="historyPpReasons[i]?.playlist_comment" class="comment">
+              <img
+                :src="users.get(historyPpReasons[i]!.user_id)!.avatar_url"
+                class="comment-user-icon"
+              />
+              <div class="comment-text">
+                {{ historyPpReasons[i]?.playlist_comment }}
               </div>
             </div>
           </div>
@@ -254,6 +268,8 @@ const formatRelativeTime = (time: string) => {
 #history {
   display: flex;
   flex-direction: column;
+
+  padding: 0 40px;
 }
 .history-item {
   position: relative;
@@ -373,6 +389,28 @@ const formatRelativeTime = (time: string) => {
       }
       .rotate-text {
         color: #ff0;
+      }
+    }
+
+    .comment {
+      display: flex;
+      margin-top: 10px;
+
+      .comment-user-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      .comment-text {
+        border-radius: 0.3em 0.3em 0.3em 0.3em;
+        font-size: 1.1em;
+        background: #e0ffff;
+        padding: 8px;
+        margin-right: 50px;
+        color: black;
+        line-height: 1.4em;
+        overflow-y: scroll;
       }
     }
   }

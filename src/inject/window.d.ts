@@ -47,6 +47,7 @@ type PriPlaylistReason = ReasonBase & {
   type: "priority_playlist"
   list_id: number
   list_title: string
+  playlist_comment?: string
 }
 type PlaylistReason = ReasonBase & {
   type: "add_playlist"
