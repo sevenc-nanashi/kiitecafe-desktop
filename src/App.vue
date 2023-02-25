@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { watch, ref, onUnmounted } from "vue"
+import { useRouter } from "vue-router"
 
 const webviewRef = ref<WebviewTag>()
 
-const params = new URLSearchParams(location.search)
-const dirname = params.get("dirname")
+const router = useRouter()
+const query = router.currentRoute.value.query
+const dirname = query.dirname as string
 const preloadPath = dirname + "/injectPreload.js"
 const preloadUrl = new URL(preloadPath, "file://").toString()
 
-const isMuted = ref(params.get("muted") === "true")
+const isMuted = ref(query.muted === "true")
 const updateAvailable = ref<
   { tag_name: string; html_url: string } | boolean | null
 >(null)
@@ -54,7 +56,7 @@ window.electron.receive("set-muted", (value: boolean) => {
 
 window.electron.receive("update-available", (value: boolean) => {
   updateAvailable.value = value
-  webviewRef.value?.send("information", value, params.get("url"))
+  webviewRef.value?.send("information", value, query.url)
 })
 
 window.electron.send("set-muted", isMuted.value)
@@ -71,7 +73,7 @@ onUnmounted(() => {
   <div>
     <webview
       ref="webviewRef"
-      src="https://cafe.kiite.jp/"
+      src="https://kiite.jp/login?mode=cafe"
       :preload="preloadUrl"
       webpreferences="autoplayPolicy=no-user-gesture-required"
       allowpopups

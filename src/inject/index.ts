@@ -6,7 +6,12 @@ import type { CafeMusicInfo } from "./window"
 import packageJson from "^/package.json"
 import { NowPlayingInfo, Playlist, UpdateAvailable } from "^/type/common"
 
-console.log("Preload: loaded")
+console.log("InjectPreload: loaded")
+
+if (location.pathname.includes("intro")) {
+  // document.querySelector(".goto_kiite_login_button")!.click();
+  location.href = "https://kiite.jp/login?mode=cafe"
+}
 
 let version = packageJson.version
 if (version === "0.0.0") {
@@ -81,12 +86,6 @@ ipcRenderer.on(
   }
 )
 
-setTimeout(() => {
-  if (location.pathname.includes("intro")) {
-    // document.querySelector(".goto_kiite_login_button")!.click();
-    location.href = "https://kiite.jp/login?mode=cafe"
-  }
-}, 0)
 ipcRenderer.on("set-favorite", (_event, favorite) => {
   const button = document.querySelector(".favorite .button") as HTMLDivElement
   if (!button) {

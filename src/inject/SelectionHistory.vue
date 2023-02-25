@@ -411,6 +411,7 @@ const formatRelativeTime = (time: string) => {
         color: black;
         line-height: 1.4em;
         overflow-y: scroll;
+        flex-grow: 1;
       }
     }
   }

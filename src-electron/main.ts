@@ -20,7 +20,7 @@ if (process.platform === "win32") {
 
 let iconPath: string
 const publicDir = isDevelopment ? path.join(__dirname, "../public") : __dirname
-const url = isDevelopment ? "http://localhost:5173" : "app://./index.html#"
+const url = isDevelopment ? "http://localhost:5173#" : "app://./index.html#"
 
 if (process.platform === "darwin") {
   iconPath = path.join(publicDir, "mac-icon.png")

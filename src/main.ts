@@ -1,9 +1,5 @@
 import { createApp } from "vue"
-import {
-  createWebHistory,
-  createRouter,
-  createWebHashHistory,
-} from "vue-router"
+import { createRouter, createWebHashHistory } from "vue-router"
 import "./style.scss"
 import { library } from "@fortawesome/fontawesome-svg-core"
 
@@ -40,10 +36,10 @@ for (const icon of [
   library.add(icon)
 }
 const router = createRouter({
-  history: import.meta.env.PROD ? createWebHashHistory() : createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
-    { path: "/", component: () => App },
-    { path: "/mini-player", component: () => MiniPlayerApp },
+    { path: "/", component: App },
+    { path: "/mini-player", component: MiniPlayerApp },
     {
       path: "/inject/about",
       props: (route) => ({
