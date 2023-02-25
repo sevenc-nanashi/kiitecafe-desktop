@@ -178,8 +178,12 @@ const createMiniPlayerWindow = async () => {
 let forceReload: NodeJS.Timeout | null = null
 electron.ipcMain.addListener("now-playing-info", (_event, info) => {
   miniPlayerWin?.webContents.send("now-playing-info", info)
-  tray?.setToolTip(`${info.title} - ${info.artist} | Kiite Cafe Desktop`)
-  win?.setTitle(`${info.title} - ${info.artist} | Kiite Cafe Desktop`)
+  tray?.setToolTip(
+    `${info.title} - ${info.artist} | Kiite Cafe Desktop: v${version}`
+  )
+  win?.setTitle(
+    `${info.title} - ${info.artist} | Kiite Cafe Desktop: v${version}`
+  )
   if (forceReload) {
     clearTimeout(forceReload)
   }

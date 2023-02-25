@@ -61,23 +61,15 @@ $menus: ("about", "history");
   grid-row: 6/8;
   grid-column: 2/5;
   background: rgba(0, 0, 0, 0.5);
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
   @media screen and (max-width: 900px) {
     grid-row: 5/7;
     grid-column: 2/3;
   }
-  @media screen and (max-width: 1050px) {
-    .logo_mini {
-      display: block;
-    }
-    .inner {
-      padding-left: 150px;
-    }
-  }
-}
-
-.bottom-view iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
 }

@@ -67,26 +67,6 @@ const props = defineProps<{
 </template>
 
 <style scoped lang="scss">
-.logo_mini {
-  display: none;
-  opacity: 0.7;
-  position: absolute;
-  left: 0px;
-  top: 30px;
-  z-index: 40;
-  text-align: center;
-  height: 100px;
-  width: 120px;
-  img {
-    width: 70px;
-  }
-
-  .logo_cafe {
-    margin-top: 5px;
-    font-size: 10px;
-  }
-}
-
 .exp {
   margin: 20px 10px 0px 40px;
   line-height: 1.5em;

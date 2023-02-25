@@ -168,10 +168,18 @@ const formatRelativeTime = (time: string) => {
           ></div>
           <div class="info">
             <div class="play-info">
-              <span v-if="i === 0" class="time time-onair">ON AIR</span>
-              <span v-else class="time">{{
-                formatRelativeTime(music.start_time)
-              }}</span>
+              <span
+                v-if="i === 0"
+                class="time time-onair"
+                :title="new Date(music.start_time).toLocaleString()"
+                >ON AIR</span
+              >
+              <span
+                v-else
+                class="time"
+                :title="new Date(music.start_time).toLocaleString()"
+                >{{ formatRelativeTime(music.start_time) }}</span
+              >
               <div
                 v-if="historyPpReasons[i] && users.has(historyPpReasons[i]!.user_id)"
                 class="reason-info"
@@ -231,26 +239,6 @@ const formatRelativeTime = (time: string) => {
 </template>
 
 <style scoped lang="scss">
-.logo_mini {
-  display: none;
-  opacity: 0.7;
-  position: absolute;
-  left: 0px;
-  top: 30px;
-  z-index: 40;
-  text-align: center;
-  height: 100px;
-  width: 120px;
-  img {
-    width: 70px;
-  }
-
-  .logo_cafe {
-    margin-top: 5px;
-    font-size: 10px;
-  }
-}
-
 .exp {
   margin: 20px 10px 0px 40px;
   line-height: 1.5em;
