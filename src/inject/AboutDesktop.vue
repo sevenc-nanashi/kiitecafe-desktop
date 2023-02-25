@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { UpdateAvailable } from "^/type/common"
+
 import "./kiiteLike.scss"
 const props = defineProps<{
   updateAvailable: UpdateAvailable
@@ -39,7 +41,7 @@ const props = defineProps<{
               >名無し｡</a
             >
           </li>
-          <li><b>バージョン：</b>{{ currentVersion }}</li>
+          <li><b>バージョン：</b>{{ props.currentVersion }}</li>
           <li>
             <b>ソースコード：</b
             ><a
@@ -49,12 +51,12 @@ const props = defineProps<{
             >
           </li>
         </ul>
-        <div v-if="updateAvailable" id="new-version">
+        <div v-if="props.updateAvailable" id="new-version">
           <h4>新しいバージョンがリリースされました！</h4>
           <p>
-            バージョン ><b>{{ updateAvailable.tag_name }}</b>
+            バージョン ><b>{{ props.updateAvailable.tag_name }}</b>
             がリリースされました。
-            <a :href="updateAvailable.html_url" target="_blank">
+            <a :href="props.updateAvailable.html_url" target="_blank">
               ダウンロードする</a
             >
           </p>

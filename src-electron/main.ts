@@ -1,11 +1,11 @@
+import path from "path"
 import * as electron from "electron"
 import Store from "electron-store"
-import path from "path"
 import fetch from "node-fetch"
 import * as semver from "semver"
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer"
 
-import { version } from "../package.json"
+import { version } from "^/package.json"
 
 const isDevelopment = import.meta.env.DEV
 
@@ -198,6 +198,17 @@ electron.ipcMain.addListener("setup-webview", (_event, id) => {
     electron.shell.openExternal(url)
     return { action: "deny" }
   })
+  webview.session.webRequest.onHeadersReceived(
+    { urls: ["*://cafe.kiite.jp/*"] },
+    (details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
+    }
+  )
 })
 electron.ipcMain.addListener("get-update-available", async () => {
   if (version === "0.0.0") {

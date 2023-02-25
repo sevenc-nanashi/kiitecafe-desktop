@@ -1,4 +1,4 @@
-type NowPlayingInfo = {
+export type NowPlayingInfo = {
   title: string
   artist: string
   thumbnail: string
@@ -11,7 +11,7 @@ type NowPlayingInfo = {
   reason: "priority_playlist" | "add_playlist" | "favorite" | "none"
 }
 
-type Playlist = {
+export type Playlist = {
   list_id: string
   list_title: string
   quantity: number
@@ -22,4 +22,4 @@ type Playlist = {
   status: "active" | "inactive"
 }
 
-type UpdateAvailable = { tag_name: string; html_url: string } | false
+export type UpdateAvailable = { tag_name: string; html_url: string } | false

@@ -5,9 +5,6 @@ import {
   createWebHashHistory,
 } from "vue-router"
 import "./style.scss"
-import App from "./App.vue"
-import MiniPlayerApp from "./miniplayer/App.vue"
-import AboutDesktop from "./inject/AboutDesktop.vue"
 import { library } from "@fortawesome/fontawesome-svg-core"
 
 import {
@@ -24,7 +21,11 @@ import {
   faSquareMinus,
 } from "@fortawesome/free-regular-svg-icons"
 import { faSquareTwitter } from "@fortawesome/free-brands-svg-icons"
-;[
+import MiniPlayerApp from "./miniplayer/App.vue"
+import App from "./App.vue"
+import { UpdateAvailable } from "^/type/common"
+
+for (const icon of [
   faHeartSolid,
   faHeartRegular,
   faVolumeMute,
@@ -35,12 +36,14 @@ import { faSquareTwitter } from "@fortawesome/free-brands-svg-icons"
   faInfo,
   faRotateRight,
   faMessage,
-].forEach((icon) => library.add(icon))
+]) {
+  library.add(icon)
+}
 const router = createRouter({
   history: import.meta.env.PROD ? createWebHashHistory() : createWebHistory(),
   routes: [
-    { path: "/", component: App },
-    { path: "/mini-player", component: MiniPlayerApp },
+    { path: "/", component: () => App },
+    { path: "/mini-player", component: () => MiniPlayerApp },
     {
       path: "/inject/about",
       props: (route) => ({
@@ -49,7 +52,11 @@ const router = createRouter({
           route.query.updateAvailable as string
         ) as UpdateAvailable,
       }),
-      component: AboutDesktop,
+      component: () => import("./inject/AboutDesktop.vue"),
+    },
+    {
+      path: "/inject/history",
+      component: () => import("./inject/SelectionHistory.vue"),
     },
   ],
 })

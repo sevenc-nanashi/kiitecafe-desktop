@@ -6,13 +6,8 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "paths": {
-      "~/*": ["./src-electron/*"]
+      "~/*": ["."]
     }
   },
-  "include": [
-    "vite.config.ts",
-    "src-electron/**/*.ts",
-    "type/**/*.ts",
-    "package.json"
-  ]
+  "include": ["vite.config.ts"]
 }

@@ -1,4 +1,8 @@
 body {
+  overflow-y: auto !important;
+}
+
+#app {
   color: white;
   font-family: Helvetica Neue, Helvetica, Arial, Hiragino Kaku Gothic Pro,
     Meiryo, MS Gothic, sans-serif;
@@ -15,7 +19,7 @@ h6 {
   font-weight: 400;
 }
 h2 {
-  font-size: 2em;
+  font-size: 2.2em;
   line-height: 1em;
   margin: 40px;
   margin-bottom: 10px;

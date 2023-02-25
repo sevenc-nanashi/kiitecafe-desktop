@@ -14,16 +14,16 @@
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "^/*": ["./*"]
     }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
-    "src/**/*.tsx",
     "src/**/*.vue",
-    "type/**/*.ts",
-    "package.json"
-  ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+    "type/*.d.ts",
+    "package.json",
+    "src-electron/**/*.ts"
+  ]
 }

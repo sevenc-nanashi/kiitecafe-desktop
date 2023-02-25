@@ -14,6 +14,7 @@ import PlaylistPlusIcon from "vue-material-design-icons/PlaylistPlus.vue"
 import PlaylistCheckIcon from "vue-material-design-icons/PlaylistCheck.vue"
 import PlaylistRemoveIcon from "vue-material-design-icons/PlaylistRemove.vue"
 import { watch, ref, computed, onUnmounted } from "vue"
+import { NowPlayingInfo, Playlist } from "^/type/common"
 
 const info = ref<NowPlayingInfo>()
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {

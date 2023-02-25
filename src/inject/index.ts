@@ -1,9 +1,10 @@
 import { contextBridge, ipcRenderer } from "electron"
-import packageJson from "../../package.json"
 import style from "./style.scss"
 import loginStyle from "./loginStyle.css"
 
 import type { CafeMusicInfo } from "./window"
+import packageJson from "^/package.json"
+import { NowPlayingInfo, Playlist, UpdateAvailable } from "^/type/common"
 
 console.log("Preload: loaded")
 
@@ -29,7 +30,7 @@ let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
 
 const sideMenus = [
   { name: "about", label: "Desktopについて" },
-  // { name: "history", label: "選曲履歴100" },
+  { name: "history", label: "選曲履歴100" },
 ]
 
 contextBridge.exposeInMainWorld("preload", {
@@ -58,12 +59,22 @@ ipcRenderer.on(
       menuContainer.id = `bottom-view-${name}`
       menuContainer.classList.add("bottom-view")
       const menuViewer = document.createElement("iframe")
+
+      let params: Record<string, string>
+      switch (name) {
+        case "about":
+          params = {
+            updateAvailable: JSON.stringify(updateAvailable),
+            version,
+          }
+          break
+        default:
+          params = {}
+          break
+      }
+
       menuViewer.src =
-        `${url}/inject/${name}?` +
-        new URLSearchParams({
-          updateAvailable: JSON.stringify(updateAvailable),
-          version,
-        }).toString()
+        `${url}/inject/${name}?` + new URLSearchParams(params).toString()
       menuContainer.appendChild(menuViewer)
       cafe.appendChild(menuContainer)
     }

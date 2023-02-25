@@ -56,7 +56,7 @@ type Reason = FavoriteReason | PriPlaylistReason | PlaylistReason
 
 type User = {
   user_id: number
-  user_nickname: string
+  nickname: string
   user_name: string
   avatar_url: string
   user_va: VA
