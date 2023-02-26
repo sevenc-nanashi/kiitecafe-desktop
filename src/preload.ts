@@ -9,4 +9,7 @@ contextBridge.exposeInMainWorld("electron", {
   receive: (channel: string, func: CallableFunction) => {
     ipcRenderer.on(channel, (_event, ...args) => func(...args))
   },
+  remove: (channel: string, func: (...args: unknown[]) => void) => {
+    ipcRenderer.removeListener(channel, func)
+  },
 })

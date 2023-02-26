@@ -2,7 +2,7 @@
   .logo {
     filter: drop-shadow(2px 2px 4px black);
   }
-  .menu li:not([kcd]) {
+  .menu li:not([data-kcd]) {
     display: none !important;
   }
 }
@@ -105,4 +105,11 @@ $menus: ("about", "history");
 
 #cafe_info .logo_mini .logo_cafe {
   margin-top: 4px;
+}
+
+#cafe_space .cafe_users .users .user *:is(.fav_icon, .new_fav_icon) i,
+#now_playing_info .inner .favorite i.filled,
+#reasons ul li .reason .text b.fav,
+#reasons ul li .reason .text a.fav {
+  color: var(--color-favorite) !important;
 }

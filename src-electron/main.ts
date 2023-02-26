@@ -4,16 +4,29 @@ import Store from "electron-store"
 import fetch from "node-fetch"
 import * as semver from "semver"
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer"
-import colors from "@colors/colors"
+import colorsJs from "@colors/colors"
 
+import colors from "~/colors"
 import { version } from "^/package.json"
 
 const isDevelopment = import.meta.env.DEV
 if (isDevelopment) {
-  colors.enable()
+  colorsJs.enable()
 }
 
 const store = new Store()
+
+const getColors = () => {
+  const mergedColors = new Map([
+    ...(colors.map((color) => [color.name, color.default]) as [
+      string,
+      string
+    ][]),
+    ...(store.get("colors", []) as [string, string][]),
+  ])
+  return Array.from(mergedColors.entries())
+}
+
 let win: electron.BrowserWindow | null = null
 let miniPlayerWin: electron.BrowserWindow | null = null
 let tray: electron.Tray | null = null
@@ -294,6 +307,7 @@ electron.ipcMain.addListener("minimize", () => {
 })
 for (const channel of ["set-muted", "set-popup-message", "set-rotating"]) {
   electron.ipcMain.addListener(channel, (_event, value) => {
+    logIpc("main", channel, value)
     sendToRenderer(channel, value)
     sendToMiniPlayerRenderer(channel, value)
     store.set("muted", value)
@@ -301,9 +315,30 @@ for (const channel of ["set-muted", "set-popup-message", "set-rotating"]) {
 }
 
 electron.ipcMain.addListener("set-favorite", (_event, value) => {
+  logIpc("main", "set-favorite", value)
   sendToRenderer("set-favorite", value)
   sendToMiniPlayerRenderer("set-favorite", value)
 })
+
+electron.ipcMain.addListener("get-colors", (_event) => {
+  const colors = store.get("colors", [])
+  logIpc("main", "get-colors")
+  sendToRenderer("set-colors", colors)
+  sendToMiniPlayerRenderer("set-colors", colors)
+})
+
+electron.ipcMain.addListener("set-colors", (_event, value) => {
+  logIpc("main", "set-colors", value)
+  sendToRenderer("set-colors", value)
+  sendToMiniPlayerRenderer("set-colors", value)
+  store.set("colors", value)
+})
+
+electron.ipcMain.addListener("open-settings", (_event) => {
+  logIpc("main", "open-settings")
+  sendToRenderer("open-settings")
+})
+
 electron.app.on("ready", async () => {
   await installExtension(VUEJS_DEVTOOLS)
   electron.protocol.registerFileProtocol("app", (request, callback) => {

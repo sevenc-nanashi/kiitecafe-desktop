@@ -54,6 +54,10 @@ const router = createRouter({
       path: "/inject/history",
       component: () => import("./inject/SelectionHistory.vue"),
     },
+    {
+      path: "/inject/settings",
+      component: () => import("./inject/CustomSettings.vue"),
+    },
   ],
 })
 

@@ -44,6 +44,20 @@ onMounted(async () => {
 const lastNewFavsCount = ref(0)
 const lastGesturesCount = ref(0)
 
+const onMessage = (event: MessageEvent) => {
+  console.log("History: Received message", event.data)
+  const [channel, ...args] = event.data
+  switch (channel) {
+    case "colors":
+      const [colors] = args as [[string, string][]]
+      for (const [name, color] of colors) {
+        document.body.style.setProperty(`--color-${name}`, color)
+      }
+
+      break
+  }
+}
+
 let fetchInterval: NodeJS.Timer | null = null
 onMounted(async () => {
   while (!history.value[0]) {
@@ -72,10 +86,14 @@ onMounted(async () => {
       `History: Favs: ${lastNewFavsCount.value}, Gestures: ${lastGesturesCount.value}`
     )
   }, 5000)
+
+  window.addEventListener("message", onMessage)
+  window.parent.postMessage(["get-colors"], "*")
 })
 
 onUnmounted(() => {
   if (fetchInterval) clearInterval(fetchInterval)
+  window.removeEventListener("message", onMessage)
 })
 
 watchEffect(async () => {
@@ -356,7 +374,7 @@ const formatRelativeTime = (time: string) => {
             inset: 0;
           }
 
-          color: #f3a;
+          color: var(--color-favorite);
           .favs-outside {
             opacity: 0.5;
           }

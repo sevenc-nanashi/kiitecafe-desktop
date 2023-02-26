@@ -39,6 +39,33 @@ const sideMenus = [
   { name: "about", label: "Desktopについて" },
 ]
 
+const topMenus = [
+  {
+    name: "reload",
+    label: "Reload",
+    onClick: () => {
+      location.reload()
+    },
+  },
+  {
+    name: "settings",
+    label: "Settings",
+    onClick: () => {
+      ipcRenderer.send("open-settings")
+    },
+  },
+  {
+    name: "logout",
+    label: "Logout",
+    onClick: () => {
+      if (!confirm("ログアウトしますか？")) {
+        return
+      }
+      location.href = "https://kiite.jp/my/logout"
+    },
+  },
+]
+
 contextBridge.exposeInMainWorld("preload", {
   setFuncs: (funcs: WindowFuncs) => {
     cafeMusic = funcs.cafeMusic
@@ -147,6 +174,24 @@ ipcRenderer.on("add-playlist-song", async (_event, listId, songId) => {
     "add-playlist-song-result",
     await addPlaylistSong!(listId, songId)
   )
+})
+ipcRenderer.on("set-colors", (_event, colors: [string, string][]) => {
+  for (const [name, color] of colors) {
+    document.body.style.setProperty(`--color-${name}`, color)
+  }
+  ;(
+    document.querySelector("#bottom-view-history iframe") as HTMLIFrameElement
+  )?.contentWindow?.postMessage(["colors", colors], "*")
+})
+window.addEventListener("message", (event) => {
+  if (!["http://localhost:5173", "app://."].includes(event.origin)) {
+    return
+  }
+  const [type] = event.data
+  switch (type) {
+    case "get-colors":
+      ipcRenderer.send("get-colors")
+  }
 })
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -383,28 +428,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const topMenu = document.querySelector("#top_menu ul") as HTMLUListElement
-  const tempTemplate = document.createElement("template")
-  const logout = () => {
-    if (!confirm("ログアウトしますか？")) {
-      return
-    }
-    location.href = "https://kiite.jp/my/logout"
+  for (const { onClick, label } of topMenus) {
+    const menuElement = document.createElement("li")
+    menuElement.setAttribute("data-kcd", "")
+    menuElement.addEventListener("click", onClick)
+    menuElement.textContent = label
+    topMenu.appendChild(menuElement)
   }
-  const reload = () => {
-    location.reload()
-  }
-
-  tempTemplate.innerHTML = `<li kcd onclick='(${reload.toString()})()'>Reload</li>`
-  const reloadElement = tempTemplate.content.firstElementChild as HTMLLIElement
-  topMenu.appendChild(reloadElement)
-
-  tempTemplate.innerHTML = `<li kcd onclick='(${logout.toString()})()'>Logout</li>`
-  const logoutElement = tempTemplate.content.firstElementChild as HTMLLIElement
-  topMenu.appendChild(logoutElement)
 
   for (const link of Array.from(document.querySelectorAll("#cafe_info a"))) {
     link.setAttribute("target", "_blank")
   }
 
   ipcRenderer.send("cancel-force-reload")
+  ipcRenderer.send("get-colors")
 })

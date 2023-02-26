@@ -195,7 +195,11 @@ window.electron.receive("add-playlist-song-result", (value: boolean) => {
 window.electron.receive("set-rotating", (value: boolean) => {
   isRotating.value = value
 })
-
+window.electron.receive("set-colors", (colors: [string, string][]) => {
+  for (const [key, value] of colors) {
+    document.body.style.setProperty(`--color-${key}`, value)
+  }
+})
 onUnmounted(() => {
   if (interval) {
     clearInterval(interval)
@@ -456,7 +460,7 @@ body {
     color: #00feff;
   }
   &[data-reason="favorite"] {
-    color: #ff33aa;
+    color: var(--color-favorite);
   }
   &[data-reason="add_playlist"] {
     color: #10d300;
@@ -487,7 +491,7 @@ span.material-design-icon {
   span.material-design-icon {
     margin-right: 2px;
     &.heart-icon {
-      color: #ff33aa;
+      color: var(--color-favorite);
     }
     svg {
       width: 16px;
