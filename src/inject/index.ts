@@ -35,8 +35,8 @@ let getPlaylists: WindowFuncs["getPlaylists"] | null = null
 let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
 
 const sideMenus = [
-  { name: "about", label: "Desktopについて" },
   { name: "history", label: "選曲履歴100" },
+  { name: "about", label: "Desktopについて" },
 ]
 
 contextBridge.exposeInMainWorld("preload", {
@@ -71,7 +71,7 @@ ipcRenderer.on(
           <div class="logo_cafe">Cafe</div>
         </div>
       </div>
-`
+      `
       const menuViewer = document.createElement("iframe")
 
       let params: Record<string, string>
@@ -401,6 +401,10 @@ document.addEventListener("DOMContentLoaded", () => {
   tempTemplate.innerHTML = `<li kcd onclick='(${logout.toString()})()'>Logout</li>`
   const logoutElement = tempTemplate.content.firstElementChild as HTMLLIElement
   topMenu.appendChild(logoutElement)
+
+  for (const link of Array.from(document.querySelectorAll("#cafe_info a"))) {
+    link.setAttribute("target", "_blank")
+  }
 
   ipcRenderer.send("cancel-force-reload")
 })
