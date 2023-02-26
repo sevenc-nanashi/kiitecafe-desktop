@@ -4,10 +4,14 @@ import Store from "electron-store"
 import fetch from "node-fetch"
 import * as semver from "semver"
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer"
+import colors from "@colors/colors"
 
 import { version } from "^/package.json"
 
 const isDevelopment = import.meta.env.DEV
+if (isDevelopment) {
+  colors.enable()
+}
 
 const store = new Store()
 let win: electron.BrowserWindow | null = null
@@ -21,6 +25,32 @@ if (process.platform === "win32") {
 let iconPath: string
 const publicDir = isDevelopment ? path.join(__dirname, "../public") : __dirname
 const url = isDevelopment ? "http://localhost:5173#" : "app://./index.html#"
+
+const logIpc = (
+  dest: "renderer" | "miniPlayer" | "main",
+  channel: string,
+  ...args: unknown[]
+) => {
+  let text = `[IPC] `.cyan
+  if (dest === "renderer") {
+    text += `-> ${channel}: `.green
+  } else if (dest === "miniPlayer") {
+    text += `-> ${channel}: `.yellow
+  } else {
+    text += `<- ${channel}: `.red
+  }
+
+  text += JSON.stringify(args)
+  console.log(text)
+}
+const sendToRenderer = (channel: string, ...args: unknown[]) => {
+  logIpc("renderer", channel, ...args)
+  win?.webContents.send(channel, ...args)
+}
+const sendToMiniPlayerRenderer = (channel: string, ...args: unknown[]) => {
+  logIpc("miniPlayer", channel, ...args)
+  miniPlayerWin?.webContents.send(channel, ...args)
+}
 
 if (process.platform === "darwin") {
   iconPath = path.join(publicDir, "mac-icon.png")
@@ -193,21 +223,21 @@ electron.ipcMain.addListener("now-playing-info", (_event, info) => {
   }, 20000)
 })
 electron.ipcMain.addListener("cancel-force-reload", () => {
-  console.log("cancel-force-reload")
+  logIpc("main", "cancel-force-reload")
   if (forceReload) {
     clearTimeout(forceReload)
   }
 })
-;["get-playlists", "add-playlist-song"].forEach((channel) => {
+for (const channel of ["get-playlists", "add-playlist-song"]) {
   electron.ipcMain.addListener(channel, (_event, ...args) => {
-    console.log(channel, args)
-    win?.webContents.send(channel, ...args)
+    logIpc("main", channel, ...args)
+    sendToRenderer(channel, ...args)
   })
   electron.ipcMain.addListener(channel + "-result", (_event, playlists) => {
-    console.log(channel + "-result", playlists)
-    miniPlayerWin?.webContents.send(channel + "-result", playlists)
+    logIpc("main", channel + "-result", playlists)
+    sendToMiniPlayerRenderer(channel + "-result", playlists)
   })
-})
+}
 
 electron.ipcMain.addListener("setup-webview", (_event, id) => {
   const webview = electron.webContents.fromId(id)
@@ -222,7 +252,7 @@ electron.ipcMain.addListener("setup-webview", (_event, id) => {
     return { action: "deny" }
   })
   webview.session.webRequest.onHeadersReceived(
-    { urls: ["*://cafe.kiite.jp/*"] },
+    { urls: ["*://cafe.kiite.jp/*", "*://embed.nicovideo.jp/*"] },
     (details, callback) => {
       callback({
         responseHeaders: {
@@ -235,14 +265,14 @@ electron.ipcMain.addListener("setup-webview", (_event, id) => {
 })
 electron.ipcMain.addListener("get-update-available", async () => {
   if (version === "0.0.0") {
-    win?.webContents.send("update-available", false)
+    sendToRenderer("update-available", false)
     return
   }
   const latestVersion = (await fetch(
     "https://api.github.com/repos/sevenc-nanashi/kiitecafe-desktop/releases/latest"
   ).then((resp) => resp.json())) as { tag_name: string }
 
-  win?.webContents.send(
+  sendToRenderer(
     "update-available",
     semver.gt(latestVersion.tag_name.replace(/^v/, ""), version)
       ? latestVersion
@@ -262,18 +292,17 @@ electron.ipcMain.addListener("minimize", () => {
   notification.show()
   store.set("minimize-info-displayed", true)
 })
-;["set-muted", "set-popup-message", "set-rotating"].forEach((channel) => {
+for (const channel of ["set-muted", "set-popup-message", "set-rotating"]) {
   electron.ipcMain.addListener(channel, (_event, value) => {
-    console.log(channel, value)
-    win?.webContents.send(channel, value)
-    miniPlayerWin?.webContents.send(channel, value)
+    sendToRenderer(channel, value)
+    sendToMiniPlayerRenderer(channel, value)
     store.set("muted", value)
   })
-})
+}
 
 electron.ipcMain.addListener("set-favorite", (_event, value) => {
-  win?.webContents.send("set-favorite", value)
-  miniPlayerWin?.webContents.send("set-favorite", value)
+  sendToRenderer("set-favorite", value)
+  sendToMiniPlayerRenderer("set-favorite", value)
 })
 electron.app.on("ready", async () => {
   await installExtension(VUEJS_DEVTOOLS)
