@@ -14,7 +14,13 @@ if (isDevelopment) {
   colorsJs.enable()
 }
 
-const store = new Store()
+electron.app.setPath(
+  "userData",
+  path.join(electron.app.getPath("appData"), "kiitecafe-desktop")
+)
+const store = new Store({
+  accessPropertiesByDotNotation: false,
+})
 
 const getColors = () => {
   const mergedColors = new Map([
@@ -312,7 +318,9 @@ for (const channel of ["set-muted", "set-popup-message", "set-rotating"]) {
     logIpc("main", channel, value)
     sendToRenderer(channel, value)
     sendToMiniPlayerRenderer(channel, value)
-    store.set("muted", value)
+    if (channel === "set-muted") {
+      store.set("muted", value)
+    }
   })
 }
 
@@ -327,8 +335,12 @@ electron.ipcMain.addListener("get-settings", (_event) => {
   sendToRenderer("set-colors", getColors())
   sendToMiniPlayerRenderer("set-colors", getColors())
 
-  const growEnabled = store.get("grow-effect", true)
-  sendToRenderer("set-grow-effect", growEnabled)
+  const cyalumeSettings = store.get("cyalume-settings", {
+    grow: false,
+    colorType: "single",
+    singleColor: "#00ff00",
+  }) as CyalumeSettings
+  sendToRenderer("set-cyalume-settings", cyalumeSettings)
 })
 
 electron.ipcMain.addListener("set-colors", (_event, value) => {
@@ -338,12 +350,11 @@ electron.ipcMain.addListener("set-colors", (_event, value) => {
   store.set("colors", value)
 })
 
-electron.ipcMain.addListener("set-grow-effect", (_event, value) => {
-  logIpc("main", "set-grow-effect", value)
-  sendToRenderer("set-grow-effect", value)
-  store.set("grow-effect", value)
+electron.ipcMain.addListener("set-cyalume-settings", (_event, value) => {
+  logIpc("main", "set-cyalume-settings", value)
+  store.set("cyalume-settings", value)
+  sendToRenderer("set-cyalume-settings", value)
 })
-
 electron.ipcMain.addListener("open-settings", (_event) => {
   logIpc("main", "open-settings")
   sendToRenderer("open-settings")

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watchEffect } from "vue"
 import "./kiiteLike.scss"
 import colors from "../colors"
 
@@ -37,17 +37,38 @@ const setColors = (value: [string, string][]) => {
   updateColors()
 }
 
-const growEffect = ref<HTMLInputElement>()
-const setGlowEffect = () => {
-  window.electron.send("set-glow-effect", growEffect.value!.checked)
-}
-
 onMounted(() => {
   window.electron.send("get-settings")
   window.electron.receive("set-colors", setColors)
-  window.electron.receive("set-glow-effect", (value: boolean) => {
-    growEffect.value!.checked = value
+  window.electron.receive("set-cyalume-settings", (value: CyalumeSettings) => {
+    cyalumeSingleColor.value = value.singleColor
+    cyalumeGrowEffectValue.value = value.grow
+    cyalumeColorType.value = value.colorType
+    cyalumeSettingReceived.value = true
   })
+})
+
+const cyalumeSettingReceived = ref(false)
+const cyalumeGrowEffect = ref<HTMLInputElement>()
+const cyalumeGrowEffectValue = ref(false)
+const cyalumeColor = ref<HTMLInputElement>()
+const cyalumeSingleColor = ref("#00ff00")
+const resetCyalumeColor = () => {
+  cyalumeSingleColor.value = "#00ff00"
+}
+watchEffect(() => {
+  cyalumeColor.value?.setAttribute("value", cyalumeSingleColor.value)
+})
+const cyalumeColorType = ref("single")
+
+watchEffect(() => {
+  if (!cyalumeSettingReceived.value) return
+  window.electron.send("set-cyalume-settings", {
+    singleColor: cyalumeSingleColor.value,
+    grow: cyalumeGrowEffectValue.value,
+    colorType: cyalumeColorType.value,
+  })
+  cyalumeSingleColor.value = cyalumeSingleColor.value
 })
 </script>
 
@@ -79,11 +100,55 @@ onMounted(() => {
           <label>
             <input
               id="grow-effect"
-              ref="growEffect"
+              ref="cyalumeGrowEffect"
+              v-model="cyalumeGrowEffectValue"
               type="checkbox"
-              @change="setGlowEffect"
             />
             <span>輝きを強化</span>
+          </label>
+        </li>
+        <li class="setting-item">
+          <label>
+            <input
+              v-model="cyalumeColorType"
+              type="radio"
+              name="cyalume-color"
+              value="single"
+            />
+            <span>単色：</span>
+          </label>
+          <label>
+            <input
+              ref="cyalumeColor"
+              type="color"
+              :value="cyalumeSingleColor"
+              @change="cyalumeSingleColor = cyalumeColor!.value"
+            />
+          </label>
+          <span role="button" class="reset" @click="resetCyalumeColor"
+            >リセット（#00ff00）</span
+          >
+        </li>
+        <li class="setting-item">
+          <label>
+            <input
+              v-model="cyalumeColorType"
+              type="radio"
+              name="cyalume-color"
+              value="crypton"
+            />
+            <span>クリプトン6色</span>
+          </label>
+        </li>
+        <li class="setting-item">
+          <label>
+            <input
+              v-model="cyalumeColorType"
+              type="radio"
+              name="cyalume-color"
+              value="follow"
+            />
+            <span>曲に合わせる</span>
           </label>
         </li>
       </ul>
@@ -93,7 +158,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .exp {
-  padding: 20px 10px 0px 40px;
+  padding: 20px 10px 20px 40px;
   line-height: 1.5em;
 
   b {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, onUnmounted, onMounted } from "vue"
+import { watch, ref, onUnmounted } from "vue"
 import { useRouter } from "vue-router"
 import CustomSettings from "./inject/CustomSettings.vue"
 
@@ -48,6 +48,7 @@ for (const channel of [
   "get-playlists",
   "add-playlist-song",
   "set-colors",
+  "set-cyalume-settings",
 ]) {
   window.electron.receive(channel, (...args: unknown[]) => {
     if (webviewRef.value) {
@@ -126,6 +127,7 @@ webview {
     height: 50%;
     min-height: 400px;
     background: rgba(0, 0, 0, 0.8);
+    overflow-y: scroll;
   }
 }
 </style>

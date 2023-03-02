@@ -79,3 +79,32 @@
 #pri_playlist .detail .label_pri .btn_unset:hover {
   background-color: var(--color-accent) !important;
 }
+
+$cyalume: "#cafe_space .cafe_users .users .user .light .bar";
+#{$cyalume} {
+  background-color: var(--cyalume);
+}
+body[data-kcd-cyalume-grow="true"] #{$cyalume} {
+  filter: drop-shadow(0 0 0.5rem var(--cyalume));
+}
+body[data-kcd-cyalume-type="single"] #{$cyalume} {
+  --cyalume: var(--color-cyalume-single);
+}
+$crypton-colors: "#3fffec", "#ffcc11", "#ffef11", "#ffbacc", "#ff4e4e",
+  "#3f80ff";
+
+body[data-kcd-cyalume-type="crypton"] #{$cyalume} {
+  @for $i from 0 through 5 {
+    &[data-kcd-cyalume-color-crypton="#{$i}"] {
+      --cyalume: #{nth($crypton-colors, $i + 1)};
+    }
+  }
+}
+
+body[data-kcd-cyalume-type="follow"] #{$cyalume} {
+  @for $i from 0 through 2 {
+    &[data-kcd-cyalume-color-follow="#{$i}"] {
+      --cyalume: var(--cyalume-music-color-#{$i});
+    }
+  }
+}

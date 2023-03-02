@@ -6,3 +6,9 @@ interface Window {
     remove: (channel: string, func: CallableFunction) => void
   }
 }
+
+type CyalumeSettings = {
+  grow: boolean
+  colorType: "single" | "crypton" | "follow"
+  singleColor: string
+}

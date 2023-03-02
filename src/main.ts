@@ -85,9 +85,16 @@ const onMessage = (event: MessageEvent) => {
       }
 
       break
+    case "get-settings":
+      if (typeof window.electron !== "undefined") {
+        window.electron.send("get-settings")
+      }
   }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("message", onMessage)
+  if (window.parent !== window) {
+    window.parent.postMessage(["get-settings"], "*")
+  }
 })

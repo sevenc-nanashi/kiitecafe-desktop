@@ -189,6 +189,14 @@ ipcRenderer.on("set-colors", (_event, colors: [string, string][]) => {
     iframe.contentWindow?.postMessage(["set-colors", colors], "*")
   }
 })
+ipcRenderer.on("set-cyalume-settings", (_event, settings: CyalumeSettings) => {
+  document.body.style.setProperty(
+    "--color-cyalume-single",
+    settings.singleColor
+  )
+  document.body.setAttribute("data-kcd-cyalume-type", settings.colorType)
+  document.body.setAttribute("data-kcd-cyalume-grow", settings.grow.toString())
+})
 window.addEventListener("message", (event) => {
   if (!["http://localhost:5173", "app://."].includes(event.origin)) {
     return
@@ -338,10 +346,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 100)
   }
 
+  let lastMusicId: string | null = null
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {
     if (!cafeUsers || !cafeUsers().me || !cafeMusic) {
       return
     }
+    if (lastMusicId !== cafeMusic().now_playing.video_id) {
+      updateCyalumeColor()
+    }
+    lastMusicId = cafeMusic().now_playing.video_id
     const nowPlaying = cafeMusic().now_playing
     const nowPlayingInfo: NowPlayingInfo = {
       title: nowPlaying.title,
@@ -448,4 +461,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
   ipcRenderer.send("cancel-force-reload")
   ipcRenderer.send("get-settings")
+
+  const usersContainer = document.querySelector(".users") as HTMLDivElement
+  new MutationObserver(() => {
+    const currentSongId = cafeMusic?.().now_playing.id ?? 0
+    const unsetUsers = Array.from(
+      document.querySelectorAll(
+        `.users .user:not([data-kcd-cyalume-color-key="${currentSongId}"])`
+      )
+    )
+    for (const user of unsetUsers) {
+      const bar = user.querySelector(".bar") as HTMLDivElement
+      user.setAttribute("data-kcd-cyalume-color-key", currentSongId.toString())
+      const userId = parseInt(user.getAttribute("data-user_id")!)
+      const key = userId + currentSongId
+      bar.setAttribute("data-kcd-cyalume-color-follow", (key % 3).toString())
+      bar.setAttribute("data-kcd-cyalume-color-crypton", (key % 6).toString())
+    }
+  }).observe(usersContainer, {
+    childList: true,
+  })
+
+  const updateCyalumeColor = () => {
+    if (!cafeMusic) return
+    cafeMusic().now_playing.colors.forEach((color, index) => {
+      const hsv = rgbToHsv(
+        ...((color
+          ? [...Array(3)].map((_, i) =>
+              parseInt(color[i * 2 + 1] + color[i * 2 + 2], 16)
+            )
+          : [0, 255, 0]) as [number, number, number])
+      )
+      const rgb = hsvToRgb(hsv.h, hsv.s, 1)
+      document.body.style.setProperty(
+        `--cyalume-music-color-${index}`,
+        `rgb(${rgb.join(",")})`
+      )
+    })
+  }
 })
+
+const rgbToHsv = (r: number, g: number, b: number) => {
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const d = max - min
+  let h: number
+  if (d === 0) {
+    h = 0
+  } else if (max === r) {
+    h = ((g - b) / d) % 6
+  } else if (max === g) {
+    h = (b - r) / d + 2
+  } else {
+    h = (r - g) / d + 4
+  }
+  const v = max / 255
+  const s = max === 0 ? 0 : d / max
+  return { h: (h * 60 + 360) % 360, s, v }
+}
+
+const hsvToRgb = (h: number, s: number, v: number) => {
+  const i = (Math.floor(h / 60) + 6) % 6
+  const f = h / 60 - i
+  const p = v * (1 - s)
+  const q = v * (1 - f * s)
+  const t = v * (1 - (1 - f) * s)
+  const rgb = [
+    [v, t, p],
+    [q, v, p],
+    [p, v, t],
+    [p, q, v],
+    [t, p, v],
+    [v, p, q],
+  ][i]
+  return rgb.map((n) => Math.round(n * 255))
+}

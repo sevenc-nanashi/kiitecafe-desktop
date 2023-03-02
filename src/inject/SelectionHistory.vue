@@ -139,6 +139,10 @@ const formatRelativeTime = (time: string) => {
     return `${Math.floor(diffSec)}秒前`
   }
 }
+
+const openMusic = (music: CafeMusicInfo) => {
+  window.open(`https://nicovideo.jp/watch/${music.video_id}`, "_blank")
+}
 </script>
 
 <template>
@@ -156,6 +160,7 @@ const formatRelativeTime = (time: string) => {
           :style="{
             backgroundImage: `url(${music.thumbnail})`,
           }"
+          @click="openMusic(music)"
         ></div>
         <div class="info">
           <div class="play-info">
@@ -267,6 +272,7 @@ const formatRelativeTime = (time: string) => {
     background-size: 180%;
     border-radius: 20%;
     height: 60px;
+    cursor: pointer;
   }
 
   .info {
