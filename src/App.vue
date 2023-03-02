@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, onUnmounted } from "vue"
+import { watch, ref, onUnmounted, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import CustomSettings from "./inject/CustomSettings.vue"
 

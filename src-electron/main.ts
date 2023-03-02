@@ -207,7 +207,9 @@ const createMiniPlayerWindow = async () => {
       miniPlayerWin?.setIgnoreMouseEvents(false)
     }
   })
-  miniPlayerWin.loadURL(`${url}/mini-player`)
+  const params = new URLSearchParams()
+  params.set("muted", (store.get("muted", false) as boolean).toString())
+  miniPlayerWin.loadURL(`${url}/mini-player?${params.toString()}`)
   if (isDevelopment) {
     miniPlayerWin.webContents.openDevTools({ mode: "detach" })
   }
@@ -320,11 +322,13 @@ electron.ipcMain.addListener("set-favorite", (_event, value) => {
   sendToMiniPlayerRenderer("set-favorite", value)
 })
 
-electron.ipcMain.addListener("get-colors", (_event) => {
-  const colors = store.get("colors", [])
-  logIpc("main", "get-colors")
-  sendToRenderer("set-colors", colors)
-  sendToMiniPlayerRenderer("set-colors", colors)
+electron.ipcMain.addListener("get-settings", (_event) => {
+  logIpc("main", "get-settings")
+  sendToRenderer("set-colors", getColors())
+  sendToMiniPlayerRenderer("set-colors", getColors())
+
+  const growEnabled = store.get("grow-effect", true)
+  sendToRenderer("set-grow-effect", growEnabled)
 })
 
 electron.ipcMain.addListener("set-colors", (_event, value) => {
@@ -332,6 +336,12 @@ electron.ipcMain.addListener("set-colors", (_event, value) => {
   sendToRenderer("set-colors", value)
   sendToMiniPlayerRenderer("set-colors", value)
   store.set("colors", value)
+})
+
+electron.ipcMain.addListener("set-grow-effect", (_event, value) => {
+  logIpc("main", "set-grow-effect", value)
+  sendToRenderer("set-grow-effect", value)
+  store.set("grow-effect", value)
 })
 
 electron.ipcMain.addListener("open-settings", (_event) => {

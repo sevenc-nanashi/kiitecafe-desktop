@@ -1,0 +1,80 @@
+#cafe_space .cafe_users .users .user *:is(.fav_icon, .new_fav_icon) i,
+#now_playing_info .inner .favorite i.filled,
+#reasons ul li .reason .text b.fav,
+#reasons ul li .reason .text a.fav {
+  color: var(--color-favorite) !important;
+}
+
+#cafe_space .cafe_users .users .user .playlist_icon i,
+#reasons ul li .reason .text b.playlist,
+#reasons ul li .reason .text a.playlist,
+#now_playing_info .inner .add_playlist .add_playlist_box .alert_box .msg span,
+#now_playing_info .inner .add_playlist .add_playlist_box ul li .add {
+  color: var(--color-playlist) !important;
+}
+
+#reasons ul li .reason .text *:is(a, b).rate,
+#reasons ul li .reason .text *:is(a, b).priority_playlist,
+#pri_playlist
+  .detail
+  *:is(.label_pri, .box_set_btn
+    *:is(.txt b, .btn.set_pri_playlist:is(*, :hover)))
+  #cafe_space
+  .cafe_users
+  .users
+  .user
+  .rate_icon
+  i,
+#cafe_space .cafe_users .users .user .priority_playlist_icon i,
+#pri_playlist .exp b {
+  color: var(--color-priority_playlist) !important;
+}
+#pri_playlist .pri.show .label {
+  background-color: var(--color-priority_playlist) !important;
+}
+#cafe_menu .sub_menu *:is(span, b),
+.cafe_menu_li_selected,
+#cafe.view_space #cafe_menu li.space,
+#cafe.view_pri_playlist #cafe_menu li.pri_playlist,
+#cafe.view_info #cafe_menu li.info,
+#cafe.view_mobile #cafe_menu li.mobile,
+#cafe_player .front:hover i,
+#cafe_player.show_hint_tab_active .hint_tab_active b,
+#reasons #now_message,
+#reasons ul li .reason .text b,
+#reasons ul li .reason .text a,
+#cafe_info .link a,
+#cafe_info ul li .text a,
+#pri_playlist .detail ul.playlist_songs li .info .played .user,
+#pri_playlist .detail ul.playlist_songs li .comment_box .button:hover,
+#cafe_space #hide_comment_button .timer,
+#cafe_space #belt_message,
+#cafe_space .cafe_users .users .user .link_icon:hover,
+#cafe_space .cafe_users .users .user .presenter_icon i {
+  color: var(--color-primary) !important;
+}
+
+.cafe_menu_li_selected,
+#cafe.view_space #cafe_menu li.space,
+#cafe.view_pri_playlist #cafe_menu li.pri_playlist,
+#cafe.view_info #cafe_menu li.info,
+#cafe.view_mobile #cafe_menu li.mobile {
+  border-left-color: var(--color-primary) !important;
+}
+#cafe_menu .sub_menu.border_right {
+  border-right-color: var(--color-primary) !important;
+}
+#cafe_space #hide_comment_button .timer,
+#cafe_space #user_limit .mater li.on,
+#comment_form .btn.rotate.on {
+  background-color: var(--color-primary) !important;
+}
+
+#now_playing_info .inner .add_playlist .add_playlist_box ul li.max .quantity {
+  color: var(--color-accent) !important;
+}
+#pri_playlist .exp span.new,
+#pri_playlist .pri .btn_unset:hover,
+#pri_playlist .detail .label_pri .btn_unset:hover {
+  background-color: var(--color-accent) !important;
+}

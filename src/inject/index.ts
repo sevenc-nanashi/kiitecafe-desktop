@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron"
 import style from "./style.scss"
+import colorsStyle from "./colors.scss"
 import loginStyle from "./loginStyle.css"
 
 import type { CafeMusicInfo } from "./window"
@@ -100,6 +101,7 @@ ipcRenderer.on(
       </div>
       `
       const menuViewer = document.createElement("iframe")
+      menuViewer.setAttribute("kcd-iframe", "")
 
       let params: Record<string, string>
       switch (name) {
@@ -179,9 +181,13 @@ ipcRenderer.on("set-colors", (_event, colors: [string, string][]) => {
   for (const [name, color] of colors) {
     document.body.style.setProperty(`--color-${name}`, color)
   }
-  ;(
-    document.querySelector("#bottom-view-history iframe") as HTMLIFrameElement
-  )?.contentWindow?.postMessage(["colors", colors], "*")
+  for (const iframe of Array.from(
+    document.querySelectorAll(
+      "iframe[kcd-iframe]"
+    ) as NodeListOf<HTMLIFrameElement>
+  )) {
+    iframe.contentWindow?.postMessage(["set-colors", colors], "*")
+  }
 })
 window.addEventListener("message", (event) => {
   if (!["http://localhost:5173", "app://."].includes(event.origin)) {
@@ -190,7 +196,7 @@ window.addEventListener("message", (event) => {
   const [type] = event.data
   switch (type) {
     case "get-colors":
-      ipcRenderer.send("get-colors")
+      ipcRenderer.send("get-settings")
   }
 })
 
@@ -294,7 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return
   }
   const styleElement = document.createElement("style")
-  styleElement.textContent = style.toString()
+  styleElement.textContent = style.toString() + colorsStyle.toString()
   document.head.appendChild(styleElement)
 
   const playButton = document.querySelector(
@@ -441,5 +447,5 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   ipcRenderer.send("cancel-force-reload")
-  ipcRenderer.send("get-colors")
+  ipcRenderer.send("get-settings")
 })

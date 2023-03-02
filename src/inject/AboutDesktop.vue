@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from "vue"
 import { UpdateAvailable } from "^/type/common"
 
 import "./kiiteLike.scss"
@@ -6,6 +7,10 @@ const props = defineProps<{
   updateAvailable: UpdateAvailable
   currentVersion: string
 }>()
+
+onMounted(() => {
+  window.parent.postMessage(["get-colors"], "*")
+})
 </script>
 
 <template>
@@ -64,7 +69,7 @@ const props = defineProps<{
 
   b {
     font-weight: bold;
-    color: cyan;
+    color: var(--color-primary);
   }
   #features {
     margin-top: 0.5rem;
@@ -81,7 +86,7 @@ const props = defineProps<{
   #new-version {
     h4 {
       margin-bottom: 0.5rem;
-      color: #ffef00;
+      color: var(--color-primary);
     }
   }
 }

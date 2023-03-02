@@ -6,15 +6,14 @@ import { CafeMusicInfo, Reason, User } from "./window"
 import "./kiiteLike.scss"
 
 const history = ref<CafeMusicInfo[]>([])
-const historyPpReasons = computed<
-  ((Reason & { type: "priority_playlist" }) | undefined)[]
->(() =>
-  history.value.map(
-    (m) =>
-      m.reasons.find((r) => r.type === "priority_playlist") as
-        | (Reason & { type: "priority_playlist" })
-        | undefined
-  )
+const historyPpReasons = computed<(Reason & { type: "priority_playlist" })[][]>(
+  () =>
+    history.value.map(
+      (m) =>
+        m.reasons.filter((r) => r.type === "priority_playlist") as (Reason & {
+          type: "priority_playlist"
+        })[]
+    )
 )
 const users = ref<Map<number, User>>(new Map())
 const rotateUsers = ref<Map<number, number[]>>(new Map())
@@ -43,21 +42,6 @@ onMounted(async () => {
 
 const lastNewFavsCount = ref(0)
 const lastGesturesCount = ref(0)
-
-const onMessage = (event: MessageEvent) => {
-  console.log("History: Received message", event.data)
-  const [channel, ...args] = event.data
-  switch (channel) {
-    case "colors":
-      const [colors] = args as [[string, string][]]
-      for (const [name, color] of colors) {
-        document.body.style.setProperty(`--color-${name}`, color)
-      }
-
-      break
-  }
-}
-
 let fetchInterval: NodeJS.Timer | null = null
 onMounted(async () => {
   while (!history.value[0]) {
@@ -87,21 +71,18 @@ onMounted(async () => {
     )
   }, 5000)
 
-  window.addEventListener("message", onMessage)
   window.parent.postMessage(["get-colors"], "*")
 })
 
 onUnmounted(() => {
   if (fetchInterval) clearInterval(fetchInterval)
-  window.removeEventListener("message", onMessage)
 })
 
 watchEffect(async () => {
   const userIds = new Set(
     historyPpReasons.value
-      .filter((r) => r)
-      .map((r) => r!.user_id)
-      .filter((id) => !users.value.has(id))
+      .map((r) => r[0]?.user_id)
+      .filter((id) => id && !users.value.has(id))
   )
   if (userIds.size === 0) return
   console.log(`History: Fetching ${userIds.size} users`)
@@ -191,21 +172,21 @@ const formatRelativeTime = (time: string) => {
               >{{ formatRelativeTime(music.start_time) }}</span
             >
             <div
-              v-if="historyPpReasons[i] && users.has(historyPpReasons[i]!.user_id)"
+              v-if="historyPpReasons[i] && historyPpReasons[i]!.length > 0 && users.get(historyPpReasons[i]![0]!.user_id)"
               class="reason-info"
             >
               <a
                 :href="
-                `https://kiite.jp/user/${users.get(historyPpReasons[i]!.user_id)!.user_name}`
+                `https://kiite.jp/user/${users.get(historyPpReasons[i]![0]!.user_id)!.user_id}`
                 "
                 target="_blank"
               >
                 <img
-                  :src="users.get(historyPpReasons[i]!.user_id)!.avatar_url"
+                  :src="users.get(historyPpReasons[i]![0].user_id)!.avatar_url"
                   class="user-icon"
                 />
                 <span class="user">{{
-                  users.get(historyPpReasons[i]!.user_id)!.nickname
+                  users.get(historyPpReasons[i]![0]!.user_id)!.nickname
                 }}</span>
               </a>
               さんの<span class="priority-playlist">イチ推し</span>
@@ -231,13 +212,22 @@ const formatRelativeTime = (time: string) => {
               {{ i === 0 ? lastNewFavsCount : music.new_fav_user_ids?.length }}
             </div>
           </div>
-          <div v-if="historyPpReasons[i]?.playlist_comment" class="comment">
+          <div
+            v-for="reason in historyPpReasons[i].filter(
+              (e) => e.playlist_comment && users.get(e.user_id)
+            )"
+            :key="reason.user_id"
+            class="comment"
+          >
             <img
-              :src="users.get(historyPpReasons[i]!.user_id)?.avatar_url || 'https://kiite.jp/img/icon-user.jpg'"
+              :src="
+                users.get(reason.user_id)?.avatar_url ||
+                'https://kiite.jp/img/icon-user.jpg'
+              "
               class="comment-user-icon"
             />
             <div class="comment-text">
-              {{ historyPpReasons[i]?.playlist_comment }}
+              {{ reason.playlist_comment }}
             </div>
           </div>
         </div>
@@ -253,7 +243,7 @@ const formatRelativeTime = (time: string) => {
 
   b {
     font-weight: bold;
-    color: cyan;
+    color: var(--color-primary);
   }
 }
 
@@ -300,7 +290,7 @@ const formatRelativeTime = (time: string) => {
         padding: 0px 10px;
 
         &.time-onair {
-          background: #f00;
+          background: var(--color-accent);
           color: #fff;
         }
       }
@@ -315,12 +305,12 @@ const formatRelativeTime = (time: string) => {
         a {
           display: flex;
           align-items: center;
-          color: #ff0;
+          color: var(--color-primary);
           margin-right: 5px;
         }
 
         .priority-playlist {
-          color: #0ff;
+          color: var(--color-priority_playlist);
         }
       }
       .user-icon {
@@ -385,7 +375,7 @@ const formatRelativeTime = (time: string) => {
         }
       }
       .rotate-text {
-        color: #ff0;
+        color: var(--color-primary);
       }
     }
 

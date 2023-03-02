@@ -37,13 +37,17 @@ const setColors = (value: [string, string][]) => {
   updateColors()
 }
 
-onMounted(() => {
-  window.electron.send("get-colors")
-  window.electron.receive("set-colors", setColors)
-})
+const growEffect = ref<HTMLInputElement>()
+const setGlowEffect = () => {
+  window.electron.send("set-glow-effect", growEffect.value!.checked)
+}
 
-onUnmounted(() => {
-  window.electron.remove("set-colors", setColors)
+onMounted(() => {
+  window.electron.send("get-settings")
+  window.electron.receive("set-colors", setColors)
+  window.electron.receive("set-glow-effect", (value: boolean) => {
+    growEffect.value!.checked = value
+  })
 })
 </script>
 
@@ -53,12 +57,11 @@ onUnmounted(() => {
     <div class="exp">
       この画面の外をクリックして設定を閉じます。
 
-      <h4>カスタム色</h4>
-      <ul id="colors">
-        <li v-for="color in colors" :key="color.name" class="color">
+      <h4>外観</h4>
+      <ul id="appearance">
+        <li v-for="color in colors" :key="color.name" class="setting-item">
           <label>
             <input
-              id="color"
               type="color"
               :data-name="color.name"
               @change="setColor(color.name)"
@@ -68,6 +71,17 @@ onUnmounted(() => {
           <span role="button" class="reset" @click="resetColor(color.name)"
             >リセット（{{ color.default }}）</span
           >
+        </li>
+        <li class="setting-item">
+          <label>
+            <input
+              id="grow-effect"
+              ref="growEffect"
+              type="checkbox"
+              @change="setGlowEffect"
+            />
+            <span>輝きを強化</span>
+          </label>
         </li>
       </ul>
     </div>
@@ -89,16 +103,18 @@ h4 {
   margin-top: 20px;
 }
 
-#colors {
+#appearance {
   list-style: none;
   padding-left: 0;
-  .color {
+  .setting-item {
     display: flex;
     align-items: center;
     margin-top: 0.5rem;
+    cursor: pointer;
 
     input {
       margin-right: 0.5rem;
+      cursor: pointer;
     }
     label {
       display: flex;
@@ -109,7 +125,6 @@ h4 {
     .reset {
       margin-left: 0.5rem;
       color: #aaa;
-      cursor: pointer;
       text-decoration: underline;
     }
   }

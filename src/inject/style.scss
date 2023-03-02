@@ -35,9 +35,9 @@ $menus: ("about", "history");
       position: relative;
       margin-right: 0px;
       margin-left: 10px;
-      color: #ffef00;
+      color: var(--color-primary);
       background: rgba(0, 0, 0, 0.5);
-      border-left: 4px #ffef00 solid;
+      border-left: 4px var(--color-primary) solid;
     }
 
     #bottom-view-#{$menu} {
@@ -105,11 +105,4 @@ $menus: ("about", "history");
 
 #cafe_info .logo_mini .logo_cafe {
   margin-top: 4px;
-}
-
-#cafe_space .cafe_users .users .user *:is(.fav_icon, .new_fav_icon) i,
-#now_playing_info .inner .favorite i.filled,
-#reasons ul li .reason .text b.fav,
-#reasons ul li .reason .text a.fav {
-  color: var(--color-favorite) !important;
 }

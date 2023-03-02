@@ -62,3 +62,32 @@ const router = createRouter({
 })
 
 createApp({}).use(router).mount("#app")
+
+if (typeof window.electron !== "undefined") {
+  window.electron.receive("set-colors", (colors: [string, string][]) => {
+    for (const [key, value] of colors) {
+      document.body.style.setProperty(`--color-${key}`, value)
+    }
+  })
+}
+
+const onMessage = (event: MessageEvent) => {
+  if (!Array.isArray(event.data)) {
+    return
+  }
+  console.log("Received message", event.data)
+  const [channel, ...args] = event.data
+  switch (channel) {
+    case "set-colors":
+      const [colors] = args as [[string, string][]]
+      for (const [name, color] of colors) {
+        document.body.style.setProperty(`--color-${name}`, color)
+      }
+
+      break
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("message", onMessage)
+})

@@ -14,8 +14,10 @@ import PlaylistPlusIcon from "vue-material-design-icons/PlaylistPlus.vue"
 import PlaylistCheckIcon from "vue-material-design-icons/PlaylistCheck.vue"
 import PlaylistRemoveIcon from "vue-material-design-icons/PlaylistRemove.vue"
 import { watch, ref, computed, onUnmounted } from "vue"
+import { useRouter } from "vue-router"
 import { NowPlayingInfo, Playlist } from "^/type/common"
 
+const router = useRouter()
 const info = ref<NowPlayingInfo>()
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
   info.value = npinfo
@@ -39,7 +41,7 @@ const titleContentEl = ref<HTMLDivElement>()
 let animation: { width: number; animation: Animation } | null = null
 
 const isHovering = ref(false)
-const isMuted = ref(false)
+const isMuted = ref(router.currentRoute.value.query.muted === "true")
 
 let interval: NodeJS.Timer | null = null
 
@@ -117,7 +119,7 @@ const tweet = () => {
   if (!info.value) return
   const text =
     `♪ ${info.value.title} #${info.value.id} #Kiite\n` +
-    `Kiite Cafe DesktopをつかってKiite Cafeできいてます https://github.com/sevenc-nanashi/kiitecafe-desktop https://cafe.kiite.jp https://nico.ms/${info.value.id}`
+    `Kiite Cafeできいてます https://cafe.kiite.jp https://nico.ms/${info.value.id}`
   window.open(
     `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
   )
@@ -194,11 +196,6 @@ window.electron.receive("add-playlist-song-result", (value: boolean) => {
 })
 window.electron.receive("set-rotating", (value: boolean) => {
   isRotating.value = value
-})
-window.electron.receive("set-colors", (colors: [string, string][]) => {
-  for (const [key, value] of colors) {
-    document.body.style.setProperty(`--color-${key}`, value)
-  }
 })
 onUnmounted(() => {
   if (interval) {

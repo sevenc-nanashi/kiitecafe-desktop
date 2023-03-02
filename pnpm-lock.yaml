@@ -27,6 +27,7 @@ specifiers:
   rimraf: ^3.0.2
   sass: ^1.56.0
   semver: ^7.3.8
+  tree-kill: ^1.2.2
   typescript: ^4.8.4
   urlcat: ^3.1.0
   vite: ^3.2.0
@@ -50,6 +51,7 @@ dependencies:
   node-fetch: 3.2.10
   sass: 1.56.0
   semver: 7.3.8
+  tree-kill: 1.2.2
   urlcat: 3.1.0
   vue: 3.2.41
   vue-material-design-icons: 5.1.2
@@ -3956,6 +3958,11 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+
+  /tree-kill/1.2.2:
+    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
+    hasBin: true
+    dev: false
 
   /truncate-utf8-bytes/1.0.2:
     resolution: {integrity: sha512-95Pu1QXQvruGEhv62XCMO3Mm90GscOCClvrIUwCM0PYOXK3kaF3l3sIHxx71ThJfcbM2O5Au6SO3AWCSEfW4mQ==}
