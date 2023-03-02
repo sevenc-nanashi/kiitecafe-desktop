@@ -314,8 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
     )
     const rotates = document.querySelectorAll(".user.gesture_rotate").length
     const newFavs = document.querySelectorAll(".user.new_fav").length
-    const favs = document.querySelectorAll(".user.reason_fav").length
-    ipcRenderer.send("update-stats", { users, rotates, newFavs, favs })
+    ipcRenderer.send("update-stats", { users, rotates, newFavs })
   }, 5000)
   const styleElement = document.createElement("style")
   styleElement.textContent = style.toString() + colorsStyle.toString()

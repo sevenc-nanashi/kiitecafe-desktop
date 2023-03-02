@@ -242,7 +242,6 @@ electron.ipcMain.addListener(
     _event,
     stats: {
       users: number
-      favs: number
       newFavs: number
       rotates: number
     }
@@ -250,15 +249,13 @@ electron.ipcMain.addListener(
     if (!nowPlayingInfo) return
     logIpc("main", "update-stats", stats)
     const details = "\u266a" + nowPlayingInfo.title
-    const state = `\u{1f464} ${stats.users} | 回 ${stats.favs} | \u{2764} ${
-      stats.favs + stats.newFavs
-    } (+${stats.newFavs})`
+    const state = `\u{1f464} ${stats.users} | 回 ${stats.rotates} | \u{2764} ${stats.newFavs}`
     log("discord", `Updating activity`)
     discord.setActivity({
       largeImageKey: nowPlayingInfo.thumbnail,
       largeImageText: `${nowPlayingInfo.title} - ${nowPlayingInfo.artist}`,
       smallImageKey: "icon",
-      smallImageText: `v${version}`,
+      smallImageText: `Kiite Cafe Desktop: v${version}`,
       startTimestamp: new Date(nowPlayingInfo.startedAt),
       endTimestamp: new Date(nowPlayingInfo.endsAt),
 
