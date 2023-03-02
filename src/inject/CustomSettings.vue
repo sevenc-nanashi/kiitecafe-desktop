@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue"
+import { ref, onMounted } from "vue"
 import "./kiiteLike.scss"
 import colors from "../colors"
 
@@ -58,7 +58,7 @@ onMounted(() => {
       この画面の外をクリックして設定を閉じます。
 
       <h4>外観</h4>
-      <ul id="appearance">
+      <ul class="setting-item-container">
         <li v-for="color in colors" :key="color.name" class="setting-item">
           <label>
             <input
@@ -72,6 +72,9 @@ onMounted(() => {
             >リセット（{{ color.default }}）</span
           >
         </li>
+      </ul>
+      <ul class="setting-item-container">
+        <h4>ペンライト設定</h4>
         <li class="setting-item">
           <label>
             <input
@@ -103,7 +106,7 @@ h4 {
   margin-top: 20px;
 }
 
-#appearance {
+.setting-item-container {
   list-style: none;
   padding-left: 0;
   .setting-item {

@@ -66,7 +66,8 @@
 }
 #cafe_space #hide_comment_button .timer,
 #cafe_space #user_limit .mater li.on,
-#comment_form .btn.rotate.on {
+#comment_form .btn.rotate.on,
+.noUi-connect {
   background-color: var(--color-primary) !important;
 }
 

@@ -454,13 +454,13 @@ body {
     background: rgba(0, 0, 0, 1);
   }
   &[data-reason="priority_playlist"] {
-    color: #00feff;
+    color: var(--color-priority_playlist);
   }
   &[data-reason="favorite"] {
     color: var(--color-favorite);
   }
   &[data-reason="add_playlist"] {
-    color: #10d300;
+    color: var(--color-playlist);
   }
   &[data-reason="none"] {
     color: #ffffff;
@@ -502,7 +502,7 @@ span.material-design-icon {
   }
 }
 svg.favorited {
-  color: #ff33aa;
+  color: var(--color-favorite);
 }
 svg[data-icon="heart"] {
   transition: color 0.2s;
@@ -577,7 +577,7 @@ svg[data-icon="heart"] {
   }
   span.material-design-icon {
     &.heart-icon {
-      color: #ff33aa;
+      color: var(--color-favorite);
     }
     svg {
       width: 16px;
@@ -588,7 +588,7 @@ svg[data-icon="heart"] {
     margin-right: 0;
   }
   &.active {
-    background: #fffe00;
+    background: var(--color-primary);
     color: #000;
   }
 }
@@ -640,21 +640,21 @@ svg[data-icon="heart"] {
 
   transition: background 0.2s, color 0.2s;
   &[data-result="true"] {
-    background: #10d300;
+    background: var(--color-priority_playlist);
     color: #fff;
   }
   &[data-result="false"] {
-    background: #ff0000;
+    background: var(--color-accent);
     color: #fff;
   }
 }
 
 #playlist-button-check {
-  color: #10d300;
+  color: var(--color-priority_playlist);
 }
 
 #playlist-button-failed {
-  color: #ff0000;
+  color: var(--color-accent);
 }
 
 #minimize-button {
