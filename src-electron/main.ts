@@ -5,9 +5,11 @@ import fetch from "node-fetch"
 import * as semver from "semver"
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer"
 import colorsJs from "@colors/colors"
+import discordRpc from "discord-rpc"
 
 import colors from "~/colors"
 import { version } from "^/package.json"
+import { NowPlayingInfo } from "^/type/common"
 
 const isDevelopment = import.meta.env.DEV
 if (isDevelopment) {
@@ -21,6 +23,7 @@ electron.app.setPath(
 const store = new Store({
   accessPropertiesByDotNotation: false,
 })
+const discord = new discordRpc.Client({ transport: "ipc" })
 
 const getColors = () => {
   const mergedColors = new Map([
@@ -45,12 +48,15 @@ let iconPath: string
 const publicDir = isDevelopment ? path.join(__dirname, "../public") : __dirname
 const url = isDevelopment ? "http://localhost:5173#" : "app://./index.html#"
 
+const log = (namespace: string, text: string) => {
+  console.log(`[${namespace.padStart(8)} ]`.cyan + ` ${text}`)
+}
 const logIpc = (
   dest: "renderer" | "miniPlayer" | "main",
   channel: string,
   ...args: unknown[]
 ) => {
-  let text = `[IPC] `.cyan
+  let text = ""
   if (dest === "renderer") {
     text += `-> ${channel}: `.green
   } else if (dest === "miniPlayer") {
@@ -60,7 +66,7 @@ const logIpc = (
   }
 
   text += JSON.stringify(args)
-  console.log(text)
+  log("ipc", text)
 }
 const sendToRenderer = (channel: string, ...args: unknown[]) => {
   logIpc("renderer", channel, ...args)
@@ -70,6 +76,10 @@ const sendToMiniPlayerRenderer = (channel: string, ...args: unknown[]) => {
   logIpc("miniPlayer", channel, ...args)
   miniPlayerWin?.webContents.send(channel, ...args)
 }
+
+discord.on("ready", () => {
+  log("discord", "Ready!")
+})
 
 if (process.platform === "darwin") {
   iconPath = path.join(publicDir, "mac-icon.png")
@@ -226,23 +236,72 @@ const createMiniPlayerWindow = async () => {
   })
 }
 
-let forceReload: NodeJS.Timeout | null = null
-electron.ipcMain.addListener("now-playing-info", (_event, info) => {
-  miniPlayerWin?.webContents.send("now-playing-info", info)
-  tray?.setToolTip(
-    `${info.title} - ${info.artist} | Kiite Cafe Desktop: v${version}`
-  )
-  win?.setTitle(
-    `${info.title} - ${info.artist} | Kiite Cafe Desktop: v${version}`
-  )
-  if (forceReload) {
-    clearTimeout(forceReload)
+electron.ipcMain.addListener(
+  "update-stats",
+  (
+    _event,
+    stats: {
+      users: number
+      favs: number
+      newFavs: number
+      rotates: number
+    }
+  ) => {
+    if (!nowPlayingInfo) return
+    logIpc("main", "update-stats", stats)
+    const details = "\u266a" + nowPlayingInfo.title
+    const state = `\u{1f464} ${stats.users} | 回 ${stats.favs} | \u{2764} ${
+      stats.favs + stats.newFavs
+    } (+${stats.newFavs})`
+    log("discord", `Updating activity`)
+    discord.setActivity({
+      largeImageKey: nowPlayingInfo.thumbnail,
+      largeImageText: `${nowPlayingInfo.title} - ${nowPlayingInfo.artist}`,
+      smallImageKey: "icon",
+      smallImageText: `v${version}`,
+      startTimestamp: new Date(nowPlayingInfo.startedAt),
+      endTimestamp: new Date(nowPlayingInfo.endsAt),
+
+      details,
+      state,
+      buttons: [
+        {
+          label: "Kiite Cafe",
+          url: "https://cafe.kiite.jp",
+        },
+        {
+          label: "ニコニコ動画",
+          url: `https://www.nicovideo.jp/watch/${nowPlayingInfo.id}`,
+        },
+      ],
+    })
   }
-  forceReload = setTimeout(() => {
-    win?.reload()
-    console.log("Did not receive now-playing-info for 20 seconds, reloading")
-  }, 20000)
-})
+)
+
+let forceReload: NodeJS.Timeout | null = null
+let nowPlayingInfo: NowPlayingInfo | null = null
+electron.ipcMain.addListener(
+  "now-playing-info",
+  (_event, info: NowPlayingInfo) => {
+    miniPlayerWin?.webContents.send("now-playing-info", info)
+    if (nowPlayingInfo?.id === info.id) {
+      tray?.setToolTip(
+        `${info.title} - ${info.artist} | Kiite Cafe Desktop: v${version}`
+      )
+      win?.setTitle(
+        `${info.title} - ${info.artist} | Kiite Cafe Desktop: v${version}`
+      )
+    }
+    nowPlayingInfo = info
+    if (forceReload) {
+      clearTimeout(forceReload)
+    }
+    forceReload = setTimeout(() => {
+      win?.reload()
+      console.log("Did not receive now-playing-info for 20 seconds, reloading")
+    }, 20000)
+  }
+)
 electron.ipcMain.addListener("cancel-force-reload", () => {
   logIpc("main", "cancel-force-reload")
   if (forceReload) {
@@ -367,6 +426,10 @@ electron.app.on("ready", async () => {
     const url = new URL(request.url)
     console.log(path.normalize(`${__dirname}/${url.pathname}`))
     callback({ path: path.normalize(`${__dirname}/${url.pathname}`) })
+  })
+  log("discord", "Starting...")
+  discord.login({
+    clientId: "1080769753506918463",
   })
   createTray()
   createMainWindow()

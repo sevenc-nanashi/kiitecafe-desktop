@@ -308,6 +308,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("pc")) {
     return
   }
+  setInterval(() => {
+    const users = parseInt(
+      document.querySelector("#user_count .val")!.textContent!
+    )
+    const rotates = document.querySelectorAll(".user.gesture_rotate").length
+    const newFavs = document.querySelectorAll(".user.new_fav").length
+    const favs = document.querySelectorAll(".user.reason_fav").length
+    ipcRenderer.send("update-stats", { users, rotates, newFavs, favs })
+  }, 5000)
   const styleElement = document.createElement("style")
   styleElement.textContent = style.toString() + colorsStyle.toString()
   document.head.appendChild(styleElement)
@@ -362,6 +371,10 @@ document.addEventListener("DOMContentLoaded", () => {
       artist: nowPlaying.artist_name,
       thumbnail: nowPlaying.thumbnail,
       publishedAt: nowPlaying.published_at,
+      startedAt: new Date(nowPlaying.start_time).getTime(),
+      endsAt: new Date(
+        new Date(nowPlaying.start_time).getTime() + nowPlaying.msec_duration
+      ).getTime(),
       id: nowPlaying.video_id,
       progress:
         parseFloat(

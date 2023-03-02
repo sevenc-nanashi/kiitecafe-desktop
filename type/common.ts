@@ -8,6 +8,8 @@ export type NowPlayingInfo = {
   favorited: boolean
   favoriteCount: number
   volume: number
+  startedAt: number
+  endsAt: number
   reason: "priority_playlist" | "add_playlist" | "favorite" | "none"
 }
 
