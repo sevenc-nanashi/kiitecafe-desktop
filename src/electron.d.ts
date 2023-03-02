@@ -11,4 +11,5 @@ type CyalumeSettings = {
   grow: boolean
   colorType: "single" | "crypton" | "follow"
   singleColor: string
+  dim: boolean
 }

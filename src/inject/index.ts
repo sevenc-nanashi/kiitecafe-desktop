@@ -196,6 +196,7 @@ ipcRenderer.on("set-cyalume-settings", (_event, settings: CyalumeSettings) => {
   )
   document.body.setAttribute("data-kcd-cyalume-type", settings.colorType)
   document.body.setAttribute("data-kcd-cyalume-grow", settings.grow.toString())
+  document.body.setAttribute("data-kcd-cyalume-dim", settings.dim.toString())
 })
 window.addEventListener("message", (event) => {
   if (!["http://localhost:5173", "app://."].includes(event.origin)) {
@@ -352,7 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return
     }
     if (lastMusicId !== cafeMusic().now_playing.video_id) {
-      updateCyalumeColor()
+      onMusicChange()
     }
     lastMusicId = cafeMusic().now_playing.video_id
     const nowPlaying = cafeMusic().now_playing
@@ -482,9 +483,10 @@ document.addEventListener("DOMContentLoaded", () => {
     childList: true,
   })
 
-  const updateCyalumeColor = () => {
+  const onMusicChange = () => {
     if (!cafeMusic) return
-    cafeMusic().now_playing.colors.forEach((color, index) => {
+    const nowPlaying = cafeMusic().now_playing
+    nowPlaying.colors.forEach((color, index) => {
       const hsv = rgbToHsv(
         ...((color
           ? [...Array(3)].map((_, i) =>
@@ -498,6 +500,10 @@ document.addEventListener("DOMContentLoaded", () => {
         `rgb(${rgb.join(",")})`
       )
     })
+    document.body.setAttribute(
+      "data-kcd-is-cyalume",
+      (nowPlaying.rotate_action === "cyalume").toString()
+    )
   }
 })
 

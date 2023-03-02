@@ -339,6 +339,7 @@ electron.ipcMain.addListener("get-settings", (_event) => {
     grow: false,
     colorType: "single",
     singleColor: "#00ff00",
+    dim: false,
   }) as CyalumeSettings
   sendToRenderer("set-cyalume-settings", cyalumeSettings)
 })

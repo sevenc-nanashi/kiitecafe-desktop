@@ -43,6 +43,7 @@ onMounted(() => {
   window.electron.receive("set-cyalume-settings", (value: CyalumeSettings) => {
     cyalumeSingleColor.value = value.singleColor
     cyalumeGrowEffectValue.value = value.grow
+    cyalumeDimEffectValue.value = value.dim
     cyalumeColorType.value = value.colorType
     cyalumeSettingReceived.value = true
   })
@@ -51,6 +52,8 @@ onMounted(() => {
 const cyalumeSettingReceived = ref(false)
 const cyalumeGrowEffect = ref<HTMLInputElement>()
 const cyalumeGrowEffectValue = ref(false)
+const cyalumeDimEffect = ref<HTMLInputElement>()
+const cyalumeDimEffectValue = ref(false)
 const cyalumeColor = ref<HTMLInputElement>()
 const cyalumeSingleColor = ref("#00ff00")
 const resetCyalumeColor = () => {
@@ -67,6 +70,7 @@ watchEffect(() => {
     singleColor: cyalumeSingleColor.value,
     grow: cyalumeGrowEffectValue.value,
     colorType: cyalumeColorType.value,
+    dim: cyalumeDimEffectValue.value,
   })
   cyalumeSingleColor.value = cyalumeSingleColor.value
 })
@@ -107,6 +111,18 @@ watchEffect(() => {
             <span>輝きを強化</span>
           </label>
         </li>
+        <li class="setting-item">
+          <label>
+            <input
+              id="dim-effect"
+              ref="cyalumeDimEffect"
+              v-model="cyalumeDimEffectValue"
+              type="checkbox"
+            />
+            <span>ペンライトタイム中は背景を暗くする</span>
+          </label>
+        </li>
+
         <li class="setting-item">
           <label>
             <input
