@@ -3,6 +3,8 @@ import { ref, onMounted, watchEffect } from "vue"
 import "./kiiteLike.scss"
 import colors from "../colors"
 
+const isDevelopment = import.meta.env.DEV
+
 const colorMap = ref(new Map<string, string>())
 
 const setColor = (name: string) => {
@@ -98,8 +100,11 @@ watchEffect(() => {
           >
         </li>
       </ul>
+      <h4>ペンライト設定</h4>
+      <p v-if="isDevelopment">
+        開発ビルド専用：Pキーでいつでもペンライトタイムになります。
+      </p>
       <ul class="setting-item-container">
-        <h4>ペンライト設定</h4>
         <li class="setting-item">
           <label>
             <input

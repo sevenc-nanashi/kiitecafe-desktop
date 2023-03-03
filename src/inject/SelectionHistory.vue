@@ -278,7 +278,6 @@ const openMusic = (music: CafeMusicInfo) => {
     background-size: 180%;
     border-radius: 20%;
     height: 60px;
-    cursor: pointer;
   }
 
   .info {

@@ -9,6 +9,8 @@ import { NowPlayingInfo, Playlist, UpdateAvailable } from "^/type/common"
 
 console.log("InjectPreload: loaded")
 
+const isDevelopment = import.meta.env.DEV
+
 if (location.pathname.includes("intro")) {
   // document.querySelector(".goto_kiite_login_button")!.click();
   location.href = "https://kiite.jp/login?mode=cafe"
@@ -29,11 +31,13 @@ type WindowFuncs = {
   snsUser: SnsUserGetter
   getPlaylists: () => Promise<Playlist[]>
   addPlaylistSong: (listId: string, songId: string) => Promise<boolean>
+  toggleCyalume: () => void
 }
 let cafeMusic: CafeMusicGetter | null = null
 let cafeUsers: CafeUsersGetter | null = null
 let getPlaylists: WindowFuncs["getPlaylists"] | null = null
 let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
+let toggleCyalume: WindowFuncs["toggleCyalume"] | null = null
 
 const sideMenus = [
   { name: "history", label: "選曲履歴100" },
@@ -73,6 +77,7 @@ contextBridge.exposeInMainWorld("preload", {
     cafeUsers = funcs.cafeUsers
     getPlaylists = funcs.getPlaylists
     addPlaylistSong = funcs.addPlaylistSong
+    toggleCyalume = funcs.toggleCyalume
   },
 })
 
@@ -296,6 +301,15 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         return true
       },
+      toggleCyalume: () => {
+        if (window.cafe_music.now_playing.rotate_action === "cyalume") {
+          console.log("Preload: Toggled cyalume off")
+          window.cafe_music.now_playing.rotate_action = null
+        } else {
+          console.log("Preload: Toggled cyalume on")
+          window.cafe_music.now_playing.rotate_action = "cyalume"
+        }
+      },
     })
   }
   const script = document.createElement("script")
@@ -516,6 +530,14 @@ document.addEventListener("DOMContentLoaded", () => {
       "data-kcd-is-cyalume",
       (nowPlaying.rotate_action === "cyalume").toString()
     )
+  }
+
+  if (isDevelopment) {
+    document.body.addEventListener("keydown", (e) => {
+      if (e.key === "p") {
+        toggleCyalume!()
+      }
+    })
   }
 })
 
