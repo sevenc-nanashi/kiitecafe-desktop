@@ -415,10 +415,12 @@ electron.ipcMain.addListener("set-cyalume-settings", (_event, value) => {
   store.set("cyalume-settings", value)
   sendToRenderer("set-cyalume-settings", value)
 })
-electron.ipcMain.addListener("open-settings", (_event) => {
-  logIpc("main", "open-settings")
-  sendToRenderer("open-settings")
-})
+for (const channel of ["open-settings", "open-about"]) {
+  electron.ipcMain.addListener(channel, (_event) => {
+    logIpc("main", channel)
+    sendToRenderer(channel)
+  })
+}
 
 electron.app.on("ready", async () => {
   await installExtension(VUEJS_DEVTOOLS)

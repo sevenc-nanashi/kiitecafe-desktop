@@ -12,19 +12,19 @@
   border-right-color: red !important;
 }
 
-.kcd-about.update-available {
+.update-available {
   animation: update-available 2s infinite;
 }
 
 @keyframes update-available {
   0% {
-    background-color: rgba(64, 64, 0, 0.7);
+    background-color: rgba(var(--color-primary-rgb), 0.2)
   }
   50% {
-    background-color: rgba(64, 64, 0, 0.9);
+    background-color: rgba(var(--color-primary-rgb), 0.5)
   }
   100% {
-    background-color: rgba(64, 64, 0, 0.7);
+    background-color: rgba(var(--color-primary-rgb), 0.2)
   }
 }
 

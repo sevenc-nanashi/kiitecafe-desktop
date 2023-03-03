@@ -4,7 +4,6 @@ import colorsStyle from "./colors.scss"
 import loginStyle from "./loginStyle.css"
 
 import type { CafeMusicInfo } from "./window"
-import packageJsonRaw from "^/package.json?raw"
 import { NowPlayingInfo, Playlist, UpdateAvailable } from "^/type/common"
 
 console.log("InjectPreload: loaded")
@@ -14,12 +13,6 @@ const isDevelopment = import.meta.env.DEV
 if (location.pathname.includes("intro")) {
   // document.querySelector(".goto_kiite_login_button")!.click();
   location.href = "https://kiite.jp/login?mode=cafe"
-}
-
-const packageJson = JSON.parse(packageJsonRaw)
-let version = packageJson.version
-if (version === "0.0.0") {
-  version = "開発版（0.0.0）"
 }
 
 type CafeMusicGetter = () => CafeMusic
@@ -39,12 +32,16 @@ let getPlaylists: WindowFuncs["getPlaylists"] | null = null
 let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
 let toggleCyalume: WindowFuncs["toggleCyalume"] | null = null
 
-const sideMenus = [
-  { name: "history", label: "選曲履歴100" },
-  { name: "about", label: "Desktopについて" },
-]
+const sideMenus = [{ name: "history", label: "選曲履歴100" }]
 
 const topMenus = [
+  {
+    name: "about",
+    label: "About",
+    onClick: () => {
+      ipcRenderer.send("open-about")
+    },
+  },
   {
     name: "reload",
     label: "Reload",
@@ -108,28 +105,16 @@ ipcRenderer.on(
       const menuViewer = document.createElement("iframe")
       menuViewer.setAttribute("kcd-iframe", "")
 
-      let params: Record<string, string>
-      switch (name) {
-        case "about":
-          params = {
-            updateAvailable: JSON.stringify(updateAvailable),
-            version,
-          }
-          break
-        default:
-          params = {}
-          break
-      }
-
-      menuViewer.src =
-        `${url}/inject/${name}?` + new URLSearchParams(params).toString()
+      menuViewer.src = `${url}/inject/${name}`
       menuContainer.appendChild(menuViewer)
       cafe.appendChild(menuContainer)
     }
 
-    const aboutButton = document.querySelector(".kcd-about") as HTMLDivElement
     if (updateAvailable) {
-      aboutButton.classList.add("update-available")
+      const aboutMenu = document.querySelector(
+        "#top_menu .menu li[data-kcd-name='about']"
+      ) as HTMLLIElement
+      aboutMenu.classList.add("update-available")
     }
   }
 )
@@ -185,6 +170,12 @@ ipcRenderer.on("add-playlist-song", async (_event, listId, songId) => {
 ipcRenderer.on("set-colors", (_event, colors: [string, string][]) => {
   for (const [name, color] of colors) {
     document.body.style.setProperty(`--color-${name}`, color)
+    document.body.style.setProperty(
+      `--color-${name}-rgb`,
+      [...Array(3)]
+        .map((_, i) => parseInt(color.slice(i * 2 + 1, i * 2 + 3), 16))
+        .join(",")
+    )
   }
   for (const iframe of Array.from(
     document.querySelectorAll(
@@ -474,9 +465,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const topMenu = document.querySelector("#top_menu ul") as HTMLUListElement
-  for (const { onClick, label } of topMenus) {
+  for (const { onClick, label, name } of topMenus) {
     const menuElement = document.createElement("li")
     menuElement.setAttribute("data-kcd", "")
+    menuElement.setAttribute("data-kcd-name", name)
     menuElement.addEventListener("click", onClick)
     menuElement.textContent = label
     topMenu.appendChild(menuElement)

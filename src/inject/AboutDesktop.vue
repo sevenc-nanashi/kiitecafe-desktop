@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from "vue"
 import { UpdateAvailable } from "^/type/common"
+import packageJson from "^/package.json"
 
 import "./kiiteLike.scss"
 const props = defineProps<{
   updateAvailable: UpdateAvailable
-  currentVersion: string
 }>()
 </script>
 
@@ -34,7 +33,7 @@ const props = defineProps<{
             >名無し｡</a
           >
         </li>
-        <li><b>バージョン：</b>{{ props.currentVersion }}</li>
+        <li><b>バージョン：</b>{{ packageJson.version }}</li>
         <li>
           <b>ソースコード：</b
           ><a
@@ -47,7 +46,8 @@ const props = defineProps<{
       <div v-if="props.updateAvailable" id="new-version">
         <h4>新しいバージョンがリリースされました！</h4>
         <p>
-          バージョン<b>{{ props.updateAvailable.tag_name }}</b>
+          バージョン
+          <b>{{ props.updateAvailable.tag_name.replace(/^v/, "") }} </b>
           がリリースされました。
           <a :href="props.updateAvailable.html_url" target="_blank">
             ダウンロードする</a
@@ -82,6 +82,7 @@ const props = defineProps<{
   #new-version {
     h4 {
       margin-bottom: 0.5rem;
+      margin-top: 1.5rem;
       color: var(--color-primary);
     }
   }

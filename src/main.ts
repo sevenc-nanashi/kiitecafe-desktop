@@ -41,22 +41,8 @@ const router = createRouter({
     { path: "/", component: App },
     { path: "/mini-player", component: MiniPlayerApp },
     {
-      path: "/inject/about",
-      props: (route) => ({
-        currentVersion: route.query.version as string,
-        updateAvailable: JSON.parse(
-          route.query.updateAvailable as string
-        ) as UpdateAvailable,
-      }),
-      component: () => import("./inject/AboutDesktop.vue"),
-    },
-    {
       path: "/inject/history",
       component: () => import("./inject/SelectionHistory.vue"),
-    },
-    {
-      path: "/inject/settings",
-      component: () => import("./inject/CustomSettings.vue"),
     },
   ],
 })

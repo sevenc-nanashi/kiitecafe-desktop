@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { watch, ref, onUnmounted } from "vue"
+import { watch, ref, onUnmounted, computed } from "vue"
 import { useRouter } from "vue-router"
+import AboutDesktop from "./inject/AboutDesktop.vue"
 import CustomSettings from "./inject/CustomSettings.vue"
+import { UpdateAvailable } from "^/type/common"
 
 const webviewRef = ref<WebviewTag>()
 
@@ -13,7 +15,7 @@ const preloadUrl = new URL(preloadPath, "file://").toString()
 
 const isMuted = ref(query.muted === "true")
 const updateAvailable = ref<
-  { tag_name: string; html_url: string } | boolean | null
+  { tag_name: string; html_url: string } | false | null
 >(null)
 
 watch(webviewRef, async (webview) => {
@@ -57,7 +59,7 @@ for (const channel of [
   })
 }
 
-window.electron.receive("update-available", (value: boolean) => {
+window.electron.receive("update-available", (value: UpdateAvailable) => {
   updateAvailable.value = value
   webviewRef.value?.send("information", value, query.url)
 })
@@ -71,13 +73,22 @@ onUnmounted(() => {
   } catch {}
 })
 
+const isPopupOpen = computed(() => {
+  return isSettingOpen.value || isAboutOpen.value
+})
 const isSettingOpen = ref(false)
-const closeSettings = () => {
+const isAboutOpen = ref(false)
+const closePopup = () => {
   isSettingOpen.value = false
+  isAboutOpen.value = false
 }
 
 window.electron.receive("open-settings", () => {
   isSettingOpen.value = true
+})
+
+window.electron.receive("open-about", () => {
+  isAboutOpen.value = true
 })
 </script>
 
@@ -91,9 +102,13 @@ window.electron.receive("open-settings", () => {
       allowpopups
     />
 
-    <div v-if="isSettingOpen" id="settings-popup" @click="closeSettings">
-      <div id="settings-popup-content" @click.stop>
-        <CustomSettings />
+    <div v-if="isPopupOpen" id="popup" @click="closePopup">
+      <div id="popup-content" @click.stop>
+        <CustomSettings v-if="isSettingOpen" />
+        <AboutDesktop
+          v-if="isAboutOpen && updateAvailable != null"
+          :update-available="updateAvailable"
+        />
       </div>
     </div>
   </div>
@@ -109,7 +124,7 @@ webview {
   width: 100%;
   height: 100%;
 }
-#settings-popup {
+#popup {
   position: absolute;
   top: 0;
   left: 0;
@@ -120,7 +135,7 @@ webview {
   display: flex;
   justify-content: center;
   align-items: center;
-  #settings-popup-content {
+  #popup-content {
     position: relative;
     width: 50%;
     min-width: 300px;
