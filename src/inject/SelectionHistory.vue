@@ -178,6 +178,7 @@ const openMusic = (music: CafeMusicInfo) => {
               <a
                 :href="`https://nicovideo.jp/watch/${music.video_id}`"
                 target="_blank"
+                title="ニコニコ動画で開く"
               >
                 <OpenInNewIcon class="open-icon" />
               </a>
