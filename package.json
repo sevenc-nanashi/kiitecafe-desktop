@@ -55,5 +55,10 @@
     "vite-plugin-electron": "^0.10.2",
     "vite-tsconfig-paths": "^4.0.5",
     "vue-tsc": "^1.0.9"
+  },
+  "pnpm": {
+    "overrides": {
+      "register-scheme": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz"
+    }
   }
 }
