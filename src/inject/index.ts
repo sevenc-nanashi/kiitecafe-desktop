@@ -204,7 +204,7 @@ window.addEventListener("message", (event) => {
   }
   const [type] = event.data
   switch (type) {
-    case "get-colors":
+    case "get-settings":
       ipcRenderer.send("get-settings")
   }
 })

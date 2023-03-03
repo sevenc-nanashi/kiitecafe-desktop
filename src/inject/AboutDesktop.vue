@@ -7,10 +7,6 @@ const props = defineProps<{
   updateAvailable: UpdateAvailable
   currentVersion: string
 }>()
-
-onMounted(() => {
-  window.parent.postMessage(["get-colors"], "*")
-})
 </script>
 
 <template>

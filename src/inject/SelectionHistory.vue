@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, watchEffect } from "vue"
 import urlcat from "urlcat"
 import HeartIcon from "vue-material-design-icons/Heart.vue"
+import OpenInNewIcon from "vue-material-design-icons/OpenInNew.vue"
 import { CafeMusicInfo, Reason, User } from "./window"
 import "./kiiteLike.scss"
 
@@ -70,8 +71,6 @@ onMounted(async () => {
       `History: Favs: ${lastNewFavsCount.value}, Gestures: ${lastGesturesCount.value}`
     )
   }, 5000)
-
-  window.parent.postMessage(["get-colors"], "*")
 })
 
 onUnmounted(() => {
@@ -160,7 +159,6 @@ const openMusic = (music: CafeMusicInfo) => {
           :style="{
             backgroundImage: `url(${music.thumbnail})`,
           }"
-          @click="openMusic(music)"
         ></div>
         <div class="info">
           <div class="play-info">
@@ -176,13 +174,21 @@ const openMusic = (music: CafeMusicInfo) => {
               :title="new Date(music.start_time).toLocaleString()"
               >{{ formatRelativeTime(music.start_time) }}</span
             >
+            <div class="open">
+              <a
+                :href="`https://nicovideo.jp/watch/${music.video_id}`"
+                target="_blank"
+              >
+                <OpenInNewIcon class="open-icon" />
+              </a>
+            </div>
             <div
               v-if="historyPpReasons[i] && historyPpReasons[i]!.length > 0 && users.get(historyPpReasons[i]![0]!.user_id)"
               class="reason-info"
             >
               <a
                 :href="
-                `https://kiite.jp/user/${users.get(historyPpReasons[i]![0]!.user_id)!.user_id}`
+                `https://kiite.jp/user/${users.get(historyPpReasons[i]![0]!.user_id)!.user_name}`
                 "
                 target="_blank"
               >
@@ -298,6 +304,17 @@ const openMusic = (music: CafeMusicInfo) => {
         &.time-onair {
           background: var(--color-accent);
           color: #fff;
+        }
+      }
+      .open {
+        position: absolute;
+        right: 0;
+        .open-icon {
+          color: #aaa;
+
+          &:hover {
+            color: #fff;
+          }
         }
       }
 
