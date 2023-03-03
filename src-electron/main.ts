@@ -18,7 +18,10 @@ if (isDevelopment) {
 
 electron.app.setPath(
   "userData",
-  path.join(electron.app.getPath("appData"), "kiitecafe-desktop")
+  path.join(
+    electron.app.getPath("appData"),
+    `kiitecafe-desktop${isDevelopment ? "-dev" : ""}`
+  )
 )
 const store = new Store({
   accessPropertiesByDotNotation: false,
