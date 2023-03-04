@@ -19,7 +19,6 @@ import {
 import { faSquareTwitter } from "@fortawesome/free-brands-svg-icons"
 import MiniPlayerApp from "./miniplayer/App.vue"
 import App from "./App.vue"
-import { UpdateAvailable } from "^/type/common"
 
 for (const icon of [
   faHeartSolid,

@@ -138,10 +138,6 @@ const formatRelativeTime = (time: string) => {
     return `${Math.floor(diffSec)}秒前`
   }
 }
-
-const openMusic = (music: CafeMusicInfo) => {
-  window.open(`https://nicovideo.jp/watch/${music.video_id}`, "_blank")
-}
 </script>
 
 <template>
