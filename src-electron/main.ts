@@ -184,7 +184,7 @@ const createMainWindow = async () => {
   params.append("dirname", __dirname)
   params.append("muted", (store.get("muted", false) as boolean).toString())
   params.append("url", url)
-  if (isDevelopment) {
+  if (isDevelopment || store.get("__open_devtools", false)) {
     win.webContents.openDevTools({ mode: "detach" })
   }
   win.loadURL(`${url}?${params.toString()}`)

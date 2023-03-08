@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron"
 import style from "./style.scss"
-import colorsStyle from "./colors.scss"
-import loginStyle from "./loginStyle.css"
+import colorsStyle from "./colors.scss?inline"
+import loginStyle from "./loginStyle.scss?inline"
 
 import type { CafeMusicInfo } from "./window"
 import { NowPlayingInfo, Playlist, UpdateAvailable } from "^/type/common"
@@ -195,7 +195,12 @@ ipcRenderer.on("set-cyalume-settings", (_event, settings: CyalumeSettings) => {
   document.body.setAttribute("data-kcd-cyalume-dim", settings.dim.toString())
 })
 window.addEventListener("message", (event) => {
-  if (!["http://localhost:5173", "app://."].includes(event.origin)) {
+  if (
+    ![
+      "http://localhost:5173", // Development mode
+      "null", // Production mode, app:// origin is "null"
+    ].includes(event.origin)
+  ) {
     return
   }
   const [type] = event.data

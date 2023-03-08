@@ -46,16 +46,6 @@ const router = createRouter({
   ],
 })
 
-createApp({
-  mounted() {
-    if (window.parent !== window) {
-      window.parent.postMessage(["get-settings"], "*")
-    }
-  },
-})
-  .use(router)
-  .mount("#app")
-
 if (typeof window.electron !== "undefined") {
   window.electron.receive("set-colors", (colors: [string, string][]) => {
     for (const [key, value] of colors) {
@@ -85,6 +75,16 @@ const onMessage = (event: MessageEvent) => {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+const setupMessages = () => {
   window.addEventListener("message", onMessage)
-})
+  console.log("Loaded, sending get-settings")
+  window.parent.postMessage(["get-settings"], "*")
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setupMessages)
+} else {
+  setupMessages()
+}
+
+createApp({}).use(router).mount("#app")
