@@ -428,7 +428,7 @@ body {
 #thumbnail {
   height: 100%;
   aspect-ratio: 1;
-  background-size: cover;
+  background-size: 180%;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 5px;

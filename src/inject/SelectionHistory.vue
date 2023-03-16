@@ -22,22 +22,26 @@ const rotateUsers = ref<Map<number, number[]>>(new Map())
 onMounted(async () => {
   console.log("History: Mounted, fetching timetable")
   while (true) {
-    history.value = await fetch(
-      urlcat("https://cafe.kiite.jp/api/cafe/timetable", {
-        limit: 100,
-        with_comment: 1,
-      })
-    ).then((res) => res.json())
-    const startTime = new Date(history.value[0].start_time)
-    const endTime = startTime.getTime() + history.value[0].msec_duration
-    const now = new Date()
-    console.log("History: Fetched timetable, waiting for next update")
-    const nextUpdate = new Date(Math.max(endTime, now.getTime() + 1000))
-    const diff = nextUpdate.getTime() - now.getTime()
-    console.log(
-      `History: Next update at ${nextUpdate.toLocaleString()}, waiting ${diff}ms`
-    )
-    await new Promise((resolve) => setTimeout(resolve, diff))
+    try {
+      history.value = await fetch(
+        urlcat("https://cafe.kiite.jp/api/cafe/timetable", {
+          limit: 100,
+          with_comment: 1,
+        })
+      ).then((res) => res.json())
+      const startTime = new Date(history.value[0].start_time)
+      const endTime = startTime.getTime() + history.value[0].msec_duration
+      const now = new Date()
+      console.log("History: Fetched timetable, waiting for next update")
+      const nextUpdate = new Date(Math.max(endTime, now.getTime() + 1000))
+      const diff = nextUpdate.getTime() - now.getTime()
+      console.log(
+        `History: Next update at ${nextUpdate.toLocaleString()}, waiting ${diff}ms`
+      )
+      await new Promise((resolve) => setTimeout(resolve, diff))
+    } catch (e) {
+      console.error(e)
+    }
   }
 })
 
@@ -418,6 +422,7 @@ const formatRelativeTime = (time: string) => {
         line-height: 1.4em;
         overflow-y: scroll;
         flex-grow: 1;
+        white-space: pre-wrap;
       }
     }
   }

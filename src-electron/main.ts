@@ -255,7 +255,8 @@ electron.ipcMain.addListener(
     const state = `\u{1f464} ${stats.users} | 回 ${stats.rotates} | \u{2764} ${stats.newFavs}`
     log("discord", `Updating activity`)
     discord.setActivity({
-      largeImageKey: nowPlayingInfo.thumbnail,
+      largeImageKey:
+        "https://kiitecafe-thumbnail.deno.dev?videoId=" + nowPlayingInfo.id,
       largeImageText: `${nowPlayingInfo.title} - ${nowPlayingInfo.artist}`,
       smallImageKey: "icon",
       smallImageText: `Kiite Cafe Desktop: v${version}`,
