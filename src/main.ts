@@ -39,10 +39,6 @@ const router = createRouter({
   routes: [
     { path: "/", component: App },
     { path: "/mini-player", component: MiniPlayerApp },
-    {
-      path: "/inject/history",
-      component: () => import("./inject/SelectionHistory.vue"),
-    },
   ],
 })
 

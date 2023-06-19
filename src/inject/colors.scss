@@ -1,4 +1,5 @@
 #cafe_space .cafe_users .users .user *:is(.fav_icon, .new_fav_icon) i,
+#cafe_timetable ul li .favs .new_favs .new_fav_icon i,
 #now_playing_info .inner .favorite i.filled,
 #reasons ul li .reason .text b.fav,
 #reasons ul li .reason .text a.fav {
@@ -26,7 +27,10 @@
   .rate_icon
   i,
 #cafe_space .cafe_users .users .user .priority_playlist_icon i,
-#pri_playlist .exp b {
+#pri_playlist .exp b:not(.hl):not(.big),
+#pri_timetable .exp b:not(.hl):not(.big),
+#cafe_timetable ul li .reason .pri_playlist,
+#pri_playlist .detail ul.playlist_songs li .info .played .pri_playlist {
   color: var(--color-priority_playlist) !important;
 }
 #pri_playlist .pri.show .label {
@@ -35,6 +39,7 @@
 #cafe_menu .sub_menu *:is(span, b),
 .cafe_menu_li_selected,
 #cafe.view_space #cafe_menu li.space,
+#cafe.view_timetable #cafe_menu li.timetable,
 #cafe.view_pri_playlist #cafe_menu li.pri_playlist,
 #cafe.view_info #cafe_menu li.info,
 #cafe.view_mobile #cafe_menu li.mobile,
@@ -50,12 +55,20 @@
 #cafe_space #hide_comment_button .timer,
 #cafe_space #belt_message,
 #cafe_space .cafe_users .users .user .link_icon:hover,
-#cafe_space .cafe_users .users .user .presenter_icon i {
+#cafe_space .cafe_users .users .user .presenter_icon i,
+#pri_playlist .exp b.hl,
+#pri_playlist .exp span.open_detail_exp,
+#cafe_timetable .exp b.hl,
+#cafe_timetable ul li .reason .user_name,
+#cafe_timetable .exp span.open_detail_exp,
+#cafe_timetable ul li .thumbnail .miner_time_label,
+#cafe_timetable ul li .rotates  b {
   color: var(--color-primary) !important;
 }
 
 .cafe_menu_li_selected,
 #cafe.view_space #cafe_menu li.space,
+#cafe.view_timetable #cafe_menu li.timetable,
 #cafe.view_pri_playlist #cafe_menu li.pri_playlist,
 #cafe.view_info #cafe_menu li.info,
 #cafe.view_mobile #cafe_menu li.mobile {
@@ -76,7 +89,8 @@
 }
 #pri_playlist .exp span.new,
 #pri_playlist .pri .btn_unset:hover,
-#pri_playlist .detail .label_pri .btn_unset:hover {
+#pri_playlist .detail .label_pri .btn_unset:hover,
+#cafe_timetable ul li .label_onair {
   background-color: var(--color-accent) !important;
 }
 

@@ -61,7 +61,7 @@ for (const channel of [
 
 window.electron.receive("update-available", (value: UpdateAvailable) => {
   updateAvailable.value = value
-  webviewRef.value?.send("information", value, query.url)
+  webviewRef.value?.send("information", value)
 })
 
 window.electron.send("set-muted", isMuted.value)

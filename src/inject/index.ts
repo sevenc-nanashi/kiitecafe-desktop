@@ -32,8 +32,6 @@ let getPlaylists: WindowFuncs["getPlaylists"] | null = null
 let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
 let toggleCyalume: WindowFuncs["toggleCyalume"] | null = null
 
-const sideMenus = [{ name: "history", label: "選曲履歴100" }]
-
 const topMenus = [
   {
     name: "about",
@@ -85,39 +83,14 @@ declare global {
     }
   }
 }
-ipcRenderer.on(
-  "information",
-  (_event, updateAvailable: UpdateAvailable, url: string) => {
-    const cafe = document.querySelector("#cafe") as HTMLDivElement
-
-    for (const { name } of sideMenus) {
-      const menuContainer = document.createElement("div")
-      menuContainer.id = `bottom-view-${name}`
-      menuContainer.classList.add("bottom-view")
-      menuContainer.innerHTML = `
-      <div class="logo_mini">
-        <div class="logo_inner">
-          <img src="https://cafe.kiite.jp/assets/logo.png" />
-          <div class="logo_cafe">Cafe</div>
-        </div>
-      </div>
-      `
-      const menuViewer = document.createElement("iframe")
-      menuViewer.setAttribute("kcd-iframe", "")
-
-      menuViewer.src = `${url}/inject/${name}`
-      menuContainer.appendChild(menuViewer)
-      cafe.appendChild(menuContainer)
-    }
-
-    if (updateAvailable) {
-      const aboutMenu = document.querySelector(
-        "#top_menu .menu li[data-kcd-name='about']"
-      ) as HTMLLIElement
-      aboutMenu.classList.add("update-available")
-    }
+ipcRenderer.on("information", (_event, updateAvailable: UpdateAvailable) => {
+  if (updateAvailable) {
+    const aboutMenu = document.querySelector(
+      "#top_menu .menu li[data-kcd-name='about']"
+    ) as HTMLLIElement
+    aboutMenu.classList.add("update-available")
   }
-)
+})
 
 ipcRenderer.on("set-favorite", (_event, favorite) => {
   const button = document.querySelector(".favorite .button") as HTMLDivElement
@@ -437,37 +410,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }).observe(rotateButton, {
     attributes: true,
   })
-
-  const cafe = document.querySelector("#cafe") as HTMLDivElement
-  const cafeMenu = document.querySelector("#cafe_menu ul") as HTMLUListElement
-  for (const { name, label } of sideMenus) {
-    const aboutMenu = document.createElement("li")
-    aboutMenu.setAttribute("class", `kcd-${name}`)
-    aboutMenu.addEventListener("click", () => {
-      cafe.classList.remove(
-        [...Object.values(cafe.classList)].find((c) => c.startsWith("view_"))!
-      )
-      cafe.classList.add(`view_${name}`)
-    })
-    aboutMenu.textContent = label
-    cafeMenu.appendChild(aboutMenu)
-
-    new MutationObserver((_mutations) => {
-      if (
-        !(
-          [...Object.values(cafe.classList)].find(
-            (c) => c.startsWith("view_") && c !== `view_${name}`
-          ) && cafe.classList.contains(`view_${name}`)
-        )
-      ) {
-        return
-      }
-      cafe.classList.remove(`view_${name}`)
-    }).observe(cafe, {
-      subtree: false,
-      attributes: true,
-    })
-  }
 
   const topMenu = document.querySelector("#top_menu ul") as HTMLUListElement
   for (const { onClick, label, name } of topMenus) {
