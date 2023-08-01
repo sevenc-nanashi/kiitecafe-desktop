@@ -119,7 +119,7 @@ const tweet = () => {
   if (!info.value) return
   const text =
     `♪ ${info.value.title} #${info.value.id} #Kiite\n` +
-    `Kiite Cafeできいてます https://cafe.kiite.jp https://nico.ms/${info.value.id}`
+    `Kiite Cafeできいてます https://cafe.kiite.jp https://nicovideo.jp/watch/${info.value.id}`
   window.open(
     `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
   )
