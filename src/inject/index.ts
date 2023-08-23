@@ -271,12 +271,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return true
       },
       toggleCyalume: () => {
+        const commentForm = document.getElementById(
+          "comment_form"
+        ) as HTMLDivElement
         if (window.cafe_music.now_playing.rotate_action === "cyalume") {
           console.log("Preload: Toggled cyalume off")
           window.cafe_music.now_playing.rotate_action = null
+          commentForm.classList.remove("with_penlight")
         } else {
           console.log("Preload: Toggled cyalume on")
           window.cafe_music.now_playing.rotate_action = "cyalume"
+          commentForm.classList.add("with_penlight")
         }
       },
     })
@@ -427,26 +432,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   ipcRenderer.send("cancel-force-reload")
   ipcRenderer.send("get-settings")
-
-  const usersContainer = document.querySelector(".users") as HTMLDivElement
-  new MutationObserver(() => {
-    const currentSongId = cafeMusic?.().now_playing.id ?? 0
-    const unsetUsers = Array.from(
-      document.querySelectorAll(
-        `.users .user:not([data-kcd-cyalume-color-key="${currentSongId}"])`
-      )
-    )
-    for (const user of unsetUsers) {
-      const bar = user.querySelector(".bar") as HTMLDivElement
-      user.setAttribute("data-kcd-cyalume-color-key", currentSongId.toString())
-      const userId = parseInt(user.getAttribute("data-user_id")!)
-      const key = userId + currentSongId
-      bar.setAttribute("data-kcd-cyalume-color-follow", (key % 3).toString())
-      bar.setAttribute("data-kcd-cyalume-color-crypton", (key % 6).toString())
-    }
-  }).observe(usersContainer, {
-    childList: true,
-  })
 
   const onMusicChange = () => {
     if (!cafeMusic) return

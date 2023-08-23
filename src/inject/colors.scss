@@ -62,7 +62,7 @@
 #cafe_timetable ul li .reason .user_name,
 #cafe_timetable .exp span.open_detail_exp,
 #cafe_timetable ul li .thumbnail .miner_time_label,
-#cafe_timetable ul li .rotates  b {
+#cafe_timetable ul li .rotates b {
   color: var(--color-primary) !important;
 }
 
@@ -94,31 +94,35 @@
   background-color: var(--color-accent) !important;
 }
 
-$cyalume: "#cafe_space .cafe_users .users .user .light .bar";
-#{$cyalume} {
-  background-color: var(--cyalume);
-}
-body[data-kcd-cyalume-grow="true"] #{$cyalume} {
+body[data-kcd-cyalume-grow="true"] .bar {
   filter: drop-shadow(0 0 0.5rem var(--cyalume));
-}
-body[data-kcd-cyalume-type="single"] #{$cyalume} {
-  --cyalume: var(--color-cyalume-single);
-}
-$crypton-colors: "#3fffec", "#ffcc11", "#ffef11", "#ffbacc", "#ff4e4e",
-  "#3f80ff";
+  --cyalume: cyan;
 
-body[data-kcd-cyalume-type="crypton"] #{$cyalume} {
-  @for $i from 0 through 5 {
-    &[data-kcd-cyalume-color-crypton="#{$i}"] {
-      --cyalume: #{nth($crypton-colors, $i + 1)};
-    }
+  &.lime {
+    --cyalume: lime;
   }
-}
 
-body[data-kcd-cyalume-type="follow"] #{$cyalume} {
-  @for $i from 0 through 2 {
-    &[data-kcd-cyalume-color-follow="#{$i}"] {
-      --cyalume: var(--cyalume-music-color-#{$i});
-    }
+  &.red {
+    --cyalume: #ff1f0f;
+  }
+
+  &.yellow {
+    --cyalume: yellow;
+  }
+
+  &.orange {
+    --cyalume: orange;
+  }
+
+  &.blue {
+    --cyalume: #10aaff;
+  }
+
+  &.pink {
+    --cyalume: #ff5bef;
+  }
+
+  &.snow {
+    --cyalume: #d2ffff;
   }
 }
