@@ -397,8 +397,6 @@ electron.ipcMain.addListener("get-settings", (_event) => {
 
   const cyalumeSettings = store.get("cyalume-settings", {
     grow: false,
-    colorType: "single",
-    singleColor: "#00ff00",
     dim: false,
   }) as CyalumeSettings
   sendToRenderer("set-cyalume-settings", cyalumeSettings)

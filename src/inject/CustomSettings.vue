@@ -43,10 +43,8 @@ onMounted(() => {
   window.electron.send("get-settings")
   window.electron.receive("set-colors", setColors)
   window.electron.receive("set-cyalume-settings", (value: CyalumeSettings) => {
-    cyalumeSingleColor.value = value.singleColor
     cyalumeGrowEffectValue.value = value.grow
     cyalumeDimEffectValue.value = value.dim
-    cyalumeColorType.value = value.colorType
     cyalumeSettingReceived.value = true
   })
 })
@@ -56,25 +54,13 @@ const cyalumeGrowEffect = ref<HTMLInputElement>()
 const cyalumeGrowEffectValue = ref(false)
 const cyalumeDimEffect = ref<HTMLInputElement>()
 const cyalumeDimEffectValue = ref(false)
-const cyalumeColor = ref<HTMLInputElement>()
-const cyalumeSingleColor = ref("#00ff00")
-const resetCyalumeColor = () => {
-  cyalumeSingleColor.value = "#00ff00"
-}
-watchEffect(() => {
-  cyalumeColor.value?.setAttribute("value", cyalumeSingleColor.value)
-})
-const cyalumeColorType = ref("single")
 
 watchEffect(() => {
   if (!cyalumeSettingReceived.value) return
   window.electron.send("set-cyalume-settings", {
-    singleColor: cyalumeSingleColor.value,
     grow: cyalumeGrowEffectValue.value,
-    colorType: cyalumeColorType.value,
     dim: cyalumeDimEffectValue.value,
   })
-  cyalumeSingleColor.value = cyalumeSingleColor.value
 })
 </script>
 
@@ -125,51 +111,6 @@ watchEffect(() => {
               type="checkbox"
             />
             <span>ペンライトタイム中は背景を暗くする</span>
-          </label>
-        </li>
-
-        <li class="setting-item">
-          <label>
-            <input
-              v-model="cyalumeColorType"
-              type="radio"
-              name="cyalume-color"
-              value="single"
-            />
-            <span>単色：</span>
-          </label>
-          <label>
-            <input
-              ref="cyalumeColor"
-              type="color"
-              :value="cyalumeSingleColor"
-              @change="cyalumeSingleColor = cyalumeColor!.value"
-            />
-          </label>
-          <span role="button" class="reset" @click="resetCyalumeColor"
-            >リセット（#00ff00）</span
-          >
-        </li>
-        <li class="setting-item">
-          <label>
-            <input
-              v-model="cyalumeColorType"
-              type="radio"
-              name="cyalume-color"
-              value="crypton"
-            />
-            <span>クリプトン6色</span>
-          </label>
-        </li>
-        <li class="setting-item">
-          <label>
-            <input
-              v-model="cyalumeColorType"
-              type="radio"
-              name="cyalume-color"
-              value="follow"
-            />
-            <span>曲に合わせる</span>
           </label>
         </li>
       </ul>
