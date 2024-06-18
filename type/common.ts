@@ -4,6 +4,7 @@ export type NowPlayingInfo = {
   thumbnail: string
   publishedAt: string
   id: string
+  source: "youtube" | "nicovideo"
   progress: number
   favorited: boolean
   favoriteCount: number

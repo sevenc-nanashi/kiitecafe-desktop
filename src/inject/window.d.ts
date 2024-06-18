@@ -7,10 +7,13 @@ declare global {
     CafePlayer: Class<CafePlayer>
     CafeMusic: Class<CafeMusic>
     d3: d3
-    gon: {
-      user: User
-      youtube_play: boolean
-    }
+    YT?: unknown
+    gon: Gon
+  }
+
+  interface Gon {
+    user: User
+    youtube_play: boolean
   }
 
   class CafeMusic {

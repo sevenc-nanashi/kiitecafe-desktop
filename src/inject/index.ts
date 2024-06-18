@@ -15,10 +15,12 @@ if (location.pathname.includes("intro")) {
   location.href = "https://kiite.jp/login?mode=cafe"
 }
 
+type GonGetter = () => Gon
 type CafeMusicGetter = () => CafeMusic
 type CafeUsersGetter = () => CafeUsers
 type SnsUserGetter = () => SnsUser
 type WindowFuncs = {
+  gon: GonGetter
   cafeMusic: CafeMusicGetter
   cafeUsers: CafeUsersGetter
   snsUser: SnsUserGetter
@@ -26,6 +28,7 @@ type WindowFuncs = {
   addPlaylistSong: (listId: string, songId: string) => Promise<boolean>
   toggleCyalume: () => void
 }
+let gon: GonGetter | null = null
 let cafeMusic: CafeMusicGetter | null = null
 let cafeUsers: CafeUsersGetter | null = null
 let getPlaylists: WindowFuncs["getPlaylists"] | null = null
@@ -68,6 +71,7 @@ const topMenus = [
 
 contextBridge.exposeInMainWorld("preload", {
   setFuncs: (funcs: WindowFuncs) => {
+    gon = funcs.gon
     cafeMusic = funcs.cafeMusic
     cafeUsers = funcs.cafeUsers
     getPlaylists = funcs.getPlaylists
@@ -233,7 +237,16 @@ document.addEventListener("DOMContentLoaded", () => {
           return this.pause()
         },
       }
-      player.load(callback)
+      ;(async () => {
+        while (true) {
+          if (typeof window.YT === "undefined") {
+            await new Promise((resolve) => setTimeout(resolve, 100))
+            continue
+          }
+          player.load(callback)
+          break
+        }
+      })()
       return this.play_history(musicInfo)
     }
     patchedPlay.isPatched = true
@@ -247,6 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 100)
 
     window.preload.setFuncs({
+      gon: () => window.gon,
       cafeMusic: () => window.cafe_music,
       cafeUsers: () => window.cafe_users,
       snsUser: () => window.sns_user,
@@ -344,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let lastMusicId: string | null = null
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {
-    if (!cafeUsers || !cafeUsers().me || !cafeMusic) {
+    if (!cafeUsers || !cafeUsers().me || !cafeMusic || !gon) {
       return
     }
     if (lastMusicId !== cafeMusic().now_playing.video_id) {
@@ -361,7 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
       endsAt: new Date(
         new Date(nowPlaying.start_time).getTime() + nowPlaying.msec_duration
       ).getTime(),
-      id: nowPlaying.video_id,
+      id: gon().youtube_play ? nowPlaying.yt_video_id : nowPlaying.video_id,
+      source: gon().youtube_play ? "youtube" : "nicovideo",
       progress:
         parseFloat(
           (
