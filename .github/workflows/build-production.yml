@@ -43,7 +43,7 @@ jobs:
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
           fi
-          pnpm update-version.js $VERSION
+          node update-version.js $VERSION
           echo Version: $VERSION
 
       - name: Build with vite
@@ -121,7 +121,7 @@ jobs:
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
           fi
-          pnpm update-version.js $VERSION
+          node update-version.js $VERSION
           echo Version: $VERSION
 
       - name: Build electron
