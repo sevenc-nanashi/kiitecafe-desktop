@@ -3,7 +3,6 @@ import vue from "@vitejs/plugin-vue"
 import electron from "vite-plugin-electron"
 import checker from "vite-plugin-checker"
 import tsconfigPaths from "vite-tsconfig-paths"
-import treeKill from "tree-kill"
 
 // https://vitejs.dev/config/
 export default defineConfig((options) => {
@@ -45,15 +44,6 @@ export default defineConfig((options) => {
           preload: "./src/preload.ts",
           injectPreload: "./src/inject",
           miniPlayerPreload: "./src/miniplayer/preload.ts",
-        },
-        // ref: https://github.com/electron-vite/vite-plugin-electron/pull/122
-        onstart: ({ startup }) => {
-          // @ts-expect-error internal API
-          const pid = process.electronApp?.pid
-          if (pid) {
-            treeKill(pid)
-          }
-          startup([".", "--no-sandbox"])
         },
         vite: {
           build: {

@@ -203,34 +203,38 @@ document.addEventListener("DOMContentLoaded", () => {
       this: CafeMusic,
       musicInfo: CafeMusicInfo & { start_time: number }
     ) {
-      console.log("Preload: Called patchedPlay")
+      console.log("InjectPreload: Patched play", musicInfo)
+      if (this.now_playing_player) {
+        this.now_playing_player.remove()
+      }
+      let player: CafePlayer | CafeYtPlayer
+      if (window.gon.youtube_play) {
+        player = new CafeYtPlayer(musicInfo.yt_video_id, musicInfo.start_time)
+      } else {
+        player = new CafePlayer(musicInfo.video_id, musicInfo.start_time)
+      }
+      this.now_playing_player = player
       window.d3
         .select("#cafe_player")
         .classed("loading", true)
         .classed("show_hint_tab_active", false)
-      const player = new window.CafePlayer(
-        musicInfo.video_id,
-        musicInfo.start_time
-      )
-
-      player.load({
-        onFirstPlay: function () {
-          return (
-            5 < player.seekTo(window.cafe_music.get_song_pos(musicInfo)),
-            window.d3
-              .select("#cafe_player")
-              .classed("loading", false)
-              .classed("playing", true)
-          )
+      const callback = {
+        onFirstPlay: () => {
+          const song_pos = this.get_song_pos(musicInfo)
+          if (song_pos > 5) {
+            player.seekTo(song_pos)
+          }
+          return window.d3
+            .select("#cafe_player")
+            .classed("loading", false)
+            .classed("playing", true)
         },
-        onPause: function () {
-          return this.pause!()
+        onPause: () => {
+          return this.pause()
         },
-      })
-
-      this.now_playing_player = player
-
-      this.play_history(musicInfo)
+      }
+      player.load(callback)
+      return this.play_history(musicInfo)
     }
     patchedPlay.isPatched = true
 

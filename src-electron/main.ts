@@ -32,7 +32,7 @@ const getColors = () => {
   const mergedColors = new Map([
     ...(colors.map((color) => [color.name, color.default]) as [
       string,
-      string
+      string,
     ][]),
     ...(store.get("colors", []) as [string, string][]),
   ])

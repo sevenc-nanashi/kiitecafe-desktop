@@ -7,6 +7,10 @@ declare global {
     CafePlayer: Class<CafePlayer>
     CafeMusic: Class<CafeMusic>
     d3: d3
+    gon: {
+      user: User
+      youtube_play: boolean
+    }
   }
 
   class CafeMusic {
@@ -14,6 +18,7 @@ declare global {
     now_playing: CafeMusicInfo
     get_song_pos: (musicInfo: CafeMusicInfo) => number
     play: (musicInfo: CafeMusicInfo & { start_time: number }) => void
+    pause: () => void
     now_playing_player: CafePlayer
     play_history: (musicInfo: CafeMusicInfo) => void
   }
@@ -29,6 +34,11 @@ declare global {
     pause: () => unknown
     onFirstPlay: () => void
     onPause: () => void
+    remove: () => void
+  }
+
+  class CafeYtPlayer extends CafePlayer {
+    constructor(video_id: string, start_time: number): void
   }
 
   type SnsUser = {
@@ -71,6 +81,7 @@ type VA = {
 type CafeMusicInfo = {
   id: number
   video_id: string
+  yt_video_id: string
   title: string
   artist_id: number
   artist_name: string

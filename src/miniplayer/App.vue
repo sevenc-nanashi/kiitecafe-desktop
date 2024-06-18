@@ -43,7 +43,7 @@ let animation: { width: number; animation: Animation } | null = null
 const isHovering = ref(false)
 const isMuted = ref(router.currentRoute.value.query.muted === "true")
 
-let interval: NodeJS.Timer | null = null
+let interval: ReturnType<typeof setInterval> | null = null
 
 document.documentElement.addEventListener("mouseleave", () => {
   isHovering.value = false
@@ -400,7 +400,9 @@ body {
   background-position: left;
   background-repeat: no-repeat;
   transform: translateX(262px);
-  transition: transform 0.2s, background-size 0.2s;
+  transition:
+    transform 0.2s,
+    background-size 0.2s;
   overflow: hidden;
   margin-top: 55px;
   height: 40px;
@@ -638,7 +640,9 @@ svg[data-icon="heart"] {
   height: 100%;
   flex-grow: 1;
 
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
   &[data-result="true"] {
     background: var(--color-priority_playlist);
     color: #fff;
