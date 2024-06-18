@@ -25,7 +25,6 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           bun i
 
@@ -90,7 +89,6 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           bun i
           bun pm trust --all
