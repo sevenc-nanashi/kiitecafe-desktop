@@ -37,7 +37,7 @@ importers:
         version: 13.0.0
       discord-rpc:
         specifier: ^4.0.1
-        version: 4.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+        version: 4.0.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       electron-store:
         specifier: ^10.0.0
         version: 10.0.0
@@ -54,8 +54,8 @@ importers:
         specifier: ^3.1.0
         version: 3.1.0
       utf-8-validate:
-        specifier: ^6.0.4
-        version: 6.0.4
+        specifier: ^5.0.10
+        version: 5.0.10
       vue:
         specifier: ^3.4.29
         version: 3.4.29(typescript@5.4.5)
@@ -2730,8 +2730,8 @@ packages:
   urlcat@3.1.0:
     resolution: {integrity: sha512-qY6b94/aGMIHh70EEQ/4hfR2LUGZ+fPQNp64cf7yRX9kAp4XG2tx7LgYUU1Qkh17bFylME0u4n3lOezonougPw==}
 
-  utf-8-validate@6.0.4:
-    resolution: {integrity: sha512-xu9GQDeFp+eZ6LnCywXN/zBancWvOpUMzgjLPSjy4BRHSmTelvn2E0DG0o1sTiw5hkCKBHo8rwSKncfRfv2EEQ==}
+  utf-8-validate@5.0.10:
+    resolution: {integrity: sha512-Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==}
     engines: {node: '>=6.14.2'}
 
   utf8-byte-length@1.0.4:
@@ -4148,10 +4148,10 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
-  discord-rpc@4.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.4):
+  discord-rpc@4.0.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       node-fetch: 2.6.9
-      ws: 7.5.9(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+      ws: 7.5.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
       register-scheme: '@favware/skip-dependency@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz'
     transitivePeerDependencies:
@@ -5922,7 +5922,7 @@ snapshots:
     dependencies:
       qs: 6.11.0
 
-  utf-8-validate@6.0.4:
+  utf-8-validate@5.0.10:
     dependencies:
       node-gyp-build: 4.8.1
 
@@ -6105,10 +6105,10 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@7.5.9(bufferutil@4.0.8)(utf-8-validate@6.0.4):
+  ws@7.5.9(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.0.8
-      utf-8-validate: 6.0.4
+      utf-8-validate: 5.0.10
 
   xml-name-validator@4.0.0: {}
 
