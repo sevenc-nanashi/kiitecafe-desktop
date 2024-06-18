@@ -18,29 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+      - uses: oven-sh/setup-bun@v1
         with:
-          version: 7
-
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: pnpm
-
-      - name: Get cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pnpm-store
-            node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          bun-version: latest
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
@@ -55,15 +37,15 @@ jobs:
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
           fi
-          node update-version.js $VERSION
+          bun update-version.js $VERSION
           echo Version: $VERSION
 
       - name: Build with vite
         run: |
-          pnpm build:vite
+          bun build:vite
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: vite-compiled
           path: dist
@@ -101,37 +83,19 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+      - uses: oven-sh/setup-bun@v1
         with:
-          version: 7
-
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: pnpm
-
-      - name: Get cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pnpm-store
-            node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          bun-version: latest
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          pnpm i
+          bun i
 
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: vite-compiled
           path: dist
@@ -145,7 +109,7 @@ jobs:
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
           fi
-          node update-version.js $VERSION
+          bun update-version.js $VERSION
           echo Version: $VERSION
 
       - name: Build electron
@@ -160,7 +124,7 @@ jobs:
           mv "${FILE}" "${FILE%.*}-${{ matrix.ext }}.${FILE##*.}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-electron-built
           path: ${{ matrix.path }}
@@ -174,30 +138,30 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Download windows binary
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: windows-electron-built
           path: dist
 
       - name: Download macos x64 binary
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: mac-x64-electron-built
           path: dist
 
       - name: Download macos arm64 binary
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: mac-arm64-electron-built
           path: dist
 
       - name: Download linux binary
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-electron-built
           path: dist
@@ -270,7 +234,7 @@ jobs:
           fi
 
       - name: Upload release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
           prerelease: ${{ steps.version.outputs.preview }}

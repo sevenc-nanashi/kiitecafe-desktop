@@ -10,33 +10,17 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
-        with:
-          version: 7
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: pnpm
+        uses: actions/checkout@v4
 
-      - name: Get cache
-        id: cache
-        uses: actions/cache@v3
+      - uses: oven-sh/setup-bun@v1
         with:
-          path: |
-            ~/.pnpm-store
-            node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          bun-version: latest
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          pnpm i
+          bun i
 
       - name: Run Lint
         run: |
-          pnpm lint
+          bun lint
