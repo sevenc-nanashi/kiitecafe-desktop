@@ -20,13 +20,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 9
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
       - name: Install dependencies
         run: |
-          bun i
+          pnpm i
 
       - name: Change version in package.json
         run: |
@@ -36,12 +43,12 @@ jobs:
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
           fi
-          bun update-version.js $VERSION
+          pnpm update-version.js $VERSION
           echo Version: $VERSION
 
       - name: Build with vite
         run: |
-          bun build:vite
+          pnpm build:vite
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -84,14 +91,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 9
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
       - name: Install dependencies
         run: |
-          bun i
-          bun pm trust --all
+          pnpm i
 
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -108,12 +121,12 @@ jobs:
             RAW_VERSION="${{ github.ref_name }}" # "
             VERSION=${RAW_VERSION#v}
           fi
-          bun update-version.js $VERSION
+          pnpm update-version.js $VERSION
           echo Version: $VERSION
 
       - name: Build electron
         run: |
-          bun build:electron ${{ matrix.build-args }}
+          pnpm build:electron ${{ matrix.build-args }}
 
       - name: Change extension
         if: matrix.ext != ''
