@@ -93,6 +93,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           bun i
+          bun pm trust --all
 
       - name: Download artifact
         uses: actions/download-artifact@v4
