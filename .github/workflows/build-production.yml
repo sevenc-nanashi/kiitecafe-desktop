@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          pnpm i
+          bun i
 
       - name: Change version in package.json
         run: |
@@ -114,7 +114,7 @@ jobs:
 
       - name: Build electron
         run: |
-          pnpm build:electron ${{ matrix.build-args }}
+          bun build:electron ${{ matrix.build-args }}
 
       - name: Change extension
         if: matrix.ext != ''
