@@ -126,7 +126,9 @@ jobs:
 
       - name: Build electron
         run: |
-          pnpm build:electron ${{ matrix.build-args }}
+          # TODO: https://github.com/electron-userland/electron-builder/issues/6933 が直ったら修正
+          # pnpm build:electron ${{ matrix.build-args }}
+          npm run build:electron ${{ matrix.build-args }}
 
       - name: Change extension
         if: matrix.ext != ''

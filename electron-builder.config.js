@@ -6,7 +6,6 @@ module.exports = {
   productName: "Kiite Cafe Desktop",
   copyright: "2022 © Nanashi. <@sevenc-nanashi>",
   icon: "build/icon.png",
-  nodeGypRebuild: false,
   directories: {
     output: "dist-electron",
   },
