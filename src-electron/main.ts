@@ -50,7 +50,7 @@ if (process.platform === "win32") {
 let iconPath: string;
 const publicDir = isDevelopment
   ? path.join(import.meta.dirname, "../public")
-  : __dirname;
+  : import.meta.dirname;
 const url = isDevelopment ? "http://localhost:5173#" : "app://./index.html#";
 
 const log = (namespace: string, text: string) => {
