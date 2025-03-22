@@ -5,11 +5,12 @@
   "version": "0.5.0",
   "main": "dist/main.js",
   "type": "module",
+  "packageManager": "pnpm@10.6.4",
   "scripts": {
     "dev": "vite",
     "build": "run-s build:*",
     "build:vite": "vite build",
-    "build:electron": "electron-builder --config electron-builder.config.js --publish never",
+    "build:electron": "electron-builder --config electron-builder.config.cjs --publish never",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "typecheck": "vue-tsc -b"
