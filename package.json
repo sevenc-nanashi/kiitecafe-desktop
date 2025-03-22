@@ -61,6 +61,7 @@
     "vite-plugin-checker": "^0.9.1",
     "vite-plugin-electron": "^0.29.0",
     "vite-tsconfig-paths": "^5.1.4",
+    "vue-eslint-parser": "^10.1.1",
     "vue-tsc": "^2.2.8"
   },
   "pnpm": {

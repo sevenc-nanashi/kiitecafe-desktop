@@ -112,7 +112,7 @@ const toActionWindow = () => {
 };
 const toPlaylistWindow = () => {
   windowType.value = "playlist";
-  fetchPlaylists();
+  void fetchPlaylists();
 };
 const toInfoWindow = () => {
   windowType.value = "info";
@@ -165,7 +165,7 @@ const isAddingPlaylist = ref(false);
 const addPlaylistResult = ref<boolean | null>(null);
 const selectedPlaylist = ref<string | null>(null);
 const playlists = ref<Playlist[]>([]);
-const fetchPlaylists = async () => {
+const fetchPlaylists = () => {
   window.electron.send("get-playlists", []);
 };
 let resolveAddPlaylistSong: ((value: boolean) => void) | null = null;
