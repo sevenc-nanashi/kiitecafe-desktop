@@ -1,7 +1,7 @@
-import { createApp } from "vue"
-import { createRouter, createWebHashHistory } from "vue-router"
-import "./style.scss"
-import { library } from "@fortawesome/fontawesome-svg-core"
+import { createApp } from "vue";
+import { createRouter, createWebHashHistory } from "vue-router";
+import "./style.scss";
+import { library } from "@fortawesome/fontawesome-svg-core";
 
 import {
   faHeart as faHeartSolid,
@@ -11,14 +11,14 @@ import {
   faInfo,
   faRotateRight,
   faMessage,
-} from "@fortawesome/free-solid-svg-icons"
+} from "@fortawesome/free-solid-svg-icons";
 import {
   faHeart as faHeartRegular,
   faSquareMinus,
-} from "@fortawesome/free-regular-svg-icons"
-import { faSquareTwitter } from "@fortawesome/free-brands-svg-icons"
-import MiniPlayerApp from "./miniplayer/App.vue"
-import App from "./App.vue"
+} from "@fortawesome/free-regular-svg-icons";
+import { faSquareTwitter } from "@fortawesome/free-brands-svg-icons";
+import MiniPlayerApp from "./miniplayer/App.vue";
+import App from "./App.vue";
 
 for (const icon of [
   faHeartSolid,
@@ -32,7 +32,7 @@ for (const icon of [
   faRotateRight,
   faMessage,
 ]) {
-  library.add(icon)
+  library.add(icon);
 }
 const router = createRouter({
   history: createWebHashHistory(),
@@ -40,47 +40,48 @@ const router = createRouter({
     { path: "/", component: App },
     { path: "/mini-player", component: MiniPlayerApp },
   ],
-})
+});
 
 if (typeof window.electron !== "undefined") {
   window.electron.receive("set-colors", (colors: [string, string][]) => {
     for (const [key, value] of colors) {
-      document.body.style.setProperty(`--color-${key}`, value)
+      document.body.style.setProperty(`--color-${key}`, value);
     }
-  })
+  });
 }
 
 const onMessage = (event: MessageEvent) => {
   if (!Array.isArray(event.data)) {
-    return
+    return;
   }
-  console.log("Received message", event.data)
-  const [channel, ...args] = event.data
+  console.log("Received message", event.data);
+  const [channel, ...args] = event.data;
   switch (channel) {
-    case "set-colors":
-      const [colors] = args as [[string, string][]]
+    case "set-colors": {
+      const [colors] = args as [[string, string][]];
       for (const [name, color] of colors) {
-        document.body.style.setProperty(`--color-${name}`, color)
+        document.body.style.setProperty(`--color-${name}`, color);
       }
 
-      break
+      break;
+    }
     case "get-settings":
       if (typeof window.electron !== "undefined") {
-        window.electron.send("get-settings")
+        window.electron.send("get-settings");
       }
   }
-}
+};
 
 const setupMessages = () => {
-  window.addEventListener("message", onMessage)
-  console.log("Loaded, sending get-settings")
-  window.parent.postMessage(["get-settings"], "*")
-}
+  window.addEventListener("message", onMessage);
+  console.log("Loaded, sending get-settings");
+  window.parent.postMessage(["get-settings"], "*");
+};
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", setupMessages)
+  document.addEventListener("DOMContentLoaded", setupMessages);
 } else {
-  setupMessages()
+  setupMessages();
 }
 
-createApp({}).use(router).mount("#app")
+createApp({}).use(router).mount("#app");

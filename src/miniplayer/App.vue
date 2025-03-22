@@ -1,72 +1,72 @@
 <script setup lang="ts">
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
-import VolumeMuteIcon from "vue-material-design-icons/VolumeMute.vue"
-import VolumeHighIcon from "vue-material-design-icons/VolumeHigh.vue"
-import HeartIcon from "vue-material-design-icons/Heart.vue"
-import HeartOutlineIcon from "vue-material-design-icons/HeartOutline.vue"
-import AutoFixIcon from "vue-material-design-icons/AutoFix.vue"
-import InformationIcon from "vue-material-design-icons/Information.vue"
-import MinusIcon from "vue-material-design-icons/Minus.vue"
-import ReloadIcon from "vue-material-design-icons/Reload.vue"
-import MessageIcon from "vue-material-design-icons/Message.vue"
-import PlaylistMusicIcon from "vue-material-design-icons/PlaylistMusic.vue"
-import PlaylistPlusIcon from "vue-material-design-icons/PlaylistPlus.vue"
-import PlaylistCheckIcon from "vue-material-design-icons/PlaylistCheck.vue"
-import PlaylistRemoveIcon from "vue-material-design-icons/PlaylistRemove.vue"
-import { watch, ref, computed, onUnmounted } from "vue"
-import { useRouter } from "vue-router"
-import { NowPlayingInfo, Playlist } from "^/type/common"
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import VolumeMuteIcon from "vue-material-design-icons/VolumeMute.vue";
+import VolumeHighIcon from "vue-material-design-icons/VolumeHigh.vue";
+import HeartIcon from "vue-material-design-icons/Heart.vue";
+import HeartOutlineIcon from "vue-material-design-icons/HeartOutline.vue";
+import AutoFixIcon from "vue-material-design-icons/AutoFix.vue";
+import InformationIcon from "vue-material-design-icons/Information.vue";
+import MinusIcon from "vue-material-design-icons/Minus.vue";
+import ReloadIcon from "vue-material-design-icons/Reload.vue";
+import MessageIcon from "vue-material-design-icons/Message.vue";
+import PlaylistMusicIcon from "vue-material-design-icons/PlaylistMusic.vue";
+import PlaylistPlusIcon from "vue-material-design-icons/PlaylistPlus.vue";
+import PlaylistCheckIcon from "vue-material-design-icons/PlaylistCheck.vue";
+import PlaylistRemoveIcon from "vue-material-design-icons/PlaylistRemove.vue";
+import { watch, ref, computed, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { NowPlayingInfo, Playlist } from "^/type/common";
 
-const router = useRouter()
-const info = ref<NowPlayingInfo>()
+const router = useRouter();
+const info = ref<NowPlayingInfo>();
 window.electron.receive("now-playing-info", (npinfo: NowPlayingInfo) => {
-  info.value = npinfo
-})
+  info.value = npinfo;
+});
 const favoriteCount = computed(() => {
   if (info.value == null) {
-    return "-"
+    return "-";
   } else if (info.value.favoriteCount > 999) {
-    return "999"
+    return "999";
   } else {
-    return info.value.favoriteCount
+    return info.value.favoriteCount;
   }
-})
+});
 const isFavoriteOverflowing = computed(() => {
-  return (info.value?.favoriteCount || 0) > 999
-})
+  return (info.value?.favoriteCount || 0) > 999;
+});
 
-const mainEl = ref<HTMLDivElement>()
-const titleEl = ref<HTMLDivElement>()
-const titleContentEl = ref<HTMLDivElement>()
-let animation: { width: number; animation: Animation } | null = null
+const mainEl = ref<HTMLDivElement>();
+const titleEl = ref<HTMLDivElement>();
+const titleContentEl = ref<HTMLDivElement>();
+let animation: { width: number; animation: Animation } | null = null;
 
-const isHovering = ref(false)
-const isMuted = ref(router.currentRoute.value.query.muted === "true")
+const isHovering = ref(false);
+const isMuted = ref(router.currentRoute.value.query.muted === "true");
 
-let interval: ReturnType<typeof setInterval> | null = null
+let interval: ReturnType<typeof setInterval> | null = null;
 
 document.documentElement.addEventListener("mouseleave", () => {
-  isHovering.value = false
-})
+  isHovering.value = false;
+});
 
 watch(isHovering, (value) => {
-  window.electron.send("set-ignore-mouse-events", !value)
-})
+  window.electron.send("set-ignore-mouse-events", !value);
+});
 
 interval = setInterval(() => {
-  const titlEl = titleEl.value
-  const conEl = titleContentEl.value
+  const titlEl = titleEl.value;
+  const conEl = titleContentEl.value;
   if (!conEl || !titlEl) {
-    return
+    return;
   }
-  const moveWidth = conEl.scrollWidth - titlEl.clientWidth
+  const moveWidth = conEl.scrollWidth - titlEl.clientWidth;
   if (animation && animation.width === moveWidth) {
-    return
+    return;
   }
-  animation?.animation.cancel()
+  animation?.animation.cancel();
   if (moveWidth <= 0) {
-    animation = null
-    return
+    animation = null;
+    return;
   }
   animation = {
     width: moveWidth,
@@ -80,138 +80,138 @@ interval = setInterval(() => {
       ],
       { duration: 10000, iterations: Infinity }
     ),
-  }
-}, 10)
+  };
+}, 10);
 
 window.electron.receive("set-muted", (value: boolean) => {
-  isMuted.value = value
-})
+  isMuted.value = value;
+});
 
 const toggleMute = () => {
-  window.electron.send("set-muted", !isMuted.value)
-}
+  window.electron.send("set-muted", !isMuted.value);
+};
 
 const toggleFavorite = () => {
-  window.electron.send("set-favorite", !info.value?.favorited)
-}
+  window.electron.send("set-favorite", !info.value?.favorited);
+};
 
 const openNico = () => {
-  if (!info.value) return
+  if (!info.value) return;
   if (info.value.source === "nicovideo") {
-    window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`)
+    window.open(`https://www.nicovideo.jp/watch/${info.value?.id}`);
   }
   if (info.value.source === "youtube") {
-    window.open(`https://youtube.com/watch?v=${info.value?.id}`)
+    window.open(`https://youtube.com/watch?v=${info.value?.id}`);
   }
-}
+};
 
-const windowType = ref<"action" | "playlist" | "info">("info")
+const windowType = ref<"action" | "playlist" | "info">("info");
 
 const toActionWindow = () => {
-  windowType.value = "action"
-}
+  windowType.value = "action";
+};
 const toPlaylistWindow = () => {
-  windowType.value = "playlist"
-  fetchPlaylists()
-}
+  windowType.value = "playlist";
+  fetchPlaylists();
+};
 const toInfoWindow = () => {
-  windowType.value = "info"
-}
+  windowType.value = "info";
+};
 const minimizeWindow = () => {
-  window.electron.send("minimize", [])
-}
+  window.electron.send("minimize", []);
+};
 
 const tweet = () => {
-  if (!info.value) return
+  if (!info.value) return;
   const text =
     `♪ ${info.value.title} #${info.value.id} #Kiite\n` +
     `Kiite Cafeできいてます https://cafe.kiite.jp ${
       info.value.source === "nicovideo"
         ? `https://www.nicovideo.jp/watch/${info.value.id}`
         : `https://youtube.com/watch?v=${info.value.id}`
-    }`
+    }`;
   window.open(
     `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
-  )
-}
+  );
+};
 
-const isRotating = ref(false)
+const isRotating = ref(false);
 const rotate = () => {
-  window.electron.send("set-rotating", !isRotating.value)
-}
+  window.electron.send("set-rotating", !isRotating.value);
+};
 
-let prevMessage: string | null = null
-const messageTextBoxContent = ref("")
-const isPopupMessageActive = ref(false)
-let clearPopupMessageTimeout: NodeJS.Timeout | null = null
+let prevMessage: string | null = null;
+const messageTextBoxContent = ref("");
+const isPopupMessageActive = ref(false);
+let clearPopupMessageTimeout: NodeJS.Timeout | null = null;
 const popupMessage = () => {
   if (clearPopupMessageTimeout) {
-    clearTimeout(clearPopupMessageTimeout)
+    clearTimeout(clearPopupMessageTimeout);
   }
   if (messageTextBoxContent.value === prevMessage) {
-    messageTextBoxContent.value = ""
-    isPopupMessageActive.value = false
-    window.electron.send("set-popup-message", "")
+    messageTextBoxContent.value = "";
+    isPopupMessageActive.value = false;
+    window.electron.send("set-popup-message", "");
   } else {
-    isPopupMessageActive.value = true
-    window.electron.send("set-popup-message", messageTextBoxContent.value)
+    isPopupMessageActive.value = true;
+    window.electron.send("set-popup-message", messageTextBoxContent.value);
     clearPopupMessageTimeout = setTimeout(() => {
-      isPopupMessageActive.value = false
-    }, 60000)
+      isPopupMessageActive.value = false;
+    }, 60000);
   }
-}
+};
 
-const isAddingPlaylist = ref(false)
-const addPlaylistResult = ref<boolean | null>(null)
-const selectedPlaylist = ref<string | null>(null)
-const playlists = ref<Playlist[]>([])
+const isAddingPlaylist = ref(false);
+const addPlaylistResult = ref<boolean | null>(null);
+const selectedPlaylist = ref<string | null>(null);
+const playlists = ref<Playlist[]>([]);
 const fetchPlaylists = async () => {
-  window.electron.send("get-playlists", [])
-}
-let resolveAddPlaylistSong: ((value: boolean) => void) | null = null
+  window.electron.send("get-playlists", []);
+};
+let resolveAddPlaylistSong: ((value: boolean) => void) | null = null;
 const addPlaylist = async () => {
-  if (!info.value) return
-  if (isAddingPlaylist.value) return
+  if (!info.value) return;
+  if (isAddingPlaylist.value) return;
   if (selectedPlaylist.value) {
-    isAddingPlaylist.value = true
+    isAddingPlaylist.value = true;
     window.electron.send(
       "add-playlist-song",
       selectedPlaylist.value,
       info.value.id
-    )
+    );
     addPlaylistResult.value = await new Promise<boolean>((resolve) => {
-      resolveAddPlaylistSong = resolve
-    })
+      resolveAddPlaylistSong = resolve;
+    });
     setTimeout(() => {
-      addPlaylistResult.value = null
+      addPlaylistResult.value = null;
 
-      isAddingPlaylist.value = false
-    }, 3000)
+      isAddingPlaylist.value = false;
+    }, 3000);
   }
-}
+};
 
 window.electron.receive("set-popup-message", (message: string) => {
-  prevMessage = message
-  messageTextBoxContent.value = message
-  isPopupMessageActive.value = message !== ""
-})
+  prevMessage = message;
+  messageTextBoxContent.value = message;
+  isPopupMessageActive.value = message !== "";
+});
 window.electron.receive("get-playlists-result", (value: Playlist[]) => {
-  playlists.value = value
-})
+  playlists.value = value;
+});
 window.electron.receive("add-playlist-song-result", (value: boolean) => {
   if (resolveAddPlaylistSong) {
-    resolveAddPlaylistSong(value)
-    resolveAddPlaylistSong = null
+    resolveAddPlaylistSong(value);
+    resolveAddPlaylistSong = null;
   }
-})
+});
 window.electron.receive("set-rotating", (value: boolean) => {
-  isRotating.value = value
-})
+  isRotating.value = value;
+});
 onUnmounted(() => {
   if (interval) {
-    clearInterval(interval)
+    clearInterval(interval);
   }
-})
+});
 </script>
 <template>
   <div

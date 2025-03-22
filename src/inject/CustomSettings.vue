@@ -1,67 +1,68 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from "vue"
-import "./kiiteLike.scss"
-import colors from "../colors"
+import { ref, onMounted, watchEffect } from "vue";
+import "./kiiteLike.scss";
+import colors from "../colors";
+import { CyalumeSettings } from "~type/common";
 
-const isDevelopment = import.meta.env.DEV
+const isDevelopment = import.meta.env.DEV;
 
-const colorMap = ref(new Map<string, string>())
+const colorMap = ref(new Map<string, string>());
 
 const setColor = (name: string) => {
   const colorInput = document.querySelector(
     `input[data-name="${name}"]`
-  ) as HTMLInputElement
-  colorMap.value.set(name, colorInput.value)
-  updateColors()
-  sendColors()
-}
+  ) as HTMLInputElement;
+  colorMap.value.set(name, colorInput.value);
+  updateColors();
+  sendColors();
+};
 const resetColor = (name: string) => {
-  colorMap.value.set(name, colors.find((c) => c.name === name)?.default || "")
-  updateColors()
-  sendColors()
-}
+  colorMap.value.set(name, colors.find((c) => c.name === name)?.default || "");
+  updateColors();
+  sendColors();
+};
 
 const sendColors = () => {
-  window.electron.send("set-colors", [...colorMap.value.entries()])
-}
+  window.electron.send("set-colors", [...colorMap.value.entries()]);
+};
 
 const updateColors = () => {
   for (const [name, color] of colorMap.value) {
     const colorInput = document.querySelector(
       `input[data-name="${name}"]`
-    ) as HTMLInputElement
-    colorInput.value = color
+    ) as HTMLInputElement;
+    colorInput.value = color;
   }
-}
+};
 
 const setColors = (value: [string, string][]) => {
-  colorMap.value = new Map(value)
-  updateColors()
-}
+  colorMap.value = new Map(value);
+  updateColors();
+};
 
 onMounted(() => {
-  window.electron.send("get-settings")
-  window.electron.receive("set-colors", setColors)
+  window.electron.send("get-settings");
+  window.electron.receive("set-colors", setColors);
   window.electron.receive("set-cyalume-settings", (value: CyalumeSettings) => {
-    cyalumeGrowEffectValue.value = value.grow
-    cyalumeDimEffectValue.value = value.dim
-    cyalumeSettingReceived.value = true
-  })
-})
+    cyalumeGrowEffectValue.value = value.grow;
+    cyalumeDimEffectValue.value = value.dim;
+    cyalumeSettingReceived.value = true;
+  });
+});
 
-const cyalumeSettingReceived = ref(false)
-const cyalumeGrowEffect = ref<HTMLInputElement>()
-const cyalumeGrowEffectValue = ref(false)
-const cyalumeDimEffect = ref<HTMLInputElement>()
-const cyalumeDimEffectValue = ref(false)
+const cyalumeSettingReceived = ref(false);
+const cyalumeGrowEffect = ref<HTMLInputElement>();
+const cyalumeGrowEffectValue = ref(false);
+const cyalumeDimEffect = ref<HTMLInputElement>();
+const cyalumeDimEffectValue = ref(false);
 
 watchEffect(() => {
-  if (!cyalumeSettingReceived.value) return
+  if (!cyalumeSettingReceived.value) return;
   window.electron.send("set-cyalume-settings", {
     grow: cyalumeGrowEffectValue.value,
     dim: cyalumeDimEffectValue.value,
-  })
-})
+  });
+});
 </script>
 
 <template>

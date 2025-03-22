@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { UpdateAvailable } from "^/type/common"
-import packageJson from "^/package.json"
+import { UpdateAvailable } from "^/type/common";
+import packageJson from "^/package.json";
 
-import "./kiiteLike.scss"
+import "./kiiteLike.scss";
 const props = defineProps<{
-  updateAvailable: UpdateAvailable
-}>()
+  updateAvailable: UpdateAvailable;
+}>();
 </script>
 
 <template>

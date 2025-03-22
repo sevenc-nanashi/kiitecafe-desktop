@@ -1,60 +1,65 @@
-import { contextBridge, ipcRenderer } from "electron"
-import style from "./style.scss?inline"
-import colorsStyle from "./colors.scss?inline"
-import loginStyle from "./loginStyle.scss?inline"
+import { contextBridge, ipcRenderer } from "electron";
+import style from "./style.scss?inline";
+import colorsStyle from "./colors.scss?inline";
+import loginStyle from "./loginStyle.scss?inline";
 
-import type { CafeMusicInfo } from "./window"
-import { NowPlayingInfo, Playlist, UpdateAvailable } from "^/type/common"
+import type { CafeMusicInfo } from "./window";
+import {
+  CyalumeSettings,
+  NowPlayingInfo,
+  Playlist,
+  UpdateAvailable,
+} from "^/type/common";
 
-console.log("InjectPreload: loaded")
+console.log("InjectPreload: loaded");
 
-const isDevelopment = import.meta.env.DEV
+const isDevelopment = import.meta.env.DEV;
 
 if (location.pathname.includes("intro")) {
   // document.querySelector(".goto_kiite_login_button")!.click();
-  location.href = "https://kiite.jp/login?mode=cafe"
+  location.href = "https://kiite.jp/login?mode=cafe";
 }
 
-type GonGetter = () => Gon
-type CafeMusicGetter = () => CafeMusic
-type CafeUsersGetter = () => CafeUsers
-type SnsUserGetter = () => SnsUser
+type GonGetter = () => Gon;
+type CafeMusicGetter = () => CafeMusic;
+type CafeUsersGetter = () => CafeUsers;
+type SnsUserGetter = () => SnsUser;
 type WindowFuncs = {
-  gon: GonGetter
-  cafeMusic: CafeMusicGetter
-  cafeUsers: CafeUsersGetter
-  snsUser: SnsUserGetter
-  getPlaylists: () => Promise<Playlist[]>
-  addPlaylistSong: (listId: string, songId: string) => Promise<boolean>
-  toggleCyalume: () => void
-}
-let gon: GonGetter | null = null
-let cafeMusic: CafeMusicGetter | null = null
-let cafeUsers: CafeUsersGetter | null = null
-let getPlaylists: WindowFuncs["getPlaylists"] | null = null
-let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null
-let toggleCyalume: WindowFuncs["toggleCyalume"] | null = null
+  gon: GonGetter;
+  cafeMusic: CafeMusicGetter;
+  cafeUsers: CafeUsersGetter;
+  snsUser: SnsUserGetter;
+  getPlaylists: () => Promise<Playlist[]>;
+  addPlaylistSong: (listId: string, songId: string) => Promise<boolean>;
+  toggleCyalume: () => void;
+};
+let gon: GonGetter | null = null;
+let cafeMusic: CafeMusicGetter | null = null;
+let cafeUsers: CafeUsersGetter | null = null;
+let getPlaylists: WindowFuncs["getPlaylists"] | null = null;
+let addPlaylistSong: WindowFuncs["addPlaylistSong"] | null = null;
+let toggleCyalume: WindowFuncs["toggleCyalume"] | null = null;
 
 const topMenus = [
   {
     name: "about",
     label: "About",
     onClick: () => {
-      ipcRenderer.send("open-about")
+      ipcRenderer.send("open-about");
     },
   },
   {
     name: "reload",
     label: "Reload",
     onClick: () => {
-      location.reload()
+      location.reload();
     },
   },
   {
     name: "settings",
     label: "Settings",
     onClick: () => {
-      ipcRenderer.send("open-settings")
+      ipcRenderer.send("open-settings");
     },
   },
   {
@@ -62,110 +67,111 @@ const topMenus = [
     label: "Logout",
     onClick: () => {
       if (!confirm("ログアウトしますか？")) {
-        return
+        return;
       }
-      location.href = "https://kiite.jp/my/logout"
+      location.href = "https://kiite.jp/my/logout";
     },
   },
-]
+];
 
 contextBridge.exposeInMainWorld("preload", {
   setFuncs: (funcs: WindowFuncs) => {
-    gon = funcs.gon
-    cafeMusic = funcs.cafeMusic
-    cafeUsers = funcs.cafeUsers
-    getPlaylists = funcs.getPlaylists
-    addPlaylistSong = funcs.addPlaylistSong
-    toggleCyalume = funcs.toggleCyalume
+    gon = funcs.gon;
+    cafeMusic = funcs.cafeMusic;
+    cafeUsers = funcs.cafeUsers;
+    getPlaylists = funcs.getPlaylists;
+    addPlaylistSong = funcs.addPlaylistSong;
+    toggleCyalume = funcs.toggleCyalume;
   },
-})
+});
 
 declare global {
   interface Window {
     preload: {
-      setFuncs: (funcs: WindowFuncs) => void
-    }
+      setFuncs: (funcs: WindowFuncs) => void;
+    };
   }
 }
 ipcRenderer.on("information", (_event, updateAvailable: UpdateAvailable) => {
   if (updateAvailable) {
     const aboutMenu = document.querySelector(
       "#top_menu .menu li[data-kcd-name='about']"
-    ) as HTMLLIElement
-    aboutMenu.classList.add("update-available")
+    ) as HTMLLIElement;
+    aboutMenu.classList.add("update-available");
   }
-})
+});
 
 ipcRenderer.on("set-favorite", (_event, favorite) => {
-  const button = document.querySelector(".favorite .button") as HTMLDivElement
+  const button = document.querySelector(".favorite .button") as HTMLDivElement;
   if (!button) {
-    return
+    return;
   }
-  const favorited = !!document.querySelector(".favorite.is_faved")
+  const favorited = !!document.querySelector(".favorite.is_faved");
   if (favorite === favorited) {
-    return
+    return;
   }
-  button.click()
-})
-let isRotating = false
+  button.click();
+});
+let isRotating = false;
 ipcRenderer.on("set-rotating", (_event, rotating) => {
   const button = document.querySelector(
     '.btn[data-gesture="rotate"]'
-  ) as HTMLDivElement
+  ) as HTMLDivElement;
   if (button.classList.contains("on") === rotating) {
-    return
+    return;
   }
-  isRotating = rotating
-  button.click()
-})
+  isRotating = rotating;
+  button.click();
+});
 ipcRenderer.on("set-popup-message", (_event, popupMessage: string | null) => {
   const input = document.querySelector(
     "#comment_form input"
-  ) as HTMLInputElement
+  ) as HTMLInputElement;
   const submitButton = document.querySelector(
     "#comment_form .btn.submit"
-  ) as HTMLButtonElement
+  ) as HTMLButtonElement;
   const cleanButton = document.querySelector(
     "#comment_form .btn.clean"
-  ) as HTMLButtonElement
+  ) as HTMLButtonElement;
   if (popupMessage) {
-    input.value = popupMessage
-    submitButton.click()
+    input.value = popupMessage;
+    submitButton.click();
   } else {
-    cleanButton.click()
+    cleanButton.click();
   }
-})
+});
 ipcRenderer.on("get-playlists", async () => {
-  ipcRenderer.send("get-playlists-result", await getPlaylists!())
-})
+  ipcRenderer.send("get-playlists-result", await getPlaylists!());
+});
 ipcRenderer.on("add-playlist-song", async (_event, listId, songId) => {
   ipcRenderer.send(
     "add-playlist-song-result",
     await addPlaylistSong!(listId, songId)
-  )
-})
+  );
+});
 ipcRenderer.on("set-colors", (_event, colors: [string, string][]) => {
   for (const [name, color] of colors) {
-    document.body.style.setProperty(`--color-${name}`, color)
+    document.body.style.setProperty(`--color-${name}`, color);
     document.body.style.setProperty(
       `--color-${name}-rgb`,
       [...Array(3)]
         .map((_, i) => parseInt(color.slice(i * 2 + 1, i * 2 + 3), 16))
         .join(",")
-    )
+    );
   }
   for (const iframe of Array.from(
-    document.querySelectorAll(
-      "iframe[kcd-iframe]"
-    ) as NodeListOf<HTMLIFrameElement>
+    document.querySelectorAll("iframe[kcd-iframe]")
   )) {
-    iframe.contentWindow?.postMessage(["set-colors", colors], "*")
+    (iframe as HTMLIFrameElement).contentWindow?.postMessage(
+      ["set-colors", colors],
+      "*"
+    );
   }
-})
+});
 ipcRenderer.on("set-cyalume-settings", (_event, settings: CyalumeSettings) => {
-  document.body.setAttribute("data-kcd-cyalume-grow", settings.grow.toString())
-  document.body.setAttribute("data-kcd-cyalume-dim", settings.dim.toString())
-})
+  document.body.setAttribute("data-kcd-cyalume-grow", settings.grow.toString());
+  document.body.setAttribute("data-kcd-cyalume-dim", settings.dim.toString());
+});
 window.addEventListener("message", (event) => {
   if (
     ![
@@ -173,91 +179,91 @@ window.addEventListener("message", (event) => {
       "null", // Production mode, app:// origin is "null"
     ].includes(event.origin)
   ) {
-    return
+    return;
   }
-  const [type] = event.data
+  const [type] = event.data;
   switch (type) {
     case "get-settings":
-      ipcRenderer.send("get-settings")
+      ipcRenderer.send("get-settings");
   }
-})
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("login")) {
-    return
+    return;
   }
-  const styleElement = document.createElement("style")
-  styleElement.textContent = loginStyle.toString()
-  document.head.appendChild(styleElement)
+  const styleElement = document.createElement("style");
+  styleElement.textContent = loginStyle.toString();
+  document.head.appendChild(styleElement);
 
   document.querySelectorAll("a").forEach((a) => {
-    a.setAttribute("target", "_blank")
-  })
+    a.setAttribute("target", "_blank");
+  });
 
   if (!location.search.includes("mode=cafe")) {
-    location.search = "?mode=cafe"
+    location.search = "?mode=cafe";
   }
-})
+});
 document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("pc")) {
-    return
+    return;
   }
   const injectScript = () => {
     const patchedPlay = function (
       this: CafeMusic,
       musicInfo: CafeMusicInfo & { start_time: number }
     ) {
-      console.log("InjectPreload: Patched play", musicInfo)
+      console.log("InjectPreload: Patched play", musicInfo);
       if (this.now_playing_player) {
-        this.now_playing_player.remove()
+        this.now_playing_player.remove();
       }
-      let player: CafePlayer | CafeYtPlayer
+      let player: CafePlayer | CafeYtPlayer;
       if (window.gon.youtube_play) {
-        player = new CafeYtPlayer(musicInfo.yt_video_id, musicInfo.start_time)
+        player = new CafeYtPlayer(musicInfo.yt_video_id, musicInfo.start_time);
       } else {
-        player = new CafePlayer(musicInfo.video_id, musicInfo.start_time)
+        player = new CafePlayer(musicInfo.video_id, musicInfo.start_time);
       }
-      this.now_playing_player = player
+      this.now_playing_player = player;
       window.d3
         .select("#cafe_player")
         .classed("loading", true)
-        .classed("show_hint_tab_active", false)
+        .classed("show_hint_tab_active", false);
       const callback = {
         onFirstPlay: () => {
-          const song_pos = this.get_song_pos(musicInfo)
+          const song_pos = this.get_song_pos(musicInfo);
           if (song_pos > 5) {
-            player.seekTo(song_pos)
+            player.seekTo(song_pos);
           }
           return window.d3
             .select("#cafe_player")
             .classed("loading", false)
-            .classed("playing", true)
+            .classed("playing", true);
         },
         onPause: () => {
-          return this.pause()
+          return this.pause();
         },
-      }
-      ;(async () => {
+      };
+      void (async () => {
         while (true) {
           if (typeof window.YT === "undefined") {
-            await new Promise((resolve) => setTimeout(resolve, 100))
-            continue
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            continue;
           }
-          player.load(callback)
-          break
+          player.load(callback);
+          break;
         }
-      })()
-      return this.play_history(musicInfo)
-    }
-    patchedPlay.isPatched = true
+      })();
+      return this.play_history(musicInfo);
+    };
+    patchedPlay.isPatched = true;
 
     const patchInterval = setInterval(() => {
       // @ts-expect-error: 改造されたかどうか判断する黒魔術
-      if (window.cafe_music.play.isPatched) clearInterval(patchInterval)
+      if (window.cafe_music.play.isPatched) clearInterval(patchInterval);
 
-      window.cafe_music.play = patchedPlay
-      window.CafeMusic.prototype.play = patchedPlay
-    }, 100)
+      window.cafe_music.play = patchedPlay;
+      window.CafeMusic.prototype.play = patchedPlay;
+    }, 100);
 
     window.preload.setFuncs({
       gon: () => window.gon,
@@ -266,106 +272,104 @@ document.addEventListener("DOMContentLoaded", () => {
       snsUser: () => window.sns_user,
       getPlaylists: () =>
         new Promise<Playlist[]>((resolve) => {
-          window.sns_user.get_api_playlists(resolve)
+          window.sns_user.get_api_playlists(resolve);
         }),
       addPlaylistSong: async (playlistId, songId) => {
         const playlist = await new Promise<{ songs: string[] }>((resolve) =>
           window.sns_user.get_api_playlist_songs(playlistId, resolve)
-        )
+        );
 
         if (playlist.songs.includes(songId)) {
-          return false
+          return false;
         }
         await new Promise((resolve) =>
           window.sns_user.post_song_to_playlist(songId, playlistId, {
             onSuccess: resolve,
           })
-        )
-        return true
+        );
+        return true;
       },
       toggleCyalume: () => {
         const commentForm = document.getElementById(
           "comment_form"
-        ) as HTMLDivElement
+        ) as HTMLDivElement;
         if (window.cafe_music.now_playing.rotate_action === "cyalume") {
-          console.log("Preload: Toggled cyalume off")
-          window.cafe_music.now_playing.rotate_action = null
-          commentForm.classList.remove("with_penlight")
+          console.log("Preload: Toggled cyalume off");
+          window.cafe_music.now_playing.rotate_action = null;
+          commentForm.classList.remove("with_penlight");
         } else {
-          console.log("Preload: Toggled cyalume on")
-          window.cafe_music.now_playing.rotate_action = "cyalume"
-          commentForm.classList.add("with_penlight")
+          console.log("Preload: Toggled cyalume on");
+          window.cafe_music.now_playing.rotate_action = "cyalume";
+          commentForm.classList.add("with_penlight");
         }
       },
-    })
-  }
-  const script = document.createElement("script")
-  script.textContent = `(${injectScript.toString()})()`
-  document.body.appendChild(script)
-  console.log("Preload: Added script", script)
-})
+    });
+  };
+  const script = document.createElement("script");
+  script.textContent = `(${injectScript.toString()})()`;
+  document.body.appendChild(script);
+  console.log("Preload: Added script", script);
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!location.pathname.includes("pc")) {
-    return
+    return;
   }
   setInterval(() => {
     const users = parseInt(
       document.querySelector("#user_count .val")!.textContent!
-    )
-    const rotates = document.querySelectorAll(".user.gesture_rotate").length
-    const newFavs = document.querySelectorAll(".user.new_fav").length
-    ipcRenderer.send("update-stats", { users, rotates, newFavs })
-  }, 5000)
-  const styleElement = document.createElement("style")
-  styleElement.textContent = style.toString() + colorsStyle.toString()
-  document.head.appendChild(styleElement)
+    );
+    const rotates = document.querySelectorAll(".user.gesture_rotate").length;
+    const newFavs = document.querySelectorAll(".user.new_fav").length;
+    ipcRenderer.send("update-stats", { users, rotates, newFavs });
+  }, 5000);
+  const styleElement = document.createElement("style");
+  styleElement.textContent = style.toString() + colorsStyle.toString();
+  document.head.appendChild(styleElement);
 
   const playButton = document.querySelector(
     "#cafe_player .front"
-  ) as HTMLDivElement
+  ) as HTMLDivElement;
   if (playButton) {
     const playInterval = setInterval(() => {
-      playButton.click()
+      playButton.click();
       if (document.querySelector("#cafe_player.loading")) {
-        clearInterval(playInterval)
+        clearInterval(playInterval);
       }
-    }, 100)
+    }, 100);
     setInterval(() => {
       if (
         document.querySelector("#cafe_player.loading") ||
         document.querySelector("#cafe_player .videos iframe")
       ) {
-        return
+        return;
       }
       if (
         parseFloat(
           (
-            document.querySelector(
-              "#song_position .position"
-            )! as HTMLDivElement
+            document.querySelector("#song_position .position") as HTMLDivElement
           ).style.width.replace("%", "")
         ) /
           100 >
         0.01
       ) {
-        const front = document.querySelector(".front") as HTMLDivElement
-        front.click()
-        front.click()
+        const front = document.querySelector(".front") as HTMLDivElement;
+        front.click();
+        front.click();
       }
-    }, 100)
+    }, 100);
   }
 
-  let lastMusicId: string | null = null
+  let lastMusicId: string | null = null;
   const sendUpdateIpc = (_mutations: MutationRecord[]) => {
     if (!cafeUsers || !cafeUsers().me || !cafeMusic || !gon) {
-      return
+      return;
     }
     if (lastMusicId !== cafeMusic().now_playing.video_id) {
-      onMusicChange()
+      onMusicChange();
     }
-    lastMusicId = cafeMusic().now_playing.video_id
-    const nowPlaying = cafeMusic().now_playing
+    lastMusicId = cafeMusic().now_playing.video_id;
+    const nowPlaying = cafeMusic().now_playing;
     const nowPlayingInfo: NowPlayingInfo = {
       title: nowPlaying.title,
       artist: nowPlaying.artist_name,
@@ -380,9 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
       progress:
         parseFloat(
           (
-            document.querySelector(
-              "#song_position .position"
-            )! as HTMLDivElement
+            document.querySelector("#song_position .position") as HTMLDivElement
           ).style.width.replace("%", "")
         ) / 100,
       favorited: !!document.querySelector(".favorite.is_faved"),
@@ -393,15 +395,15 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector(".volume .value")!.textContent!.trim()
       ),
       reason:
-        cafeMusic!().reason.reasons.find(
+        cafeMusic().reason.reasons.find(
           (r) => r.user_id === cafeUsers!().me.user_id
         )?.type ?? "none",
-    }
+    };
     if (!nowPlayingInfo.id) {
-      return
+      return;
     }
-    ipcRenderer.send("now-playing-info", nowPlayingInfo)
-  }
+    ipcRenderer.send("now-playing-info", nowPlayingInfo);
+  };
   new MutationObserver(sendUpdateIpc).observe(
     document.querySelector("#now_playing_info")!,
     {
@@ -409,7 +411,7 @@ document.addEventListener("DOMContentLoaded", () => {
       subtree: true,
       attributes: true,
     }
-  )
+  );
   new MutationObserver(sendUpdateIpc).observe(
     document.querySelector("#cafe_player")!,
     {
@@ -417,50 +419,50 @@ document.addEventListener("DOMContentLoaded", () => {
       subtree: true,
       attributes: true,
     }
-  )
+  );
   const rotateButton = document.querySelector(
     '.btn[data-gesture="rotate"]'
-  ) as HTMLDivElement
+  ) as HTMLDivElement;
   new MutationObserver(() => {
     if (isRotating === rotateButton.classList.contains("on")) {
-      return
+      return;
     }
-    ipcRenderer.send("set-rotating", rotateButton.classList.contains("on"))
+    ipcRenderer.send("set-rotating", rotateButton.classList.contains("on"));
   }).observe(rotateButton, {
     attributes: true,
-  })
+  });
 
-  const topMenu = document.querySelector("#top_menu ul") as HTMLUListElement
+  const topMenu = document.querySelector("#top_menu ul") as HTMLUListElement;
   for (const { onClick, label, name } of topMenus) {
-    const menuElement = document.createElement("li")
-    menuElement.setAttribute("data-kcd", "")
-    menuElement.setAttribute("data-kcd-name", name)
-    menuElement.addEventListener("click", onClick)
-    menuElement.textContent = label
-    topMenu.appendChild(menuElement)
+    const menuElement = document.createElement("li");
+    menuElement.setAttribute("data-kcd", "");
+    menuElement.setAttribute("data-kcd-name", name);
+    menuElement.addEventListener("click", onClick);
+    menuElement.textContent = label;
+    topMenu.appendChild(menuElement);
   }
 
   for (const link of Array.from(document.querySelectorAll("#cafe_info a"))) {
-    link.setAttribute("target", "_blank")
+    link.setAttribute("target", "_blank");
   }
 
-  ipcRenderer.send("cancel-force-reload")
-  ipcRenderer.send("get-settings")
+  ipcRenderer.send("cancel-force-reload");
+  ipcRenderer.send("get-settings");
 
   const onMusicChange = () => {
-    if (!cafeMusic) return
-    const nowPlaying = cafeMusic().now_playing
+    if (!cafeMusic) return;
+    const nowPlaying = cafeMusic().now_playing;
     document.body.setAttribute(
       "data-kcd-is-cyalume",
       (nowPlaying.rotate_action === "cyalume").toString()
-    )
-  }
+    );
+  };
 
   if (isDevelopment) {
     document.body.addEventListener("keydown", (e) => {
       if (e.key === "p") {
-        toggleCyalume!()
+        toggleCyalume!();
       }
-    })
+    });
   }
-})
+});

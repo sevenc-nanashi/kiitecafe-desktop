@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
-    "composite": true,
+    "incremental": false,
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "noEmit": true,
+    "skipLibCheck": true,
     "paths": {
       "~/*": ["."]
     }
   },
-  "include": ["vite.config.ts"]
+  "include": ["./*.config.ts"]
 }

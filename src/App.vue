@@ -1,48 +1,48 @@
 <script setup lang="ts">
-import { watch, ref, onUnmounted, computed } from "vue"
-import { useRouter } from "vue-router"
-import AboutDesktop from "./inject/AboutDesktop.vue"
-import CustomSettings from "./inject/CustomSettings.vue"
-import { UpdateAvailable } from "^/type/common"
+import { watch, ref, onUnmounted, computed } from "vue";
+import { useRouter } from "vue-router";
+import AboutDesktop from "./inject/AboutDesktop.vue";
+import CustomSettings from "./inject/CustomSettings.vue";
+import { UpdateAvailable } from "~type/common";
 
-const webviewRef = ref<WebviewTag>()
+const webviewRef = ref<WebviewTag>();
 
-const router = useRouter()
-const query = router.currentRoute.value.query
-const dirname = query.dirname as string
-const preloadPath = dirname + "/injectPreload.js"
-const preloadUrl = new URL(preloadPath, "file://").toString()
+const router = useRouter();
+const query = router.currentRoute.value.query;
+const dirname = query.dirname as string;
+const preloadPath = dirname + "/injectPreload.js";
+const preloadUrl = new URL(preloadPath, "file://").toString();
 
-const isMuted = ref(query.muted === "true")
+const isMuted = ref(query.muted === "true");
 const updateAvailable = ref<
   { tag_name: string; html_url: string } | false | null
->(null)
+>(null);
 
-watch(webviewRef, async (webview) => {
+watch(webviewRef, (webview) => {
   if (webview) {
     if (import.meta.env.DEV) {
       webview.addEventListener("dom-ready", () => {
-        webview.openDevTools()
-        webviewWithDevTools = webview
-      })
+        webview.openDevTools();
+        webviewWithDevTools = webview;
+      });
     }
     webview.addEventListener("dom-ready", () => {
-      window.electron.send("setup-webview", webview.getWebContentsId())
-      window.electron.send("get-update-available", null)
-      webview.setAudioMuted(isMuted.value)
-    })
+      window.electron.send("setup-webview", webview.getWebContentsId());
+      window.electron.send("get-update-available", null);
+      webview.setAudioMuted(isMuted.value);
+    });
   }
-})
+});
 
 watch(isMuted, (value) => {
   if (webviewRef.value) {
-    webviewRef.value.setAudioMuted(value)
+    webviewRef.value.setAudioMuted(value);
   }
-})
+});
 
 window.electron.receive("set-muted", (value: boolean) => {
-  isMuted.value = value
-})
+  isMuted.value = value;
+});
 for (const channel of [
   "set-favorite",
   "set-rotating",
@@ -54,42 +54,40 @@ for (const channel of [
 ]) {
   window.electron.receive(channel, (...args: unknown[]) => {
     if (webviewRef.value) {
-      webviewRef.value.send(channel, ...args)
+      void webviewRef.value.send(channel, ...args);
     }
-  })
+  });
 }
 
 window.electron.receive("update-available", (value: UpdateAvailable) => {
-  updateAvailable.value = value
-  webviewRef.value?.send("information", value)
-})
+  updateAvailable.value = value;
+  void webviewRef.value?.send("information", value);
+});
 
-window.electron.send("set-muted", isMuted.value)
+window.electron.send("set-muted", isMuted.value);
 
-let webviewWithDevTools: WebviewTag | null = null
+let webviewWithDevTools: WebviewTag | null = null;
 onUnmounted(() => {
-  try {
-    webviewWithDevTools?.closeDevTools()
-  } catch {}
-})
+  webviewWithDevTools?.closeDevTools();
+});
 
 const isPopupOpen = computed(() => {
-  return isSettingOpen.value || isAboutOpen.value
-})
-const isSettingOpen = ref(false)
-const isAboutOpen = ref(false)
+  return isSettingOpen.value || isAboutOpen.value;
+});
+const isSettingOpen = ref(false);
+const isAboutOpen = ref(false);
 const closePopup = () => {
-  isSettingOpen.value = false
-  isAboutOpen.value = false
-}
+  isSettingOpen.value = false;
+  isAboutOpen.value = false;
+};
 
 window.electron.receive("open-settings", () => {
-  isSettingOpen.value = true
-})
+  isSettingOpen.value = true;
+});
 
 window.electron.receive("open-about", () => {
-  isAboutOpen.value = true
-})
+  isAboutOpen.value = true;
+});
 </script>
 
 <template>

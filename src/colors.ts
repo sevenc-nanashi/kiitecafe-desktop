@@ -24,6 +24,6 @@ const colors = [
     label: "アクセント",
     name: "accent",
   },
-] as const
+] as const;
 
-export default colors
+export default colors;

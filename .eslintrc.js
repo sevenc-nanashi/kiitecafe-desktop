@@ -26,4 +26,4 @@ module.exports = {
     "no-control-regex": "off",
     "import/order": "error",
   },
-}
+};
