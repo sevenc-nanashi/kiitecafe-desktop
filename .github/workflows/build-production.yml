@@ -56,6 +56,7 @@ jobs:
 
   build-electron:
     strategy:
+      fail-fast: false
       matrix:
         name:
           - windows
@@ -100,6 +101,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pip3 install setuptools
           pnpm i
 
       - name: Download artifact
@@ -211,7 +213,7 @@ jobs:
           sudo xattr -d com.apple.quarantine "/Applications/Kiite Cafe Desktop.app"
           \`\`\`
 
-          > **Warning**
+          > [!WARNING]
           > 開発者がMacの実機を持っていないため、記述が間違っている場合があります。
 
           ----
