@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+
+const { ossign } = require("@ossign/electronbuilder");
 /**
  * @type {import('electron-builder').Configuration}
  */
@@ -18,6 +21,7 @@ module.exports = {
   win: {
     target: ["nsis", "portable"],
     icon: "public/icon.ico",
+    sign: process.env.OSSIGN_CONFIG ? ossign : undefined,
   },
   nsis: {
     oneClick: false,

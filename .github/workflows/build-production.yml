@@ -55,32 +55,30 @@ jobs:
           path: dist
 
   build-electron:
+    environment: OSSign
     strategy:
       fail-fast: false
       matrix:
         name:
           - windows
-          - mac-x64
-          - mac-arm64
-          - linux
+#          - mac-x64
+#          - mac-arm64
+#          - linux
         include:
           - os: windows-latest
             path: dist-electron/*.exe
             build-args: ""
             name: windows
-          - os: macos-latest
-            path: dist-electron/*.dmg
-            build-args: "--x64"
-            name: mac-x64
-            ext: x64
-          - os: macos-latest
-            path: dist-electron/*.dmg
-            build-args: "--arm64"
-            name: mac-arm64
-          - os: ubuntu-latest
-            path: dist-electron/*.AppImage
-            build-args: ""
-            name: linux
+#          - os: macos-latest
+#            path: dist-electron/*.dmg
+#            build-args: "--x64"
+#            name: mac-x64
+#            ext: x64
+#          - os: macos-latest
+#            path: dist-electron/*.dmg
+#            build-args: "--arm64"
+#            name: mac-arm64
+
 
     runs-on: ${{ matrix.os }}
     needs:
@@ -122,7 +120,15 @@ jobs:
           node update-version.js $VERSION
           echo Version: $VERSION
 
+      - name: Install OSSign
+        uses: ossign/actions/setup-ossign@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ossignConfig: ""
+
       - name: Build electron
+        env:
+          OSSIGN_CONFIG: ${{ secrets.OSSIGN_CONFIG }}
         run: |
           # TODO: https://github.com/electron-userland/electron-builder/issues/6933 が直ったら修正
           # pnpm build:electron ${{ matrix.build-args }}
@@ -145,6 +151,10 @@ jobs:
   release:
     name: Upload release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     needs:
       - build-electron
 
