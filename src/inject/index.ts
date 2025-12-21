@@ -317,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   setInterval(() => {
     const users = parseInt(
-      document.querySelector("#user_count .val")!.textContent!
+      document.querySelector("#user_count .val")!.textContent
     );
     const rotates = document.querySelectorAll(".user.gesture_rotate").length;
     const newFavs = document.querySelectorAll(".user.new_fav").length;
@@ -389,10 +389,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ) / 100,
       favorited: !!document.querySelector(".favorite.is_faved"),
       favoriteCount: parseInt(
-        document.querySelector(".favorite .value")!.textContent!.trim()
+        document.querySelector(".favorite .value")!.textContent.trim()
       ),
       volume: parseInt(
-        document.querySelector(".volume .value")!.textContent!.trim()
+        document.querySelector(".volume .value")!.textContent.trim()
       ),
       reason:
         cafeMusic().reason.reasons.find(
