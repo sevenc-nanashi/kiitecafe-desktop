@@ -29,6 +29,9 @@ importers:
       '@fortawesome/vue-fontawesome':
         specifier: ^3.1.2
         version: 3.1.2(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.26(typescript@5.9.3))
+      '@ossign/electronbuilder':
+        specifier: ^1.0.1
+        version: 1.0.1
       bufferutil:
         specifier: ^4.1.0
         version: 4.1.0
@@ -543,6 +546,9 @@ packages:
     resolution: {integrity: sha512-mJd2Z5TjYWq/ttPLLGqArdtnC74J6bOzg4rMDnN+p1xTacZ2yPRCk2y0oSWQtygLR9YVQXgOcONrwtnk3JupxQ==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
     deprecated: This functionality has been moved to @npmcli/fs
+
+  '@ossign/electronbuilder@1.0.1':
+    resolution: {integrity: sha512-KqvVVpEBQeMthpt/l+sDUG3+uDjf9JZvWMLBixNc887N+qPAjbHPU1z8KDZMBaGaNtsg40LBT1/MhwwqCvIsEw==}
 
   '@parcel/watcher-android-arm64@2.5.1':
     resolution: {integrity: sha512-KF8+j9nNbUN8vzOFDpRMsaKBHZ/mcjEjMToVMJOhTozkDonQFFrRcfdLWn6yWKCmJKmdVxSgHiYvTCef4/qcBA==}
@@ -3876,6 +3882,8 @@ snapshots:
     dependencies:
       mkdirp: 1.0.4
       rimraf: 3.0.2
+
+  '@ossign/electronbuilder@1.0.1': {}
 
   '@parcel/watcher-android-arm64@2.5.1':
     optional: true

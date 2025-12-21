@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 const { ossign } = require("@ossign/electronbuilder");
+
 /**
  * @type {import('electron-builder').Configuration}
  */
