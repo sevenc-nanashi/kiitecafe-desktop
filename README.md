@@ -1,5 +1,6 @@
 # Kiite Cafe Desktop
-[![GitHub release](https://img.shields.io/github/v/release/sevenc-nanashi/kiitecafe-desktop?label=Release)](https://github.com/sevenc-nanashi/kiitecafe-desktop/releases/latest)  
+
+[![GitHub release](https://img.shields.io/github/v/release/sevenc-nanashi/kiitecafe-desktop?label=Release)](https://github.com/sevenc-nanashi/kiitecafe-desktop/releases/latest)
 
 Kiite Cafeのデスクトップアプリ版です。
 
@@ -15,7 +16,10 @@ Kiite Cafeのデスクトップアプリ版です。
 - 動画フリーズ（動画だけ止まった状態）時の自動復帰
 - UIカスタマイズ
 
+## 謝辞
+
+Windows版では[OSSign](https://ossign.org)による署名を使用しています。
+
 ## ライセンス
 
 GPLv3でライセンスされています。
-
