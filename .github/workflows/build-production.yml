@@ -170,23 +170,23 @@ jobs:
           name: windows-electron-built
           path: dist
 
-      # - name: Download macos x64 binary
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: mac-x64-electron-built
-      #     path: dist
+      - name: Download macos x64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-x64-electron-built
+          path: dist
 
-      # - name: Download macos arm64 binary
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: mac-arm64-electron-built
-      #     path: dist
+      - name: Download macos arm64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-arm64-electron-built
+          path: dist
 
-      # - name: Download linux binary
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: linux-electron-built
-      #     path: dist
+      - name: Download linux binary
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-electron-built
+          path: dist
 
       - name: Setup resources
         id: version

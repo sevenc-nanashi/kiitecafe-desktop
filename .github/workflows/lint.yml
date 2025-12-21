@@ -1,0 +1,30 @@
+name: "Run ESLint"
+
+on:
+  push:
+
+jobs:
+  lint:
+    name: "Run ESLint"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install dependencies
+        run: |
+          pnpm i
+
+      - name: Run Lint
+        run: |
+          pnpm lint
